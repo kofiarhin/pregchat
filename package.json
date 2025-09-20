@@ -1,0 +1,31 @@
+{
+  "name": "pregchat",
+  "version": "1.0.0",
+  "description": "Pregnancy Wellness Chatbot with MERN stack",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "concurrently \"npm run start:server\" \"npm run start:client\"",
+    "start:server": "cd server && nodemon server.js",
+    "start:client": "cd client && vite --port 5000",
+    "test:server": "cd server && jest --runInBand",
+    "test:client": "cd client && vitest"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.0",
+    "nodemon": "^3.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "vitest": "^1.0.0"
+  },
+  "keywords": [
+    "pregnancy",
+    "chatbot",
+    "mern",
+    "groq"
+  ],
+  "author": "",
+  "license": "ISC"
+}
