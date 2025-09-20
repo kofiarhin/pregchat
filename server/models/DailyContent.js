@@ -42,7 +42,4 @@ const dailyContentSchema = new mongoose.Schema(
   }
 );
 
-// Index on day for fast lookups
-dailyContentSchema.index({ day: 1 });
-
 module.exports = mongoose.model("DailyContent", dailyContentSchema);

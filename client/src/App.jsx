@@ -8,6 +8,7 @@ import ChatBox from "./components/ChatBox/ChatBox";
 import { useGetToday } from "./hooks/usePregnancyQuery";
 import Welcome from "./pages/Welcome";
 import Chat from "./pages/Chat";
+import Footer from "./components/Footer/Footer";
 
 const App = () => {
   const { user, token } = useAppSelector((state) => state.auth);
@@ -54,6 +55,7 @@ const App = () => {
           <Route path="/chat" element={<Chat />} />
           <Route path="/welcome" element={<Welcome />} />
         </Routes>
+        <Footer />
       </div>
     </BrowserRouter>
   );
