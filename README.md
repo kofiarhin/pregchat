@@ -4,7 +4,7 @@ A comprehensive pregnancy wellness chatbot that provides personalized support, d
 
 ## 🌟 Live Demo
 
-Experience PregChat live: [https://pregchat-7b9avnnvw-kofi-arhins-projects.vercel.app/chat](https://pregchat-7b9avnnvw-kofi-arhins-projects.vercel.app/chat)
+Experience PregChat live: [https://pregchat-7b9avnnvw-kofi-arhins-projects.vercel.app](https://pregchat-7b9avnnvw-kofi-arhins-projects.vercel.app)
 
 ## ✨ Features
 
