@@ -133,10 +133,10 @@ const ChatBox = () => {
 
   return (
     <div className={`container ${mode}`}>
-      <div className="chat_title">
+      {/* <div className="chat_title">
         <span className="brand">Aya</span>
         <span className="model">Pregnancy 2.5</span>
-      </div>
+      </div> */}
 
       <main className="messages" ref={messagesRef} onScroll={handleScroll}>
         {chatHistory.length === 0 && (
