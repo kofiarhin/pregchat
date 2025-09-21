@@ -14,10 +14,6 @@ import "./chatBox.styles.scss";
 
 const ChatBox = () => {
   const [message, setMessage] = useState("");
-  const [dark, setDark] = useState(() => {
-    const saved = localStorage.getItem("aya_theme");
-    return saved ? saved === "dark" : true;
-  });
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   // Typewriter state
@@ -31,6 +27,7 @@ const ChatBox = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const { dayIndex } = useAppSelector((s) => s.pregnancy);
+  const { mode } = useAppSelector((s) => s.theme);
   const { chatHistory, isTyping, typingMsgId } = useAppSelector((s) => s.chat);
   const askMutation = useAsk();
 
@@ -41,10 +38,6 @@ const ChatBox = () => {
       block: "nearest",
     });
   }, [chatHistory, isTyping, typingText]);
-
-  useEffect(() => {
-    localStorage.setItem("aya_theme", dark ? "dark" : "light");
-  }, [dark]);
 
   useEffect(() => {
     return () => {
@@ -139,29 +132,11 @@ const ChatBox = () => {
   const fill = (v) => setMessage(v);
 
   return (
-    <div className={`container ${dark ? "dark" : "light"}`}>
-      <header className="topbar">
-        <button className="menu" type="button" aria-label="Menu">
-          <span />
-          <span />
-          <span />
-        </button>
-        <div className="title">
-          <span className="brand">Aya</span>
-          <span className="model">Pregnancy 2.5</span>
-        </div>
-        <div className="actions">
-          <button
-            className="toggle"
-            type="button"
-            onClick={() => setDark((v) => !v)}
-            aria-label="Toggle theme"
-          >
-            {dark ? "🌞" : "🌙"}
-          </button>
-          <div className="avatar">{user?.name?.[0]?.toUpperCase() || "A"}</div>
-        </div>
-      </header>
+    <div className={`container ${mode}`}>
+      <div className="chat_title">
+        <span className="brand">Aya</span>
+        <span className="model">Pregnancy 2.5</span>
+      </div>
 
       <main className="messages" ref={messagesRef} onScroll={handleScroll}>
         {chatHistory.length === 0 && (

@@ -4,6 +4,7 @@ import authReducer from "./slices/authSlice";
 import pregnancyReducer from "./slices/pregnancySlice";
 import uiReducer from "./slices/uiSlice";
 import chatReducer from "./slices/chatSlice";
+import themeReducer from "./slices/themeSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     pregnancy: pregnancyReducer,
     ui: uiReducer,
     chat: chatReducer,
+    theme: themeReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../store/store";
 import { logout } from "../../store/slices/authSlice";
+import { toggleTheme } from "../../store/slices/themeSlice";
 import "./header.styles.scss";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
+  const { mode } = useAppSelector((s) => s.theme);
   const dispatch = useAppDispatch();
 
   const handleLogout = () => {
@@ -36,7 +38,17 @@ const Header = () => {
           <span className="model">Pregnancy 2.5</span>
         </div>
 
-        <div className="avatar">{user?.name?.[0]?.toUpperCase() || "P"}</div>
+        <div className="actions">
+          <button
+            className="theme_btn"
+            type="button"
+            onClick={() => dispatch(toggleTheme())}
+            aria-label="Toggle theme"
+          >
+            {mode === "dark" ? "🌞" : "🌙"}
+          </button>
+          <div className="avatar">{user?.name?.[0]?.toUpperCase() || "P"}</div>
+        </div>
       </div>
 
       {/* Drawer navigation */}

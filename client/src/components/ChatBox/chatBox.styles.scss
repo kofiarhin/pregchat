@@ -48,76 +48,29 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* --- TOP BAR --- */
-.topbar {
-  height: 52px;
-  display: grid;
-  grid-template-columns: 48px 1fr auto;
+/* --- CHAT TITLE --- */
+.chat_title {
+  display: inline-flex;
   align-items: center;
-  padding: 0 8px;
-  position: sticky;
-  top: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.18), transparent);
-  backdrop-filter: blur(8px);
-  z-index: 2;
-}
-
-.menu {
-  width: 36px;
-  height: 36px;
-  border: 0;
-  background: transparent;
-  display: grid;
-  place-items: center;
-
-  span {
-    display: block;
-    width: 18px;
-    height: 2px;
-    background: #777;
-    border-radius: 2px;
-    margin: 3px 0;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+  margin: 8px 0 4px;
+  .brand {
+    font-weight: 600;
   }
-}
-
-.title {
-  text-align: center;
-  font-weight: 600;
-}
-
-.model {
-  font-size: 12px;
-  margin-left: 6px;
-  color: var(--muted);
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.toggle {
-  background: transparent;
-  border: 0;
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--assistant);
-  display: grid;
-  place-items: center;
-  font-weight: 700;
+  .model {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #1a1a1a;
+    color: #cfcfcf;
+    border: 1px solid #262626;
+  }
 }
 
 /* --- MESSAGES --- */
 .messages {
-  height: calc(100dvh - 52px);
   overflow-y: auto;
   padding: 12px 12px 140px; /* space for composer */
   scroll-behavior: smooth;

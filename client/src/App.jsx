@@ -13,13 +13,14 @@ import Footer from "./components/Footer/Footer";
 const App = () => {
   const { user, token } = useAppSelector((state) => state.auth);
   const { dayIndex } = useAppSelector((state) => state.pregnancy);
+  const { mode } = useAppSelector((s) => s.theme);
   const { data: userData, isLoading: userLoading } = useMe();
   const { data: todayData, isLoading: todayLoading } = useGetToday();
 
   // Show loading state
   if (userLoading) {
     return (
-      <div className="app">
+      <div className={`app ${mode}`}>
         <div
           style={{
             display: "flex",
@@ -40,7 +41,7 @@ const App = () => {
   // Show login/register if not authenticated
   if (!token || !user) {
     return (
-      <div className="app">
+      <div className={`app ${mode}`}>
         <AuthScreen />
       </div>
     );
@@ -48,7 +49,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <div className="app">
+      <div className={`app ${mode}`}>
         <Header />
         <Routes>
           <Route path="/" element={<Navigate to="/chat" replace />} />

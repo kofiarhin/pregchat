@@ -21,7 +21,7 @@
 .topbar {
   height: 56px;
   display: grid;
-  grid-template-columns: 56px 1fr 56px;
+  grid-template-columns: 56px 1fr auto;
   align-items: center;
   padding: 0 8px;
   background: linear-gradient(
@@ -78,12 +78,26 @@
   border: 1px solid #262626;
 }
 
-/* Right avatar */
-.avatar {
+/* Right actions */
+.actions {
   justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.theme_btn {
+  background: transparent;
+  border: 0;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+}
+
+.avatar {
   width: 32px;
   height: 32px;
-  margin-right: 6px;
   border-radius: 50%;
   background: #222;
   color: #ddd;
