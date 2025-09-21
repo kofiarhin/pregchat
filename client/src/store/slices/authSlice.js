@@ -1,8 +1,30 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const loadUser = () => {
+  try {
+    const saved = localStorage.getItem("user");
+    return saved ? JSON.parse(saved) : null;
+  } catch (error) {
+    console.error("Error loading user:", error);
+    return null;
+  }
+};
+
+const saveUser = (user) => {
+  try {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  } catch (error) {
+    console.error("Error saving user:", error);
+  }
+};
+
 const initialState = {
   token: localStorage.getItem("token") || null,
-  user: null,
+  user: loadUser(),
   loading: false,
   error: null,
 };
@@ -20,6 +42,7 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.user = action.payload.user;
       localStorage.setItem("token", action.payload.token);
+      saveUser(action.payload.user);
     },
     loginFailure: (state, action) => {
       state.loading = false;
@@ -29,6 +52,7 @@ const authSlice = createSlice({
       state.token = null;
       state.user = null;
       localStorage.removeItem("token");
+      saveUser(null);
     },
     setUser: (state, action) => {
       state.user = action.payload;

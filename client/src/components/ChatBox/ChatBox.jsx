@@ -1,13 +1,19 @@
 // ChatBox.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useAsk } from "../../hooks/useChat";
-import { useAppSelector } from "../../store/store";
+import { useAppSelector, useAppDispatch } from "../../store/store";
+import {
+  addUserMessage,
+  addAssistantMessage,
+  addTriageMessage,
+  addErrorMessage,
+  setTyping,
+  setTypingMsgId,
+} from "../../store/slices/chatSlice";
 import "./chatBox.styles.scss";
 
 const ChatBox = () => {
   const [message, setMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState([]);
-  const [isTyping, setIsTyping] = useState(false); // network request in-flight
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem("aya_theme");
     return saved ? saved === "dark" : true;
@@ -15,7 +21,6 @@ const ChatBox = () => {
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   // Typewriter state
-  const [typingMsgId, setTypingMsgId] = useState(null);
   const [typingText, setTypingText] = useState("");
   const typeIntervalRef = useRef(null);
 
@@ -23,8 +28,10 @@ const ChatBox = () => {
   const endRef = useRef(null);
   const lastMsgRef = useRef(null);
 
+  const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const { dayIndex } = useAppSelector((s) => s.pregnancy);
+  const { chatHistory, isTyping, typingMsgId } = useAppSelector((s) => s.chat);
   const askMutation = useAsk();
 
   useEffect(() => {
@@ -80,7 +87,7 @@ const ChatBox = () => {
       if (i >= full.length) {
         clearInterval(typeIntervalRef.current);
         typeIntervalRef.current = null;
-        setTypingMsgId(null);
+        dispatch(setTypingMsgId(null));
       }
     }, step);
   }, [typingMsgId, chatHistory]);
@@ -91,12 +98,9 @@ const ChatBox = () => {
 
     const text = message.trim();
     setMessage("");
-    setIsTyping(true);
+    dispatch(setTyping(true));
 
-    setChatHistory((prev) => [
-      ...prev,
-      { id: Date.now(), type: "user", content: text, timestamp: new Date() },
-    ]);
+    dispatch(addUserMessage(text));
 
     try {
       const dayData = dayIndex
@@ -109,51 +113,24 @@ const ChatBox = () => {
         stream: false,
       });
 
-      const newMsg = res.triage
-        ? {
-            id: Date.now() + 1,
-            type: "triage",
-            content: res.message,
-            timestamp: new Date(),
-          }
-        : {
-            id: Date.now() + 1,
-            type: "assistant",
-            content: res.content,
-            timestamp: new Date(),
-          };
-
-      setChatHistory((prev) => [...prev, newMsg]);
-
-      if (!res.triage) {
-        setTypingMsgId(newMsg.id);
-        setTypingText("");
+      if (res.triage) {
+        dispatch(addTriageMessage(res.message));
       } else {
-        if (typeIntervalRef.current) {
-          clearInterval(typeIntervalRef.current);
-          typeIntervalRef.current = null;
-        }
-        setTypingMsgId(null);
+        dispatch(addAssistantMessage(res.content));
         setTypingText("");
       }
     } catch {
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          id: Date.now() + 1,
-          type: "error",
-          content: "Sorry, I encountered an error. Please try again.",
-          timestamp: new Date(),
-        },
-      ]);
+      dispatch(
+        addErrorMessage("Sorry, I encountered an error. Please try again.")
+      );
       if (typeIntervalRef.current) {
         clearInterval(typeIntervalRef.current);
         typeIntervalRef.current = null;
       }
-      setTypingMsgId(null);
+      dispatch(setTypingMsgId(null));
       setTypingText("");
     } finally {
-      setIsTyping(false);
+      dispatch(setTyping(false));
     }
   };
 
@@ -243,7 +220,7 @@ const ChatBox = () => {
                   {isAnimating && <span className="caret" />}
                 </p>
               </div>
-              <time className="time">{t(m.timestamp)}</time>
+              <time className="time">{t(new Date(m.timestamp))}</time>
             </div>
           );
         })}
