@@ -83,7 +83,7 @@ const ChatBox = () => {
         dispatch(setTypingMsgId(null));
       }
     }, step);
-  }, [typingMsgId, chatHistory]);
+  }, [typingMsgId, chatHistory, dispatch]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -127,9 +127,9 @@ const ChatBox = () => {
     }
   };
 
-  const t = (d) =>
-    d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  const fill = (v) => setMessage(v);
+  const formatTime = (date) =>
+    date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const selectQuickPrompt = (value) => setMessage(value);
 
   return (
     <div className={`container ${mode}`}>
@@ -148,7 +148,7 @@ const ChatBox = () => {
               <button
                 className="chip"
                 onClick={() =>
-                  fill(
+                  selectQuickPrompt(
                     `What should I know today about week ${
                       dayIndex ? Math.ceil(dayIndex / 7) : "X"
                     }?`
@@ -160,14 +160,16 @@ const ChatBox = () => {
               <button
                 className="chip"
                 onClick={() =>
-                  fill("Give me a quick wellness checklist for today.")
+                  selectQuickPrompt("Give me a quick wellness checklist for today.")
                 }
               >
                 Save me time
               </button>
               <button
                 className="chip"
-                onClick={() => fill("What can you do for pregnancy support?")}
+                onClick={() =>
+                  selectQuickPrompt("What can you do for pregnancy support?")
+                }
               >
                 What you can do
               </button>
@@ -188,14 +190,14 @@ const ChatBox = () => {
             >
               <div className={`body ${isAnimating ? "typewriter" : ""}`}>
                 {m.type === "triage" && (
-                  <div className="flag">⚠️ Important</div>
+                  <div className="flag">Important</div>
                 )}
                 <p>
                   {displayText}
                   {isAnimating && <span className="caret" />}
                 </p>
               </div>
-              <time className="time">{t(new Date(m.timestamp))}</time>
+              <time className="time">{formatTime(new Date(m.timestamp))}</time>
             </div>
           );
         })}
@@ -219,7 +221,7 @@ const ChatBox = () => {
         onClick={scrollToBottom}
         aria-label="Scroll to latest"
       >
-        ↓
+        Scroll
       </button>
 
       <form className="composer" onSubmit={submit}>
@@ -230,7 +232,7 @@ const ChatBox = () => {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Ask Aya about your pregnancy…"
+              placeholder="Ask Aya about your pregnancy..."
               disabled={isTyping}
             />
             <button
@@ -238,7 +240,7 @@ const ChatBox = () => {
               type="submit"
               disabled={!message.trim() || isTyping}
             >
-              {isTyping ? "…" : "➤"}
+              {isTyping ? "..." : "Send"}
             </button>
           </div>
         </div>

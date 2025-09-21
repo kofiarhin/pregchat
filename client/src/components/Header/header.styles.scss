@@ -13,6 +13,7 @@
 
 .header {
   position: sticky;
+  padding: 1rem;
   top: 0;
   z-index: 20;
 }
@@ -23,36 +24,17 @@
   display: grid;
   grid-template-columns: 56px 1fr auto;
   align-items: center;
-  padding: 0 8px;
-  background: linear-gradient(
-    to bottom,
-    rgba(15, 15, 15, 0.95),
-    rgba(15, 15, 15, 0.65) 70%,
-    rgba(15, 15, 15, 0)
-  );
   color: var(--text);
-  backdrop-filter: blur(8px);
 }
 
 /* Hamburger */
 .menu_btn {
-  width: 40px;
-  height: 40px;
-  margin-left: 4px;
-  display: grid;
-  place-items: center;
-  border: 0;
+  border: none;
+  .icon {
+    font-size: 2rem;
+  }
   background: transparent;
   cursor: pointer;
-
-  span {
-    display: block;
-    width: 20px;
-    height: 2px;
-    background: #8a8a8a;
-    border-radius: 2px;
-    margin: 3px 0;
-  }
 }
 
 /* Center brand + pill */
@@ -93,18 +75,25 @@
   line-height: 1;
   cursor: pointer;
   color: inherit;
+  font-size: 1.2rem;
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: #222;
   color: #ddd;
   display: grid;
   place-items: center;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 1rem;
+  margin-left: 1rem;
+  cursor: pointer;
+  transition: all ease-in-out-300ms;
+  &:hover {
+    transform: scale(1.08);
+  }
 }
 
 /* Drawer + overlay */

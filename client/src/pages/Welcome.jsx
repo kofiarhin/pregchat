@@ -40,7 +40,7 @@ const Welcome = () => {
         {user && (
           <div style={{ marginBottom: "2rem" }}>
             <p style={{ fontSize: "1.1rem" }}>
-              👋 Hi {user.name}! I'm Aya, your pregnancy guide.
+              Hi {user.name}! I'm Aya, your pregnancy guide.
             </p>
             <p>Ask me anything about your pregnancy wellness journey!</p>
           </div>

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../store/store";
 import { logout } from "../../store/slices/authSlice";
 import { toggleTheme } from "../../store/slices/themeSlice";
 import "./header.styles.scss";
+import { FaBars } from "react-icons/fa";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,6 +19,7 @@ const Header = () => {
 
   const toggleMenu = () => setMenuOpen((v) => !v);
   const closeMenu = () => setMenuOpen(false);
+  const themeLabel = mode === "dark" ? "Light" : "Dark";
 
   return (
     <header className="header">
@@ -28,14 +30,12 @@ const Header = () => {
           aria-label="Open menu"
           aria-expanded={menuOpen}
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          <FaBars className="icon" />
         </button>
 
         <div className="brand_wrap">
           <span className="brand">PregChat</span>
-          <span className="model">Pregnancy 2.5</span>
+          <span className="model">alpha</span>
         </div>
 
         <div className="actions">
@@ -45,13 +45,12 @@ const Header = () => {
             onClick={() => dispatch(toggleTheme())}
             aria-label="Toggle theme"
           >
-            {mode === "dark" ? "🌞" : "🌙"}
+            {themeLabel}
           </button>
           <div className="avatar">{user?.name?.[0]?.toUpperCase() || "P"}</div>
         </div>
       </div>
 
-      {/* Drawer navigation */}
       <div
         className={`overlay ${menuOpen ? "show" : ""}`}
         onClick={closeMenu}
@@ -64,7 +63,7 @@ const Header = () => {
             onClick={closeMenu}
             aria-label="Close menu"
           >
-            ×
+            Close
           </button>
         </div>
         <ul className="nav_list">
