@@ -9,29 +9,29 @@ const adminRoutes = require("./routes/adminRoutes");
 const onboardingRoutes = require("./routes/onboarding.routes");
 const errorHandler = require("./middleware/error");
 
+const corsOptions = {
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
 const createApp = () => {
   const app = express();
 
   app.set("trust proxy", 1);
 
+  app.use(cors(corsOptions));
+  app.options("*", cors(corsOptions));
+
   const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 300,
     keyGenerator: (req) => req.ip,
     standardHeaders: true,
     legacyHeaders: false,
   });
 
   app.use(limiter);
-
-  app.use(
-    cors({
-      origin: "*",
-      methods: "GET,POST,PUT,DELETE,OPTIONS",
-      allowedHeaders: "Content-Type,Authorization",
-      credentials: true,
-    })
-  );
-
-  app.options("*", cors());
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true }));
 
