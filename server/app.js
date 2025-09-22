@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 
 const authRoutes = require("./routes/authRoutes");
 const chatRoutes = require("./routes/chatRoutes");
@@ -11,12 +12,26 @@ const errorHandler = require("./middleware/error");
 const createApp = () => {
   const app = express();
 
+  app.set("trust proxy", 1);
+
+  const limiter = rateLimit({
+    keyGenerator: (req) => req.ip,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  app.use(limiter);
+
   app.use(
     cors({
-      origin: true,
+      origin: "*",
+      methods: "GET,POST,PUT,DELETE,OPTIONS",
+      allowedHeaders: "Content-Type,Authorization",
       credentials: true,
     })
   );
+
+  app.options("*", cors());
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true }));
 
