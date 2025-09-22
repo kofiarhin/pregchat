@@ -1,0 +1,123 @@
+.onboarding_page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: radial-gradient(circle at top, #151515 0%, #080808 55%, #020202 100%);
+}
+
+.onboarding_card {
+  width: 100%;
+  max-width: 640px;
+  background: rgba(12, 12, 12, 0.92);
+  border: 1px solid #1f1f1f;
+  border-radius: 1rem;
+  padding: 2.5rem;
+  color: #f3f4ff;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+}
+
+.onboarding_header {
+  margin-bottom: 2rem;
+}
+
+.onboarding_title {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.onboarding_subtitle {
+  font-size: 1.1rem;
+  color: #b5b9c9;
+}
+
+.onboarding_form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.onboarding_field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.onboarding_label {
+  font-weight: 600;
+  color: #e6e8f1;
+}
+
+.onboarding_input,
+.onboarding_select,
+.onboarding_textarea {
+  padding: 0.75rem 1rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(76, 139, 245, 0.25);
+  background: rgba(21, 21, 21, 0.9);
+  color: #f3f4ff;
+  font-size: 1rem;
+}
+
+.onboarding_textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.onboarding_radio_group {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.onboarding_radio_option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: #e6e8f1;
+}
+
+.onboarding_error {
+  color: #ff6b81;
+  font-size: 0.875rem;
+}
+
+.onboarding_submit {
+  margin-top: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #4c8bf5 0%, #7a5df4 100%);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.onboarding_submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.onboarding_submit:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(76, 139, 245, 0.35);
+}
+
+.onboarding_alert {
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 107, 129, 0.15);
+  border: 1px solid rgba(255, 107, 129, 0.35);
+  color: #ffd8df;
+}
+
+.onboarding_loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 160px;
+  color: #d0d3dc;
+}

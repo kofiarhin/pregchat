@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema(
       default: "UK",
       enum: ["UK", "US", "Global"],
     },
+    onboardingCompletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
