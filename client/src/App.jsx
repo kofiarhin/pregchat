@@ -10,6 +10,7 @@ import Onboarding from "./pages/Onboarding/Onboarding";
 import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
 const App = () => {
   const { user, token } = useAppSelector((state) => state.auth);
@@ -47,22 +48,39 @@ const App = () => {
           <Route
             path="/"
             element={
-              <Navigate to={isAuthenticated ? "/chat" : "/login"} replace />
+              <Navigate
+                to={isAuthenticated ? "/dashboard" : "/login"}
+                replace
+              />
             }
           />
           <Route
             path="/login"
-            element={isAuthenticated ? <Navigate to="/chat" replace /> : <Login />}
+            element={
+              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+            }
           />
           <Route
             path="/register"
             element={
-              isAuthenticated ? <Navigate to="/chat" replace /> : <Register />
+              isAuthenticated ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Register />
+              )
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />
             }
           />
           <Route
             path="/chat"
-            element={isAuthenticated ? <Chat /> : <Navigate to="/login" replace />}
+            element={
+              isAuthenticated ? <Chat /> : <Navigate to="/login" replace />
+            }
           />
           <Route
             path="/welcome"
@@ -73,7 +91,11 @@ const App = () => {
           <Route
             path="/onboarding"
             element={
-              isAuthenticated ? <Onboarding /> : <Navigate to="/login" replace />
+              isAuthenticated ? (
+                <Onboarding />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
         </Routes>
