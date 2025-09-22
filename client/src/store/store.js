@@ -4,6 +4,8 @@ import authReducer from "./slices/authSlice";
 import pregnancyReducer from "./slices/pregnancySlice";
 import uiReducer from "./slices/uiSlice";
 import chatReducer from "./slices/chatSlice";
+import profileReducer from "./profileSlice";
+import dailyReducer from "./dailySlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +13,8 @@ export const store = configureStore({
     pregnancy: pregnancyReducer,
     ui: uiReducer,
     chat: chatReducer,
+    profile: profileReducer,
+    daily: dailyReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
