@@ -11,7 +11,6 @@ import authReducer from "./store/slices/authSlice";
 import pregnancyReducer from "./store/slices/pregnancySlice";
 import uiReducer from "./store/slices/uiSlice";
 import chatReducer from "./store/slices/chatSlice";
-import themeReducer from "./store/slices/themeSlice";
 
 const loginMutate = vi.fn();
 const registerMutate = vi.fn();
@@ -43,7 +42,6 @@ const createTestStore = (authState) => {
       pregnancy: pregnancyReducer,
       ui: uiReducer,
       chat: chatReducer,
-      theme: themeReducer,
     },
     preloadedState: authState
       ? {

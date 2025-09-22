@@ -2,6 +2,52 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/useAuthQuery";
 
+const loginStyles = {
+  wrapper: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background:
+      "radial-gradient(circle at top, #181818 0%, #090909 55%, #020202 100%)",
+    padding: "1rem",
+  },
+  card: {
+    background: "#141414",
+    border: "1px solid #1f1f1f",
+    padding: "2rem",
+    borderRadius: "1rem",
+    boxShadow: "0 16px 40px rgba(0, 0, 0, 0.55)",
+    width: "100%",
+    maxWidth: "400px",
+  },
+  header: { textAlign: "center", marginBottom: "2rem" },
+  title: { color: "#f5f7ff", marginBottom: "0.5rem" },
+  subtitle: { color: "#a0a5b4", marginBottom: "0.5rem" },
+  field: { marginBottom: "1rem" },
+  label: {
+    display: "block",
+    marginBottom: "0.5rem",
+    fontWeight: "500",
+    color: "#d0d3dc",
+  },
+  error: {
+    background: "#3a1212",
+    color: "#ffd6d6",
+    padding: "0.75rem",
+    borderRadius: "0.25rem",
+    marginBottom: "1rem",
+    fontSize: "0.875rem",
+    border: "1px solid #5b1c1c",
+  },
+  cta: {
+    textAlign: "center",
+    fontSize: "0.875rem",
+    color: "#9aa0a6",
+  },
+  link: { color: "#4c8bf5" },
+};
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -27,45 +73,16 @@ const Login = () => {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        padding: "1rem",
-      }}
-    >
-      <div
-        style={{
-          background: "white",
-          padding: "2rem",
-          borderRadius: "1rem",
-          boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
-          width: "100%",
-          maxWidth: "400px",
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <h1 style={{ color: "#667eea", marginBottom: "0.5rem" }}>
-            Welcome Back
-          </h1>
-          <p style={{ color: "#666", marginBottom: "0.5rem" }}>
-            Sign in to PregChat
-          </p>
+    <div style={loginStyles.wrapper}>
+      <div style={loginStyles.card}>
+        <div style={loginStyles.header}>
+          <h1 style={loginStyles.title}>Welcome Back</h1>
+          <p style={loginStyles.subtitle}>Sign in to PregChat</p>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: "1rem" }}>
-            <label
-              htmlFor="email"
-              style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                fontWeight: "500",
-              }}
-            >
+          <div style={loginStyles.field}>
+            <label htmlFor="email" style={loginStyles.label}>
               Email
             </label>
             <input
@@ -79,15 +96,8 @@ const Login = () => {
             />
           </div>
 
-          <div style={{ marginBottom: "1.5rem" }}>
-            <label
-              htmlFor="password"
-              style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                fontWeight: "500",
-              }}
-            >
+          <div style={{ ...loginStyles.field, marginBottom: "1.5rem" }}>
+            <label htmlFor="password" style={loginStyles.label}>
               Password
             </label>
             <input
@@ -102,16 +112,7 @@ const Login = () => {
           </div>
 
           {loginMutation.isError && (
-            <div
-              style={{
-                background: "#f8d7da",
-                color: "#721c24",
-                padding: "0.75rem",
-                borderRadius: "0.25rem",
-                marginBottom: "1rem",
-                fontSize: "0.875rem",
-              }}
-            >
+            <div style={loginStyles.error}>
               {loginMutation.error?.message}
             </div>
           )}
@@ -126,15 +127,9 @@ const Login = () => {
           </button>
         </form>
 
-        <p
-          style={{
-            textAlign: "center",
-            fontSize: "0.875rem",
-            color: "#555",
-          }}
-        >
+        <p style={loginStyles.cta}>
           Don't have an account? {" "}
-          <Link to="/register" style={{ color: "#667eea" }}>
+          <Link to="/register" style={loginStyles.link}>
             Register
           </Link>
         </p>

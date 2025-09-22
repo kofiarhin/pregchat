@@ -2,6 +2,52 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useRegister } from "../hooks/useAuthQuery";
 
+const registerStyles = {
+  wrapper: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background:
+      "radial-gradient(circle at top, #181818 0%, #090909 55%, #020202 100%)",
+    padding: "1rem",
+  },
+  card: {
+    background: "#141414",
+    border: "1px solid #1f1f1f",
+    padding: "2rem",
+    borderRadius: "1rem",
+    boxShadow: "0 16px 40px rgba(0, 0, 0, 0.55)",
+    width: "100%",
+    maxWidth: "420px",
+  },
+  header: { textAlign: "center", marginBottom: "2rem" },
+  title: { color: "#f5f7ff", marginBottom: "0.5rem" },
+  subtitle: { color: "#a0a5b4", marginBottom: "0.5rem" },
+  field: { marginBottom: "1rem" },
+  label: {
+    display: "block",
+    marginBottom: "0.5rem",
+    fontWeight: "500",
+    color: "#d0d3dc",
+  },
+  error: {
+    background: "#3a1212",
+    color: "#ffd6d6",
+    padding: "0.75rem",
+    borderRadius: "0.25rem",
+    marginBottom: "1rem",
+    fontSize: "0.875rem",
+    border: "1px solid #5b1c1c",
+  },
+  cta: {
+    textAlign: "center",
+    fontSize: "0.875rem",
+    color: "#9aa0a6",
+  },
+  link: { color: "#4c8bf5" },
+};
+
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -26,45 +72,16 @@ const Register = () => {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        padding: "1rem",
-      }}
-    >
-      <div
-        style={{
-          background: "white",
-          padding: "2rem",
-          borderRadius: "1rem",
-          boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
-          width: "100%",
-          maxWidth: "400px",
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <h1 style={{ color: "#667eea", marginBottom: "0.5rem" }}>
-            Create Your Account
-          </h1>
-          <p style={{ color: "#666", marginBottom: "0.5rem" }}>
-            Join PregChat today
-          </p>
+    <div style={registerStyles.wrapper}>
+      <div style={registerStyles.card}>
+        <div style={registerStyles.header}>
+          <h1 style={registerStyles.title}>Create Your Account</h1>
+          <p style={registerStyles.subtitle}>Join PregChat today</p>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: "1rem" }}>
-            <label
-              htmlFor="name"
-              style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                fontWeight: "500",
-              }}
-            >
+          <div style={registerStyles.field}>
+            <label htmlFor="name" style={registerStyles.label}>
               Name
             </label>
             <input
@@ -78,15 +95,8 @@ const Register = () => {
             />
           </div>
 
-          <div style={{ marginBottom: "1rem" }}>
-            <label
-              htmlFor="email"
-              style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                fontWeight: "500",
-              }}
-            >
+          <div style={registerStyles.field}>
+            <label htmlFor="email" style={registerStyles.label}>
               Email
             </label>
             <input
@@ -100,15 +110,8 @@ const Register = () => {
             />
           </div>
 
-          <div style={{ marginBottom: "1rem" }}>
-            <label
-              htmlFor="password"
-              style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                fontWeight: "500",
-              }}
-            >
+          <div style={registerStyles.field}>
+            <label htmlFor="password" style={registerStyles.label}>
               Password
             </label>
             <input
@@ -122,15 +125,8 @@ const Register = () => {
             />
           </div>
 
-          <div style={{ marginBottom: "1.5rem" }}>
-            <label
-              htmlFor="region"
-              style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                fontWeight: "500",
-              }}
-            >
+          <div style={{ ...registerStyles.field, marginBottom: "1.5rem" }}>
+            <label htmlFor="region" style={registerStyles.label}>
               Region
             </label>
             <select
@@ -147,16 +143,7 @@ const Register = () => {
           </div>
 
           {registerMutation.isError && (
-            <div
-              style={{
-                background: "#f8d7da",
-                color: "#721c24",
-                padding: "0.75rem",
-                borderRadius: "0.25rem",
-                marginBottom: "1rem",
-                fontSize: "0.875rem",
-              }}
-            >
+            <div style={registerStyles.error}>
               {registerMutation.error?.message}
             </div>
           )}
@@ -171,15 +158,9 @@ const Register = () => {
           </button>
         </form>
 
-        <p
-          style={{
-            textAlign: "center",
-            fontSize: "0.875rem",
-            color: "#555",
-          }}
-        >
+        <p style={registerStyles.cta}>
           Already have an account? {" "}
-          <Link to="/login" style={{ color: "#667eea" }}>
+          <Link to="/login" style={registerStyles.link}>
             Login
           </Link>
         </p>

@@ -27,7 +27,6 @@ const ChatBox = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const { dayIndex } = useAppSelector((s) => s.pregnancy);
-  const { mode } = useAppSelector((s) => s.theme);
   const { chatHistory, isTyping, typingMsgId } = useAppSelector((s) => s.chat);
   const askMutation = useAsk();
 
@@ -132,7 +131,7 @@ const ChatBox = () => {
   const selectQuickPrompt = (value) => setMessage(value);
 
   return (
-    <div className={`container ${mode}`}>
+    <div className="container dark">
       {/* <div className="chat_title">
         <span className="brand">Aya</span>
         <span className="model">Pregnancy 2.5</span>
