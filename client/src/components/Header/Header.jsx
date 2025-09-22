@@ -2,14 +2,12 @@
 import { NavLink } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../store/store";
 import { logout } from "../../store/slices/authSlice";
-import { toggleTheme } from "../../store/slices/themeSlice";
 import "./header.styles.scss";
 import { FaBars } from "react-icons/fa";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
-  const { mode } = useAppSelector((s) => s.theme);
   const dispatch = useAppDispatch();
 
   const handleLogout = () => {
@@ -19,8 +17,6 @@ const Header = () => {
 
   const toggleMenu = () => setMenuOpen((v) => !v);
   const closeMenu = () => setMenuOpen(false);
-  const themeLabel = mode === "dark" ? "Light" : "Dark";
-
   return (
     <header className="header">
       <div className="topbar">
@@ -39,14 +35,6 @@ const Header = () => {
         </div>
 
         <div className="actions">
-          <button
-            className="theme_btn"
-            type="button"
-            onClick={() => dispatch(toggleTheme())}
-            aria-label="Toggle theme"
-          >
-            {themeLabel}
-          </button>
           <div className="avatar">{user?.name?.[0]?.toUpperCase() || "P"}</div>
         </div>
       </div>

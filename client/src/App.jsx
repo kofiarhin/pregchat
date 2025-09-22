@@ -12,14 +12,13 @@ import Register from "./pages/Register";
 
 const App = () => {
   const { user, token } = useAppSelector((state) => state.auth);
-  const { mode } = useAppSelector((s) => s.theme);
   const { isLoading: userLoading } = useMe();
   useGetToday();
 
   // Show loading state
   if (userLoading) {
     return (
-      <div className={`app ${mode}`}>
+      <div className="app dark">
         <div
           style={{
             display: "flex",
@@ -41,7 +40,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <div className={`app ${mode}`}>
+      <div className="app dark">
         {isAuthenticated && <Header />}
         <Routes>
           <Route
