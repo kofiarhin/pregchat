@@ -10,6 +10,9 @@
     "start:client": "cd client && vite --port 5000",
     "test:server": "cd server && jest --runInBand",
     "test:client": "cd client && vitest",
+    "test:unit": "cd server && jest --config jest.unit.config.js --runInBand",
+    "test:integration": "cd server && jest --config jest.integration.config.js --runInBand",
+    "e2e": "jest --config jest.e2e.config.js --runInBand",
     "install-server": "npm install && cd server && npm install"
   },
   "dependencies": {
@@ -28,6 +31,8 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.4",
+    "playwright": "^1.43.0",
     "supertest": "^6.3.3",
     "vitest": "^1.0.0"
   },
