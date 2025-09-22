@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 2.5rem 0.75rem;
   background: radial-gradient(circle at top, #151515 0%, #080808 55%, #020202 100%);
 }
 
@@ -13,29 +13,41 @@
   background: rgba(12, 12, 12, 0.92);
   border: 1px solid #1f1f1f;
   border-radius: 1rem;
-  padding: 2.5rem;
+  padding: 1rem;
   color: #f3f4ff;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .onboarding_header {
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 65ch;
+  margin-inline: auto;
 }
 
 .onboarding_title {
   font-size: 2.2rem;
-  margin-bottom: 0.5rem;
+  margin: 0;
+  max-width: 65ch;
+  margin-inline: auto;
 }
 
 .onboarding_subtitle {
   font-size: 1.1rem;
   color: #b5b9c9;
+  margin: 0;
 }
 
 .onboarding_form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.75rem;
+  max-width: 65ch;
+  margin-inline: auto;
 }
 
 .onboarding_field {
@@ -67,7 +79,8 @@
 
 .onboarding_radio_group {
   display: flex;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .onboarding_radio_option {
@@ -84,7 +97,7 @@
 }
 
 .onboarding_submit {
-  margin-top: 0.5rem;
+  margin-top: 0;
   padding: 0.85rem 1.5rem;
   border: none;
   border-radius: 0.75rem;
@@ -94,6 +107,7 @@
   font-size: 1rem;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-self: center;
 }
 
 .onboarding_submit:disabled {
@@ -107,17 +121,46 @@
 }
 
 .onboarding_alert {
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   border-radius: 0.75rem;
   background: rgba(255, 107, 129, 0.15);
   border: 1px solid rgba(255, 107, 129, 0.35);
   color: #ffd8df;
+  max-width: 65ch;
+  margin-inline: auto;
 }
 
 .onboarding_loading {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 160px;
   color: #d0d3dc;
+  max-width: 65ch;
+  margin-inline: auto;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .onboarding_page {
+    padding: 3rem 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .onboarding_page {
+    padding: 3.5rem 1.5rem;
+  }
+
+  .onboarding_card {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .onboarding_form {
+    gap: 1rem;
+  }
+
+  .onboarding_radio_group {
+    gap: 1rem;
+  }
 }
