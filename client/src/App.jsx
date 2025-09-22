@@ -5,7 +5,8 @@ import { useMe } from "./hooks/useAuthQuery";
 import { useGetToday } from "./hooks/usePregnancyQuery";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
-import Welcome from "./pages/Welcome";
+import Welcome from "./pages/Welcome/Welcome";
+import Onboarding from "./pages/Onboarding/Onboarding";
 import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -67,6 +68,12 @@ const App = () => {
             path="/welcome"
             element={
               isAuthenticated ? <Welcome /> : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/onboarding"
+            element={
+              isAuthenticated ? <Onboarding /> : <Navigate to="/login" replace />
             }
           />
         </Routes>

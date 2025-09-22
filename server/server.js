@@ -10,6 +10,7 @@ const authRoutes = require("./routes/authRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const updatesRoutes = require("./routes/updatesRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const onboardingRoutes = require("./routes/onboarding.routes");
 
 // Middleware
 const errorHandler = require("./middleware/error");
@@ -41,6 +42,7 @@ app.use("/auth", authRoutes);
 app.use("/chat", chatRoutes);
 app.use("/updates", updatesRoutes);
 app.use("/admin", adminRoutes);
+app.use("/api/onboarding", onboardingRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
