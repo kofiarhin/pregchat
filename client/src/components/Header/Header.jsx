@@ -18,7 +18,7 @@ const Header = () => {
   const toggleMenu = () => setMenuOpen((v) => !v);
   const closeMenu = () => setMenuOpen(false);
   return (
-    <header className="header">
+    <header className="header" role="banner">
       <div className="topbar">
         <button
           className="menu_btn"
