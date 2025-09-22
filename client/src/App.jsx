@@ -116,7 +116,9 @@ const AuthScreen = () => {
         }}
       >
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <h1 style={{ color: "#667eea", marginBottom: "0.5rem" }}>PregChat</h1>
+          <h1 style={{ color: "#667eea", marginBottom: "0.5rem" }}>
+            PregChat (alpha){" "}
+          </h1>
           <p style={{ color: "#666" }}>Your Pregnancy Wellness Guide</p>
         </div>
 
