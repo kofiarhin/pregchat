@@ -115,7 +115,7 @@ const Onboarding = () => {
         isFirstPregnancy: formValues.isFirstPregnancy === "true",
       });
 
-      navigate("/welcome");
+      navigate("/profile");
     } catch (error) {
       setSubmitError(error.message);
     }

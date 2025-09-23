@@ -6,8 +6,8 @@ import { useCart } from "../../context/CartContext.jsx";
 
 const navItems = [
   {
-    id: "welcome",
-    path: "/welcome",
+    id: "profile",
+    path: "/profile",
   },
   {
     id: "dashboard",

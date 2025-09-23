@@ -5,7 +5,7 @@ import { selectAuthToken } from "./store/ui/uiSlice.js";
 import { useCurrentUserQuery } from "./features/auth/hooks/useAuth.js";
 import Header from "./components/Header/Header.jsx";
 import Footer from "./components/Footer/Footer.jsx";
-import Welcome from "./pages/Welcome/Welcome.jsx";
+import Profile from "./pages/Profile.jsx";
 import Onboarding from "./pages/Onboarding/Onboarding.jsx";
 import Chat from "./pages/Chat.jsx";
 import Login from "./pages/Login.jsx";
@@ -192,11 +192,12 @@ const App = () => {
             }
           />
           <Route
-            path="/welcome"
+            path="/profile"
             element={
-              isAuthenticated ? <Welcome /> : <Navigate to="/login" replace />
+              isAuthenticated ? <Profile /> : <Navigate to="/login" replace />
             }
           />
+          <Route path="/welcome" element={<Navigate to="/profile" replace />} />
           <Route
             path="/onboarding"
             element={
