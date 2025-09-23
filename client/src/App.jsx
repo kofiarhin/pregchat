@@ -12,6 +12,10 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import ChatSessionProvider from "./features/chats/context/ChatSessionContext.jsx";
+import Store from "./pages/Store/Store.jsx";
+import ItemDetails from "./pages/ItemDetails/ItemDetails.jsx";
+import Cart from "./pages/Cart/Cart.jsx";
+import Checkout from "./pages/Checkout/Checkout.jsx";
 
 const App = () => {
   const token = useAppSelector(selectAuthToken);
@@ -85,6 +89,38 @@ const App = () => {
             path="/chat"
             element={
               isAuthenticated ? <Chat /> : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/store"
+            element={
+              isAuthenticated ? <Store /> : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/store/:id"
+            element={
+              isAuthenticated ? (
+                <ItemDetails />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              isAuthenticated ? <Cart /> : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              isAuthenticated ? (
+                <Checkout />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
           <Route

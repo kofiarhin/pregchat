@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "title": "Navigation",
+    "close": "Close",
+    "logout": "Logout",
+    "signingOut": "Signing out...",
+    "links": {
+      "welcome": "Welcome",
+      "dashboard": "Dashboard",
+      "chat": "Chat",
+      "store": "Store",
+      "cart": "Cart"
+    }
+  },
+  "store": {
+    "title": "Pregnancy & Baby Store",
+    "subtitle": "Curated essentials for your pregnancy and newborn journey.",
+    "detailsLinkLabel": "View details",
+    "addToCart": "Add to Cart",
+    "addMore": "Add more",
+    "empty": "No items available in the store right now.",
+    "loading": "Loading products...",
+    "error": "We couldn't load products right now. Please try again shortly.",
+    "outOfStock": "Out of stock"
+  },
+  "itemDetails": {
+    "backLink": "Back to Store",
+    "addToCart": "Add to Cart",
+    "addAnother": "Add another",
+    "priceLabel": "Price",
+    "stockLabel": "In stock",
+    "outOfStock": "Out of stock",
+    "loading": "Loading item...",
+    "error": "We couldn't find that item."
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty.",
+    "continueShopping": "Continue shopping",
+    "subtotal": "Subtotal",
+    "checkout": "Proceed to Checkout",
+    "quantity": "Quantity",
+    "remove": "Remove"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "summaryHeading": "Order Summary",
+    "formHeading": "Contact Details",
+    "nameLabel": "Full Name",
+    "emailLabel": "Email",
+    "addressLabel": "Shipping Address",
+    "confirm": "Confirm Order",
+    "success": "Thank you! Your order has been placed.",
+    "empty": "Add items to your cart before checking out.",
+    "backToStore": "Browse the store"
+  }
+}

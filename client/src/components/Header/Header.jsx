@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
 import {
   useLogoutMutation,
   useCurrentUserQuery,
@@ -8,6 +7,7 @@ import "./header.styles.scss";
 import { FaBars } from "react-icons/fa";
 import AvatarDropdown from "../AvatarDropdown.jsx";
 import { useChatSession } from "../../features/chats/context/ChatSessionContext.jsx";
+import Sidebar from "../Sidebar/Sidebar.jsx";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -55,47 +55,12 @@ const Header = () => {
         className={`overlay ${menuOpen ? "show" : ""}`}
         onClick={closeMenu}
       />
-      <nav className={`drawer ${menuOpen ? "open" : ""}`}>
-        <div className="drawer_header">
-          <span className="drawer_title">Menu</span>
-          <button
-            className="close_btn"
-            onClick={closeMenu}
-            aria-label="Close menu"
-          >
-            Close
-          </button>
-        </div>
-        <ul className="nav_list">
-          <li>
-            <NavLink to="/welcome" className="link" onClick={closeMenu}>
-              Welcome
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/dashboard" className="link" onClick={closeMenu}>
-              Dashboard
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/chat" className="link" onClick={closeMenu}>
-              Chat
-            </NavLink>
-          </li>
-
-          {user && (
-            <li>
-              <button
-                onClick={handleLogout}
-                className="logout_btn"
-                disabled={logoutMutation.isPending}
-              >
-                {logoutMutation.isPending ? "Signing out..." : "Logout"}
-              </button>
-            </li>
-          )}
-        </ul>
-      </nav>
+      <Sidebar
+        isOpen={menuOpen}
+        onClose={closeMenu}
+        onLogout={handleLogout}
+        isLoggingOut={logoutMutation.isPending}
+      />
     </header>
   );
 };
