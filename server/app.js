@@ -10,9 +10,14 @@ const onboardingRoutes = require("./routes/onboarding.routes");
 const errorHandler = require("./middleware/error");
 
 const corsOptions = {
-  origin: "*",
+  origin: [
+    "https://pregchat-mu.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:5173",
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 };
 
 const createApp = () => {
