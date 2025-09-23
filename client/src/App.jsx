@@ -19,6 +19,9 @@ import Checkout from "./pages/Checkout/Checkout.jsx";
 import AppointmentBrowse from "./pages/AppointmentBrowse.jsx";
 import AppointmentMidwife from "./pages/AppointmentMidwife.jsx";
 import MyAppointments from "./pages/MyAppointments.jsx";
+import JournalsList from "./pages/JournalsList.jsx";
+import JournalForm from "./pages/JournalForm.jsx";
+import JournalDetail from "./pages/JournalDetail.jsx";
 
 const App = () => {
   const token = useAppSelector(selectAuthToken);
@@ -141,6 +144,38 @@ const App = () => {
             element={
               isAuthenticated ? (
                 <MyAppointments />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/journals"
+            element={
+              isAuthenticated ? <JournalsList /> : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/journals/new"
+            element={
+              isAuthenticated ? (
+                <JournalForm mode="create" />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/journals/:id"
+            element={
+              isAuthenticated ? <JournalDetail /> : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/journals/:id/edit"
+            element={
+              isAuthenticated ? (
+                <JournalForm mode="edit" />
               ) : (
                 <Navigate to="/login" replace />
               )
