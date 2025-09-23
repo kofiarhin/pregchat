@@ -2,7 +2,7 @@ if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 const http = require("http");
-const createApp = require("./app");
+const createApp = require("./index");
 const connectDB = require("./config/db");
 
 const PORT = process.env.PORT || 5001;
