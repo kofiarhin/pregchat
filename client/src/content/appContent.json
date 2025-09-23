@@ -7,11 +7,53 @@
     "links": {
       "welcome": "Welcome",
       "dashboard": "Dashboard",
+      "journals": "Journals",
       "chat": "Chat",
       "store": "Store",
       "cart": "Cart",
       "bookAppointment": "Book Appointment",
       "myAppointments": "My Appointments"
+    }
+  },
+  "journals": {
+    "list": {
+      "title": "Daily journals",
+      "description": "Capture how you're feeling each day to spot patterns and celebrate wins.",
+      "newJournal": "New Journal",
+      "loading": "Loading your journals...",
+      "error": "We couldn't load your journals right now.",
+      "empty": "You haven't created any journal entries yet.",
+      "noUser": "Sign in to view your journals.",
+      "view": "View entry"
+    },
+    "detail": {
+      "loading": "Loading journal...",
+      "error": "We couldn't load that journal entry.",
+      "notFound": "This journal entry was not found or you don't have access to it.",
+      "recordedOn": "Recorded on",
+      "back": "Back to journals",
+      "edit": "Edit entry",
+      "delete": "Delete entry",
+      "confirmDelete": "Delete this journal entry?",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "createTitle": "New journal entry",
+      "editTitle": "Edit journal entry",
+      "description": "Reflect on your day to track mood shifts, symptoms, and moments of gratitude.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Give your entry a title",
+      "contentLabel": "How are you feeling today?",
+      "contentPlaceholder": "Write down your thoughts, symptoms, and wins...",
+      "required": "Title and content are required.",
+      "save": "Save journal",
+      "saving": "Saving...",
+      "update": "Update journal",
+      "updating": "Updating...",
+      "cancel": "Cancel",
+      "loading": "Loading journal...",
+      "loadError": "We couldn't load that journal entry.",
+      "submitError": "We couldn't save your journal. Please try again."
     }
   },
   "store": {

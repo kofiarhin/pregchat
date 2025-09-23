@@ -11,6 +11,7 @@ const messagesRoutes = require("./routes/messages");
 const storeRoutes = require("./routes/store");
 const midwifeRoutes = require("./routes/midwives");
 const appointmentRoutes = require("./routes/appointments");
+const journalRoutes = require("./routes/journals");
 const errorHandler = require("./middleware/error");
 
 const corsOptions = {
@@ -57,6 +58,7 @@ const createApp = () => {
   app.use("/api/store", storeRoutes);
   app.use("/api/midwives", midwifeRoutes);
   app.use("/api/appointments", appointmentRoutes);
+  app.use("/api/journals", journalRoutes);
 
   app.use(errorHandler);
 
