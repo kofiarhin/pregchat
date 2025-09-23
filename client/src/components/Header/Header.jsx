@@ -8,6 +8,7 @@ import { FaBars } from "react-icons/fa";
 import AvatarDropdown from "../AvatarDropdown.jsx";
 import { useChatSession } from "../../features/chats/context/ChatSessionContext.jsx";
 import Sidebar from "../Sidebar/Sidebar.jsx";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -37,10 +38,10 @@ const Header = () => {
           <FaBars className="icon" />
         </button>
 
-        <div className="brand_wrap">
+        <Link to="/" className="brand_wrap">
           <span className="brand">PregChat</span>
           <span className="model">alpha</span>
-        </div>
+        </Link>
 
         <div className="actions">
           <AvatarDropdown
