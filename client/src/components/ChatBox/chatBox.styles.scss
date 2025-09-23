@@ -246,7 +246,7 @@
 
 .field {
   display: grid;
-  grid-template-columns: 1fr 56px;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 8px;
   background: var(--elev);
@@ -311,17 +311,42 @@
 }
 
 .send {
-  height: 36px;
-  border-radius: 18px;
-  background: #1a73e8;
-  color: #fff;
-  font-weight: 600;
-  border: 0;
-  padding: 0 16px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease,
+    transform 0.2s ease;
 }
+
+.send:hover:not(:disabled),
+.send:focus-visible:not(:disabled) {
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.container.light .send:hover:not(:disabled),
+.container.light .send:focus-visible:not(:disabled) {
+  background: rgba(139, 92, 246, 0.16);
+}
+
+.send:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
 .send:disabled {
-  background: #2a2a2a;
-  color: #8a8a8a;
+  color: var(--muted);
+  cursor: not-allowed;
+  background: transparent;
+  border-color: transparent;
+  opacity: 0.7;
 }
 
 /* --- SCROLL BUTTON --- */
