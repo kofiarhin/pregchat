@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useChatsQuery } from "../../features/chats/hooks/useChatsQuery.js";
 import { useCreateChatMutation } from "../../features/chats/hooks/useCreateChatMutation.js";
 import { useInfiniteMessagesQuery } from "../../features/messages/hooks/useInfiniteMessagesQuery.js";
+import { FiSend } from "react-icons/fi";
 import { useSendMessageMutation } from "../../features/messages/hooks/useSendMessageMutation.js";
 import { useCurrentUserQuery } from "../../features/auth/hooks/useAuth.js";
 import { useChatSession } from "../../features/chats/context/ChatSessionContext.jsx";
@@ -269,9 +270,11 @@ const ChatBox = ({ daySummary }) => {
             <button
               className="send"
               type="submit"
+              aria-label="Send message"
+              title="Send message"
               disabled={!message.trim() || isSending || !chatId}
             >
-              {isSending ? "..." : "Send"}
+              <FiSend aria-hidden="true" size={20} />
             </button>
           </div>
         </div>
