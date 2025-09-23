@@ -14,6 +14,7 @@ import {
   triggerLoginPrompt,
 } from "./store/ui/uiSlice.js";
 import "./styles/global.scss";
+import CartProvider from "./context/CartContext.jsx";
 
 const shouldRetryQuery = (failureCount, error) => {
   if (error?.status === 401) {
@@ -57,7 +58,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <CartProvider>
+          <App />
+        </CartProvider>
         <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
       </QueryClientProvider>
     </Provider>

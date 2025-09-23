@@ -8,6 +8,7 @@ const updatesRoutes = require("./routes/updatesRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const onboardingRoutes = require("./routes/onboarding.routes");
 const messagesRoutes = require("./routes/messages");
+const storeRoutes = require("./routes/store");
 const errorHandler = require("./middleware/error");
 
 const corsOptions = {
@@ -51,6 +52,7 @@ const createApp = () => {
   app.use("/admin", adminRoutes);
   app.use("/api/onboarding", onboardingRoutes);
   app.use("/api/messages", messagesRoutes);
+  app.use("/api/store", storeRoutes);
 
   app.use(errorHandler);
 
