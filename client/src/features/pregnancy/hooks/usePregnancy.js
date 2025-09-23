@@ -38,9 +38,9 @@ export const useUpdatePregnancyProfileMutation = (options = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ lmpDate, dueDate }) => {
+    mutationFn: async ({ lmpDate, dueDate, weeks, days }) => {
       const response = await http.put("/updates/profile", {
-        json: { lmpDate, dueDate },
+        json: { lmpDate, dueDate, weeks, days },
       });
       return {
         lmpDate: response?.lmpDate ?? null,
@@ -54,8 +54,12 @@ export const useUpdatePregnancyProfileMutation = (options = {}) => {
           ...(current ?? {}),
           day: data.day,
         }));
+        queryClient.invalidateQueries({
+          queryKey: pregnancyKeys.day(data.day),
+        });
       }
-      queryClient.invalidateQueries({ queryKey: pregnancyKeys.day(data.day) });
+      queryClient.invalidateQueries({ queryKey: pregnancyKeys.profile() });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
       options.onSuccess?.(data);
     },
     ...options,
