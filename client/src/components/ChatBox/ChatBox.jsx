@@ -86,30 +86,31 @@ const ChatBox = ({ daySummary }) => {
     scrollAnchorRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const quickPrompts = useMemo(() => {
-    const weekLabel = daySummary?.day
-      ? Math.ceil(Number(daySummary.day) / 7)
-      : "your pregnancy";
-    return [
+  const quickPrompts = useMemo(
+    () => [
       {
-        id: "inspire",
-        label: "Inspire me",
-        text: `What should I focus on today for week ${weekLabel}?`,
+        id: "meal-plan",
+        label: "Design me a meal plan",
+        text:
+          "Design a 1-day pregnancy-safe meal plan. Assume user provides weeks/days when asked. Include breakfast, lunch, dinner, 2 snacks, hydration targets, and simple prep notes. Consider common aversions and nausea. Avoid high-mercury fish, unpasteurized dairy, deli meats, and alcohol.",
       },
       {
-        id: "checklist",
-        label: "Save me time",
-        text: "Give me a quick wellness checklist for today.",
+        id: "health-tips",
+        label: "Share health tips for me",
+        text:
+          "Share 3 concise, evidence-based pregnancy health tips for today. Cover movement, hydration/supplements, and rest. Add 1 red-flag symptom to watch and when to seek care. Keep it under 120 words total.",
       },
       {
-        id: "support",
-        label: "What you can do",
-        text: "What support can you offer for pregnancy questions?",
+        id: "relax",
+        label: "Help me relax today",
+        text:
+          "Lead a 5-minute relaxation routine safe for pregnancy: brief breathwork (box or 4-7-8), a short body scan, and one simple stretch sequence with clear cues. Offer a 30-second TL;DR option.",
       },
-    ];
-  }, [daySummary]);
+    ],
+    []
+  );
 
-  const selectQuickPrompt = (value) => setMessage(value);
+  const onAction = (value) => setMessage(value);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -182,7 +183,7 @@ const ChatBox = ({ daySummary }) => {
                 <button
                   key={prompt.id}
                   className="chip"
-                  onClick={() => selectQuickPrompt(prompt.text)}
+                  onClick={() => onAction(prompt.text)}
                   type="button"
                 >
                   {prompt.label}
