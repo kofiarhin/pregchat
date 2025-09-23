@@ -25,6 +25,14 @@ const navItems = [
     id: "cart",
     path: "/cart",
   },
+  {
+    id: "bookAppointment",
+    path: "/appointments",
+  },
+  {
+    id: "myAppointments",
+    path: "/appointments/mine",
+  },
 ];
 
 const Sidebar = ({ isOpen, onClose, onLogout, isLoggingOut }) => {

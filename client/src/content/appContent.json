@@ -9,7 +9,9 @@
       "dashboard": "Dashboard",
       "chat": "Chat",
       "store": "Store",
-      "cart": "Cart"
+      "cart": "Cart",
+      "bookAppointment": "Book Appointment",
+      "myAppointments": "My Appointments"
     }
   },
   "store": {
@@ -53,5 +55,59 @@
     "success": "Thank you! Your order has been placed.",
     "empty": "Add items to your cart before checking out.",
     "backToStore": "Browse the store"
+  },
+  "appointments": {
+    "shared": {
+      "timezoneNote": "All times shown in London time."
+    },
+    "browse": {
+      "title": "Book a midwife appointment",
+      "description": "Browse our supportive midwives and choose the best fit for your next check-in.",
+      "loading": "Loading midwives...",
+      "error": "We couldn't load midwives right now. Please try again soon.",
+      "empty": "No midwives are available just yet. Check back shortly.",
+      "viewProfile": "View availability"
+    },
+    "midwife": {
+      "loading": "Loading midwife details...",
+      "error": "We couldn't load this midwife right now.",
+      "thisWeek": "This week",
+      "nextTwoWeeks": "Next 2 weeks",
+      "availabilityTitle": "Available slots",
+      "availabilityHelp": "Choose a range and load upcoming sessions that work for you.",
+      "loadAvailability": "Load availability",
+      "loadingSlots": "Loading slots...",
+      "noSlots": "No open slots in this range. Try another week.",
+      "modalTitle": "Confirm your appointment",
+      "nameLabel": "Full name",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Share anything you'd like your midwife to know",
+      "confirm": "Confirm appointment",
+      "submitting": "Booking...",
+      "cancel": "Cancel",
+      "required": "Name and email are required to book.",
+      "success": "Appointment booked! We'll send a confirmation to your inbox.",
+      "error": "We couldn't book that slot. Please try another time."
+    },
+    "mine": {
+      "title": "My appointments",
+      "subtitle": "Review upcoming visits and manage any changes.",
+      "loading": "Loading your appointments...",
+      "error": "We couldn't load your appointments right now.",
+      "empty": "You haven't booked any appointments yet.",
+      "cancel": "Cancel appointment",
+      "cancelling": "Cancelling...",
+      "cancelSuccess": "Appointment cancelled. You're welcome to book another slot anytime.",
+      "cancelError": "We couldn't cancel that appointment. Please try again.",
+      "statusBooked": "Booked",
+      "statusCancelled": "Cancelled",
+      "noUser": "Sign in to see your appointments.",
+      "unknownMidwife": "Midwife",
+      "cancelled": "Cancelled",
+      "booked": "Booked"
+    }
   }
 }

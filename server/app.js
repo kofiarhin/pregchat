@@ -9,6 +9,8 @@ const adminRoutes = require("./routes/adminRoutes");
 const onboardingRoutes = require("./routes/onboarding.routes");
 const messagesRoutes = require("./routes/messages");
 const storeRoutes = require("./routes/store");
+const midwifeRoutes = require("./routes/midwives");
+const appointmentRoutes = require("./routes/appointments");
 const errorHandler = require("./middleware/error");
 
 const corsOptions = {
@@ -53,6 +55,8 @@ const createApp = () => {
   app.use("/api/onboarding", onboardingRoutes);
   app.use("/api/messages", messagesRoutes);
   app.use("/api/store", storeRoutes);
+  app.use("/api/midwives", midwifeRoutes);
+  app.use("/api/appointments", appointmentRoutes);
 
   app.use(errorHandler);
 

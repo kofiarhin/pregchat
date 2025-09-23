@@ -15,6 +15,7 @@ import {
 } from "./store/ui/uiSlice.js";
 import "./styles/global.scss";
 import CartProvider from "./context/CartContext.jsx";
+import BookingProvider from "./context/BookingContext.jsx";
 
 const shouldRetryQuery = (failureCount, error) => {
   if (error?.status === 401) {
@@ -59,7 +60,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <CartProvider>
-          <App />
+          <BookingProvider>
+            <App />
+          </BookingProvider>
         </CartProvider>
         <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
       </QueryClientProvider>

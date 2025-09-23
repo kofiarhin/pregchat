@@ -14,6 +14,7 @@ Experience PregChat live: [https://pregchat-7b9avnnvw-kofi-arhins-projects.verce
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Real-time Support**: Instant responses to your pregnancy questions
 - **Progress Tracking**: Monitor your pregnancy journey day by day
+- **Midwife Bookings**: Browse midwives, check availability, and book or cancel appointments in London time
 
 ## 🚀 Quick Start
 

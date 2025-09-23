@@ -1,0 +1,84 @@
+.myAppointments {
+  gap: 1.75rem;
+}
+
+.list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.card {
+  background: rgba(23, 26, 48, 0.9);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 16px 40px rgba(10, 12, 24, 0.45);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cardHeader h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.status {
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.statusBooked {
+  background: rgba(117, 131, 255, 0.2);
+  color: #9faeff;
+}
+
+.statusCancelled {
+  background: rgba(255, 154, 162, 0.2);
+  color: #ff9aa2;
+}
+
+.date {
+  color: #8be9fd;
+  font-weight: 600;
+}
+
+.notes {
+  color: #cfd3ff;
+  line-height: 1.5;
+}
+
+.cardActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cancelButton {
+  padding: 0.55rem 1.25rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255, 154, 162, 0.5);
+  background: transparent;
+  color: #ff9aa2;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 154, 162, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
