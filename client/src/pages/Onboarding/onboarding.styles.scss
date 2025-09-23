@@ -56,6 +56,12 @@
   gap: 0.5rem;
 }
 
+.onboarding_fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
 .onboarding_label {
   font-weight: 600;
   color: #e6e8f1;
@@ -70,11 +76,21 @@
   background: rgba(21, 21, 21, 0.9);
   color: #f3f4ff;
   font-size: 1rem;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 .onboarding_textarea {
   min-height: 120px;
   resize: vertical;
+}
+
+.onboarding_input:focus-visible,
+.onboarding_select:focus-visible,
+.onboarding_textarea:focus-visible {
+  outline: 2px solid #7a5df4;
+  outline-offset: 2px;
+  border-color: rgba(124, 156, 255, 0.6);
+  box-shadow: 0 0 0 1px rgba(124, 156, 255, 0.25);
 }
 
 .onboarding_radio_group {
@@ -91,9 +107,108 @@
   color: #e6e8f1;
 }
 
+.onboarding_radio_option input:focus-visible {
+  outline: 2px solid #7a5df4;
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+.onboarding_toggle {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 0.35rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(76, 139, 245, 0.32);
+  background: rgba(16, 16, 16, 0.88);
+}
+
+.onboarding_toggle_button {
+  border: none;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: #cdd3f8;
+  font-weight: 600;
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.onboarding_toggle_button:hover:not(.onboarding_toggle_button--active) {
+  background: rgba(76, 139, 245, 0.18);
+  color: #f5f6ff;
+}
+
+.onboarding_toggle_button--active {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 139, 245, 0.3) 0%,
+    rgba(122, 93, 244, 0.34) 100%
+  );
+  color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(124, 156, 255, 0.45);
+}
+
+.onboarding_toggle_button:focus-visible {
+  outline: 2px solid #7a5df4;
+  outline-offset: 2px;
+}
+
+.onboarding_segment {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(124, 156, 255, 0.18);
+  background: rgba(12, 12, 12, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.onboarding_inputs_row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.onboarding_inline_field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.onboarding_inline_field--compact {
+  flex: 1 1 140px;
+  max-width: 220px;
+}
+
+.onboarding_inline_label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #c5c9dc;
+}
+
 .onboarding_error {
   color: #ff6b81;
   font-size: 0.875rem;
+}
+
+.onboarding_helper {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: #a6abc3;
+}
+
+.onboarding_preview {
+  margin: 0.25rem 0 0;
+  font-size: 0.95rem;
+  color: #e6e8f1;
+}
+
+.onboarding_preview strong {
+  color: #9eb4ff;
 }
 
 .onboarding_submit {
