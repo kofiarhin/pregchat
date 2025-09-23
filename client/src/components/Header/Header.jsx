@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useLogoutMutation, useCurrentUserQuery } from "../../features/auth/hooks/useAuth.js";
+import {
+  useLogoutMutation,
+  useCurrentUserQuery,
+} from "../../features/auth/hooks/useAuth.js";
 import "./header.styles.scss";
 import { FaBars } from "react-icons/fa";
 
@@ -58,6 +61,11 @@ const Header = () => {
         </div>
         <ul className="nav_list">
           <li>
+            <NavLink to="/welcome" className="link" onClick={closeMenu}>
+              Welcome
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/dashboard" className="link" onClick={closeMenu}>
               Dashboard
             </NavLink>
@@ -67,11 +75,7 @@ const Header = () => {
               Chat
             </NavLink>
           </li>
-          <li>
-            <NavLink to="/welcome" className="link" onClick={closeMenu}>
-              Welcome
-            </NavLink>
-          </li>
+
           {user && (
             <li>
               <button
