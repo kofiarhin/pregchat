@@ -25,7 +25,7 @@ const corsOptions = {
   credentials: true,
 };
 
-const createApp = () => {
+const createApp = (configureApp) => {
   const app = express();
 
   app.set("trust proxy", 1);
@@ -59,6 +59,10 @@ const createApp = () => {
   app.use("/api/midwives", midwifeRoutes);
   app.use("/api/appointments", appointmentRoutes);
   app.use("/api/journals", journalRoutes);
+
+  if (typeof configureApp === "function") {
+    configureApp(app);
+  }
 
   app.use(errorHandler);
 
