@@ -11,6 +11,7 @@ import Chat from "./pages/Chat.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import ChatSessionProvider from "./features/chats/context/ChatSessionContext.jsx";
 
 const App = () => {
   const token = useAppSelector(selectAuthToken);
@@ -45,9 +46,10 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <div className="app dark">
-        {isAuthenticated && <Header />}
-        <Routes>
+      <ChatSessionProvider>
+        <div className="app dark">
+          {isAuthenticated && <Header />}
+          <Routes>
           <Route
             path="/"
             element={
@@ -101,9 +103,10 @@ const App = () => {
               )
             }
           />
-        </Routes>
-        {isAuthenticated && <Footer />}
-      </div>
+          </Routes>
+          {isAuthenticated && <Footer />}
+        </div>
+      </ChatSessionProvider>
     </BrowserRouter>
   );
 };

@@ -1,9 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useChatsQuery } from "../../features/chats/hooks/useChatsQuery.js";
 import { useCreateChatMutation } from "../../features/chats/hooks/useCreateChatMutation.js";
 import { useInfiniteMessagesQuery } from "../../features/messages/hooks/useInfiniteMessagesQuery.js";
 import { useSendMessageMutation } from "../../features/messages/hooks/useSendMessageMutation.js";
 import { useCurrentUserQuery } from "../../features/auth/hooks/useAuth.js";
+import { useChatSession } from "../../features/chats/context/ChatSessionContext.jsx";
+import { messagesKeys } from "../../features/messages/queryKeys.js";
+import { chatsKeys } from "../../features/chats/queryKeys.js";
 import "./chatBox.styles.scss";
 
 const formatTime = (value) => {
@@ -29,6 +33,8 @@ const ChatBox = ({ daySummary }) => {
 
   const { data: user } = useCurrentUserQuery();
   const chatsQuery = useChatsQuery();
+  const { setMessagesSetter } = useChatSession();
+  const queryClient = useQueryClient();
 
   const createChatMutation = useCreateChatMutation({
     onSuccess: (chat) => {
@@ -57,6 +63,7 @@ const ChatBox = ({ daySummary }) => {
     { chatId, initialPage: 0 },
     { enabled: Boolean(chatId) }
   );
+  const { remove: removeMessagesQuery } = messagesQuery;
 
   const messages = useMemo(
     () => deriveDisplayMessages(messagesQuery.data?.pages),
@@ -64,6 +71,24 @@ const ChatBox = ({ daySummary }) => {
   );
 
   const sendMessageMutation = useSendMessageMutation({ chatId });
+
+  useEffect(() => {
+    if (!setMessagesSetter) {
+      return undefined;
+    }
+
+    const setter = () => {
+      setActiveChatId(null);
+      setMessage("");
+      setShowScrollButton(false);
+      removeMessagesQuery?.();
+      queryClient.removeQueries({ queryKey: messagesKeys.all });
+      queryClient.removeQueries({ queryKey: chatsKeys.list() });
+    };
+
+    setMessagesSetter(setter);
+    return () => setMessagesSetter(null);
+  }, [setMessagesSetter, removeMessagesQuery, queryClient]);
 
   useEffect(() => {
     if (!scrollAnchorRef.current) {

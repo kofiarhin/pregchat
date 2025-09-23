@@ -1,0 +1,48 @@
+.wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.avatarBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+.menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 200px;
+  padding: 8px;
+  background: #0b0b0c;
+  color: #e5e7eb;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  display: grid;
+  gap: 8px;
+  z-index: 50;
+}
+
+.dangerItem {
+  background: transparent;
+  border: 1px solid #7f1d1d;
+  color: #ef4444;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dangerItem:hover {
+  background: rgba(127, 29, 29, 0.13);
+}
