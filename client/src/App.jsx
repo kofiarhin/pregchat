@@ -16,6 +16,9 @@ import Store from "./pages/Store/Store.jsx";
 import ItemDetails from "./pages/ItemDetails/ItemDetails.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
 import Checkout from "./pages/Checkout/Checkout.jsx";
+import AppointmentBrowse from "./pages/AppointmentBrowse.jsx";
+import AppointmentMidwife from "./pages/AppointmentMidwife.jsx";
+import MyAppointments from "./pages/MyAppointments.jsx";
 
 const App = () => {
   const token = useAppSelector(selectAuthToken);
@@ -118,6 +121,36 @@ const App = () => {
             element={
               isAuthenticated ? (
                 <Checkout />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/appointments"
+            element={
+              isAuthenticated ? (
+                <AppointmentBrowse />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/appointments/mine"
+            element={
+              isAuthenticated ? (
+                <MyAppointments />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/appointments/:id"
+            element={
+              isAuthenticated ? (
+                <AppointmentMidwife />
               ) : (
                 <Navigate to="/login" replace />
               )
