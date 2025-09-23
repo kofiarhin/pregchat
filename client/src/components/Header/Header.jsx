@@ -1,21 +1,23 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useAppSelector, useAppDispatch } from "../../store/store";
-import { logout } from "../../store/slices/authSlice";
+import { useLogoutMutation, useCurrentUserQuery } from "../../features/auth/hooks/useAuth.js";
 import "./header.styles.scss";
 import { FaBars } from "react-icons/fa";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
+  const { data: user } = useCurrentUserQuery();
+  const logoutMutation = useLogoutMutation({
+    onSuccess: () => {
+      setMenuOpen(false);
+    },
+  });
 
   const handleLogout = () => {
-    dispatch(logout());
-    setMenuOpen(false);
+    logoutMutation.mutate();
   };
 
-  const toggleMenu = () => setMenuOpen((v) => !v);
+  const toggleMenu = () => setMenuOpen((value) => !value);
   const closeMenu = () => setMenuOpen(false);
   return (
     <header className="header" role="banner">
@@ -56,6 +58,11 @@ const Header = () => {
         </div>
         <ul className="nav_list">
           <li>
+            <NavLink to="/dashboard" className="link" onClick={closeMenu}>
+              Dashboard
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/chat" className="link" onClick={closeMenu}>
               Chat
             </NavLink>
@@ -67,8 +74,12 @@ const Header = () => {
           </li>
           {user && (
             <li>
-              <button onClick={handleLogout} className="logout_btn">
-                Logout
+              <button
+                onClick={handleLogout}
+                className="logout_btn"
+                disabled={logoutMutation.isPending}
+              >
+                {logoutMutation.isPending ? "Signing out..." : "Logout"}
               </button>
             </li>
           )}

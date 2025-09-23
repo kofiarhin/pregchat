@@ -1,23 +1,26 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useAppSelector } from "./store/store";
-import { useMe } from "./hooks/useAuthQuery";
-import { useGetToday } from "./hooks/usePregnancyQuery";
-import Header from "./components/Header/Header";
-import Footer from "./components/Footer/Footer";
-import Welcome from "./pages/Welcome/Welcome";
-import Onboarding from "./pages/Onboarding/Onboarding";
-import Chat from "./pages/Chat";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useAppSelector } from "./store/store.js";
+import { selectAuthToken } from "./store/ui/uiSlice.js";
+import { useCurrentUserQuery } from "./features/auth/hooks/useAuth.js";
+import Header from "./components/Header/Header.jsx";
+import Footer from "./components/Footer/Footer.jsx";
+import Welcome from "./pages/Welcome/Welcome.jsx";
+import Onboarding from "./pages/Onboarding/Onboarding.jsx";
+import Chat from "./pages/Chat.jsx";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 
 const App = () => {
-  const { user, token } = useAppSelector((state) => state.auth);
-  const { isLoading: userLoading } = useMe();
-  useGetToday();
+  const token = useAppSelector(selectAuthToken);
+  const {
+    data: currentUser,
+    isLoading: userLoading,
+  } = useCurrentUserQuery({
+    enabled: Boolean(token),
+  });
 
-  // Show loading state
   if (userLoading) {
     return (
       <div className="app dark">
@@ -31,14 +34,14 @@ const App = () => {
             gap: "1rem",
           }}
         >
-          <div className="loading"></div>
+          <div className="loading" />
           <p>Loading...</p>
         </div>
       </div>
     );
   }
 
-  const isAuthenticated = Boolean(token && user);
+  const isAuthenticated = Boolean(token && currentUser);
 
   return (
     <BrowserRouter>

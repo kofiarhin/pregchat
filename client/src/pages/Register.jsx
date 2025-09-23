@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useRegister } from "../hooks/useAuthQuery";
+import { Link, useNavigate } from "react-router-dom";
+import { useRegisterMutation } from "../features/auth/hooks/useAuth.js";
 
 const registerStyles = {
   wrapper: {
@@ -49,14 +49,19 @@ const registerStyles = {
 };
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    region: "UK",
+    region: "",
   });
 
-  const registerMutation = useRegister();
+  const registerMutation = useRegisterMutation({
+    onSuccess: () => {
+      navigate("/dashboard");
+    },
+  });
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -75,14 +80,14 @@ const Register = () => {
     <div style={registerStyles.wrapper}>
       <div style={registerStyles.card}>
         <div style={registerStyles.header}>
-          <h1 style={registerStyles.title}>Create Your Account</h1>
-          <p style={registerStyles.subtitle}>Join PregChat today</p>
+          <h1 style={registerStyles.title}>Create an account</h1>
+          <p style={registerStyles.subtitle}>Join PregChat in a few steps</p>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div style={registerStyles.field}>
             <label htmlFor="name" style={registerStyles.label}>
-              Name
+              Full name
             </label>
             <input
               type="text"
@@ -135,9 +140,11 @@ const Register = () => {
               value={formData.region}
               onChange={handleChange}
               className="input"
+              required
             >
-              <option value="UK">United Kingdom</option>
+              <option value="">Select your region</option>
               <option value="US">United States</option>
+              <option value="UK">United Kingdom</option>
               <option value="Global">Global</option>
             </select>
           </div>

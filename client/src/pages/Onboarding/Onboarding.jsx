@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMyOnboarding, useSaveOnboarding } from "../../hooks/useOnboarding";
+import { useOnboardingQuery } from "../../features/onboarding/hooks/useOnboarding.js";
+import { useSaveOnboardingMutation } from "../../features/onboarding/hooks/useOnboarding.js";
 import "./onboarding.styles.scss";
 
 const initialValues = {
@@ -13,12 +14,13 @@ const initialValues = {
 
 const Onboarding = () => {
   const navigate = useNavigate();
-  const { data: onboardingData, isLoading: onboardingLoading } = useMyOnboarding();
+  const { data: onboardingData, isLoading: onboardingLoading } =
+    useOnboardingQuery();
   const {
     mutateAsync: saveOnboarding,
     isPending: saving,
     error: mutationError,
-  } = useSaveOnboarding();
+  } = useSaveOnboardingMutation();
   const [formValues, setFormValues] = useState(initialValues);
   const [fieldErrors, setFieldErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -127,11 +129,14 @@ const Onboarding = () => {
         <div className="onboarding_header">
           <h1 className="onboarding_title">Complete your onboarding</h1>
           <p className="onboarding_subtitle">
-            Share a few details to personalize your PregChat experience.
+            Share a few details so PregChat can personalise your experience.
           </p>
         </div>
+
         {onboardingLoading ? (
-          <div className="onboarding_loading">Loading your details…</div>
+          <div className="onboarding_loading">
+            <div className="loading" />
+          </div>
         ) : (
           <form className="onboarding_form" onSubmit={handleSubmit} noValidate>
             {globalError && <div className="onboarding_alert">{globalError}</div>}

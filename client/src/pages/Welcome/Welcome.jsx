@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useAppSelector } from "../../store/store";
-import { useGetToday } from "../../hooks/usePregnancyQuery";
-import { useMyOnboarding } from "../../hooks/useOnboarding";
+import { useCurrentUserQuery } from "../../features/auth/hooks/useAuth.js";
+import { useOnboardingQuery } from "../../features/onboarding/hooks/useOnboarding.js";
+import { useTodayPregnancyQuery } from "../../features/pregnancy/hooks/usePregnancy.js";
 import "./welcome.styles.scss";
 
 const frequencyLabels = {
@@ -18,17 +18,17 @@ const genderLabels = {
 };
 
 const Welcome = () => {
-  const { user } = useAppSelector((state) => state.auth);
+  const { data: currentUser } = useCurrentUserQuery();
   const {
     data: onboardingData,
     isLoading: onboardingLoading,
     error: onboardingError,
-  } = useMyOnboarding();
+  } = useOnboardingQuery();
   const {
     data: todayData,
     isLoading: todayLoading,
     error: todayError,
-  } = useGetToday();
+  } = useTodayPregnancyQuery();
 
   const onboardingErrorMessage = onboardingError?.message;
   const hasOnboarding = Boolean(onboardingData);
@@ -57,9 +57,9 @@ const Welcome = () => {
         <h1 className="welcome_heading">Welcome to PregChat!</h1>
         <p className="welcome_subheading">Your Pregnancy Wellness Guide</p>
 
-        {user && (
+        {currentUser && (
           <div className="welcome_intro">
-            <p>Hi {user.name}! I'm Aya, your pregnancy guide.</p>
+            <p>Hi {currentUser.name}! I'm Aya, your pregnancy guide.</p>
             <p>Ask me anything about your pregnancy wellness journey.</p>
           </div>
         )}
@@ -89,7 +89,7 @@ const Welcome = () => {
         )}
 
         {onboardingLoading ? (
-          <div className="welcome_loading">Loading your onboarding details…</div>
+          <div className="welcome_loading">Loading your onboarding details...</div>
         ) : onboardingErrorMessage ? (
           <div className="welcome_error">{onboardingErrorMessage}</div>
         ) : hasOnboarding ? (

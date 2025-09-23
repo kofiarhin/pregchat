@@ -5,57 +5,58 @@ import React from "react";
 import { fireEvent, render, screen, cleanup } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import App from "./App";
-import authReducer from "./store/slices/authSlice";
-import pregnancyReducer from "./store/slices/pregnancySlice";
-import uiReducer from "./store/slices/uiSlice";
-import chatReducer from "./store/slices/chatSlice";
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import App from "./App.jsx";
+import uiReducer from "./store/ui/uiSlice.js";
 
 const loginMutate = vi.fn();
 const registerMutate = vi.fn();
+const logoutMutate = vi.fn();
 
-vi.mock("./hooks/useAuthQuery", () => ({
-  useMe: () => ({ data: null, isLoading: false }),
-  useLogin: () => ({
+vi.mock("./features/auth/hooks/useAuth.js", () => ({
+  useCurrentUserQuery: () => ({ data: null, isLoading: false }),
+  useLoginMutation: () => ({
     mutate: loginMutate,
     isPending: false,
     isError: false,
     error: null,
   }),
-  useRegister: () => ({
+  useRegisterMutation: () => ({
     mutate: registerMutate,
     isPending: false,
     isError: false,
     error: null,
   }),
+  useLogoutMutation: () => ({
+    mutate: logoutMutate,
+    isPending: false,
+  }),
 }));
 
-vi.mock("./hooks/usePregnancyQuery", () => ({
-  useGetToday: () => ({ data: null, isLoading: false }),
+vi.mock("./features/pregnancy/hooks/usePregnancy.js", () => ({
+  useTodayPregnancyQuery: () => ({ data: null, isLoading: false, error: null }),
 }));
 
-const createTestStore = (authState) => {
-  return configureStore({
+const createTestStore = (uiState) =>
+  configureStore({
     reducer: {
-      auth: authReducer,
-      pregnancy: pregnancyReducer,
       ui: uiReducer,
-      chat: chatReducer,
     },
-    preloadedState: authState
+    preloadedState: uiState
       ? {
-          auth: {
-            ...authReducer(undefined, { type: "@@INIT" }),
-            ...authState,
+          ui: {
+            ...uiReducer(undefined, { type: "@@INIT" }),
+            ...uiState,
           },
         }
       : undefined,
   });
-};
 
-const renderApp = (route = "/login", authState) => {
-  const store = createTestStore(authState);
+const renderApp = (route = "/login", uiState) => {
+  const store = createTestStore(uiState);
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false, refetchOnWindowFocus: false },
@@ -105,7 +106,7 @@ describe("App routing", () => {
   it("renders register route and submits details", () => {
     renderApp("/register");
 
-    fireEvent.change(screen.getByLabelText(/name/i), {
+    fireEvent.change(screen.getByLabelText(/full name/i), {
       target: { value: "Test User" },
     });
     fireEvent.change(screen.getByLabelText(/^email$/i), {

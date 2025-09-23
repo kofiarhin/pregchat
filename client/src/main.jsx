@@ -1,16 +1,54 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { store } from "./store/store";
-import App from "./App";
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import App from "./App.jsx";
+import { store } from "./store/store.js";
+import {
+  enqueueToast,
+  triggerLoginPrompt,
+} from "./store/ui/uiSlice.js";
 import "./styles/global.scss";
 
+const shouldRetryQuery = (failureCount, error) => {
+  if (error?.status === 401) {
+    return false;
+  }
+  if (error?.status && error.status < 500) {
+    return false;
+  }
+  return failureCount < 2;
+};
+
+const queryCache = new QueryCache({
+  onError: (error) => {
+    if (error?.status === 401) {
+      store.dispatch(triggerLoginPrompt());
+      store.dispatch(
+        enqueueToast({
+          message: "Session expired. Please sign in again.",
+          tone: "warning",
+        })
+      );
+    }
+  },
+});
+
 const queryClient = new QueryClient({
+  queryCache,
   defaultOptions: {
     queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
+      retry: shouldRetryQuery,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+    },
+    mutations: {
+      retry: shouldRetryQuery,
     },
   },
 });
@@ -20,6 +58,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <App />
+        <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
       </QueryClientProvider>
     </Provider>
   </React.StrictMode>

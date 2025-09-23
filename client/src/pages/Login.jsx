@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useLogin } from "../hooks/useAuthQuery";
+import { Link, useNavigate } from "react-router-dom";
+import { useLoginMutation } from "../features/auth/hooks/useAuth.js";
 
 const loginStyles = {
   wrapper: {
@@ -49,12 +49,17 @@ const loginStyles = {
 };
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const loginMutation = useLogin();
+  const loginMutation = useLoginMutation({
+    onSuccess: () => {
+      navigate("/dashboard");
+    },
+  });
 
   const handleChange = (event) => {
     const { name, value } = event.target;
