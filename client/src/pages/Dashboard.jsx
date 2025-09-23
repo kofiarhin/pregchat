@@ -71,7 +71,7 @@ const Dashboard = () => {
           <div className="actions">
             <a className="action" href="/chat">Ask a question</a>
             <a className="action" href="/onboarding">Update profile</a>
-            <a className="action" href="/welcome">View insights</a>
+            <a className="action" href="/profile">View profile</a>
           </div>
         </article>
 
