@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useCurrentUserQuery } from "../features/auth/hooks/useAuth.js";
 import { useTodayPregnancyQuery } from "../features/pregnancy/hooks/usePregnancy.js";
 import { http } from "../api/http.js";
+import ActionsMenu from "../components/ActionsMenu.jsx";
 import "./dashboard.styles.scss";
 
 const Dashboard = () => {
@@ -69,7 +70,7 @@ const Dashboard = () => {
   return (
     <main className="dashboard">
       <header className="dashboard__header">
-        <div>
+        <div className="dashboard__header-info">
           <h1>Welcome{currentUser?.firstName ? `, ${currentUser.firstName}` : ""}</h1>
           <p className="muted">
             {gestationDays != null
@@ -77,9 +78,12 @@ const Dashboard = () => {
               : "Set your due date to unlock personalised updates."}
           </p>
         </div>
-        <div className="dashboard__header-cta">
-          <a className="btn" href="/chat">Open Chat</a>
-          <a className="btn btn--ghost" href="/onboarding">Edit Profile</a>
+        <div className="dashboard__header-actions">
+          <ActionsMenu />
+          <div className="dashboard__header-cta">
+            <a className="btn" href="/chat">Open Chat</a>
+            <a className="btn btn--ghost" href="/onboarding">Edit Profile</a>
+          </div>
         </div>
       </header>
 
