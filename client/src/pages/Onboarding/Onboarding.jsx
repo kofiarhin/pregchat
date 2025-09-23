@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useOnboardingQuery } from "../../features/onboarding/hooks/useOnboarding.js";
 import { useSaveOnboardingMutation } from "../../features/onboarding/hooks/useOnboarding.js";
+import { useUpdatePregnancyProfileMutation } from "../../features/pregnancy/hooks/usePregnancy.js";
+import { pregnancyKeys } from "../../features/pregnancy/queryKeys.js";
 import "./onboarding.styles.scss";
 
 const initialValues = {
@@ -14,6 +17,7 @@ const initialValues = {
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: onboardingData, isLoading: onboardingLoading } =
     useOnboardingQuery();
   const {
@@ -21,6 +25,8 @@ const Onboarding = () => {
     isPending: saving,
     error: mutationError,
   } = useSaveOnboardingMutation();
+  const { mutateAsync: updatePregnancyProfile } =
+    useUpdatePregnancyProfileMutation();
   const [formValues, setFormValues] = useState(initialValues);
   const [fieldErrors, setFieldErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -62,11 +68,72 @@ const Onboarding = () => {
     []
   );
 
+  const parsePregnancyInput = (rawInput) => {
+    if (typeof rawInput !== "string") {
+      return null;
+    }
+
+    const value = rawInput.trim();
+    if (!value) {
+      return null;
+    }
+
+    const weeksMatch = value
+      .toLowerCase()
+      .match(
+        /^(\d{1,2})\s*(?:weeks?|w)(?:\s*(?:and)?\s*(\d)\s*(?:days?|d))?$/
+      );
+
+    if (weeksMatch) {
+      const weeks = Number.parseInt(weeksMatch[1], 10);
+      const days = weeksMatch[2] ? Number.parseInt(weeksMatch[2], 10) : 0;
+
+      if (
+        !Number.isInteger(weeks) ||
+        weeks < 0 ||
+        weeks > 42 ||
+        !Number.isInteger(days) ||
+        days < 0 ||
+        days > 6
+      ) {
+        return null;
+      }
+
+      const totalDays = weeks * 7 + days;
+      if (totalDays > 280) {
+        return null;
+      }
+
+      const today = new Date();
+      today.setHours(12, 0, 0, 0);
+      const lmpDate = new Date(today);
+      lmpDate.setDate(today.getDate() - totalDays);
+
+      return { payload: { lmpDate: lmpDate.toISOString() } };
+    }
+
+    const parsedDate = new Date(value);
+    if (!Number.isNaN(parsedDate.getTime())) {
+      const dueDate = new Date(parsedDate);
+      dueDate.setHours(12, 0, 0, 0);
+      return { payload: { dueDate: dueDate.toISOString() } };
+    }
+
+    return null;
+  };
+
   const validate = () => {
     const errors = {};
+    let parsedPregnancy = null;
 
     if (!formValues.dueDateOrPregnancyWeek.trim()) {
       errors.dueDateOrPregnancyWeek = "This field is required.";
+    } else {
+      parsedPregnancy = parsePregnancyInput(formValues.dueDateOrPregnancyWeek);
+      if (!parsedPregnancy) {
+        errors.dueDateOrPregnancyWeek =
+          "Enter a due date or pregnancy week (e.g. \"12 March 2025\" or \"18 weeks\").";
+      }
     }
 
     if (!formValues.updateFrequency) {
@@ -77,7 +144,7 @@ const Onboarding = () => {
       errors.isFirstPregnancy = "Please let us know if this is your first pregnancy.";
     }
 
-    return errors;
+    return { errors, parsedPregnancy };
   };
 
   const handleFieldChange = (event) => {
@@ -99,7 +166,7 @@ const Onboarding = () => {
     event.preventDefault();
     setSubmitError("");
 
-    const errors = validate();
+    const { errors, parsedPregnancy } = validate();
     setFieldErrors(errors);
 
     if (Object.keys(errors).length > 0) {
@@ -114,6 +181,13 @@ const Onboarding = () => {
         updateFrequency: formValues.updateFrequency,
         isFirstPregnancy: formValues.isFirstPregnancy === "true",
       });
+
+      if (parsedPregnancy?.payload) {
+        await updatePregnancyProfile(parsedPregnancy.payload);
+        await queryClient.invalidateQueries({
+          queryKey: pregnancyKeys.today(),
+        });
+      }
 
       navigate("/profile");
     } catch (error) {
