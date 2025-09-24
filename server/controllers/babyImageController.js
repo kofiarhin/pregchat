@@ -25,6 +25,8 @@ const getTodayBabyImage = async (req, res) => {
       profile,
     });
 
+    console.log({ url: result.url, isCached: result.isCached });
+
     return res.json({
       url: result.url,
       week: result.week,
@@ -42,9 +44,7 @@ const getTodayBabyImage = async (req, res) => {
     }
 
     if (error.code === "BABY_IMAGE_GENERATION_FAILED") {
-      return res
-        .status(503)
-        .json({ error: "BABY_IMAGE_NOT_AVAILABLE" });
+      return res.status(503).json({ error: "BABY_IMAGE_NOT_AVAILABLE" });
     }
 
     console.error("Failed to get baby preview", error);

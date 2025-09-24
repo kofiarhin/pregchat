@@ -77,7 +77,7 @@ const Dashboard = () => {
     queryKey: ["baby-image", "today", londonDateKey],
     queryFn: async () => {
       const response = await http.get("/api/baby-image/today", {
-        credentials: false,
+        credentials: "omit",
       });
 
       const resolvedUrl = resolveBabyImageUrl(response?.url);
@@ -251,3 +251,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
