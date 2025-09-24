@@ -1,0 +1,32 @@
+.faceoff-page {
+  display: grid;
+  gap: 2rem;
+  padding: 2.5rem 1.5rem 3rem;
+  justify-items: center;
+  color: #f1f3f5;
+}
+
+.faceoff-page__intro {
+  text-align: center;
+  max-width: 640px;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.faceoff-page__intro h1 {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: 700;
+  margin: 0;
+}
+
+.faceoff-page__intro p {
+  margin: 0;
+  color: rgba(241, 243, 245, 0.8);
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .faceoff-page {
+    padding: 2rem 1rem 2.5rem;
+  }
+}

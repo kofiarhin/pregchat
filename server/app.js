@@ -12,6 +12,7 @@ const storeRoutes = require("./routes/store");
 const midwifeRoutes = require("./routes/midwives");
 const appointmentRoutes = require("./routes/appointments");
 const journalRoutes = require("./routes/journals");
+const namesRoutes = require("./routes/namesRoutes");
 const errorHandler = require("./middleware/error");
 
 const createApp = (configureApp) => {
@@ -52,6 +53,7 @@ const createApp = (configureApp) => {
   app.use("/api/midwives", midwifeRoutes);
   app.use("/api/appointments", appointmentRoutes);
   app.use("/api/journals", journalRoutes);
+  app.use("/api/names", namesRoutes);
 
   if (typeof configureApp === "function") {
     configureApp(app);
