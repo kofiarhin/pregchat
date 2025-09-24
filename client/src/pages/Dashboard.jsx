@@ -4,8 +4,23 @@ import { useCurrentUserQuery } from "../features/auth/hooks/useAuth.js";
 import { useTodayPregnancyQuery } from "../features/pregnancy/hooks/usePregnancy.js";
 import { http } from "../api/http.js";
 import ActionsMenu from "../components/ActionsMenu.jsx";
+import { BASE_URL } from "../constants/baseUrl.js";
 import "./dashboard.styles.scss";
 import { Link } from "react-router-dom";
+
+const resolveBabyImageUrl = (rawUrl) => {
+  if (!rawUrl) {
+    return null;
+  }
+
+  const trimmed = String(rawUrl).trim();
+
+  try {
+    return new URL(trimmed, BASE_URL).toString();
+  } catch (error) {
+    return null;
+  }
+};
 
 const Dashboard = () => {
   const { data: currentUser } = useCurrentUserQuery();
@@ -35,8 +50,10 @@ const Dashboard = () => {
     queryFn: async () => {
       const response = await http.get("/api/baby-image/today");
 
+      const resolvedUrl = resolveBabyImageUrl(response?.url);
+
       return {
-        url: response?.url ?? null,
+        url: resolvedUrl,
         week: response?.week ?? null,
         day: response?.day ?? null,
         dateKey: response?.dateKey ?? null,
