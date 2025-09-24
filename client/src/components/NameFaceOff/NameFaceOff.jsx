@@ -46,6 +46,8 @@ const NameFaceOff = () => {
 
   const { data: names = [], isLoading, isError } = useNamesQuery(filters);
 
+  const namesHash = useMemo(() => createNamesHash(names), [names]);
+
   const [orderedNames, setOrderedNames] = useState([]);
   const [gameState, setGameState] = useState({
     champion: "",
@@ -86,13 +88,13 @@ const NameFaceOff = () => {
     seedRef.current = activeSeed;
 
     const shuffled = shuffle(names, activeSeed);
-    const namesHash = createNamesHash(shuffled);
-    namesHashRef.current = namesHash;
+    const shuffledHash = createNamesHash(shuffled);
+    namesHashRef.current = shuffledHash;
 
     const storedIsValid =
       storedState &&
       storedState.seed === activeSeed &&
-      storedState.namesHash === namesHash &&
+      storedState.namesHash === shuffledHash &&
       typeof storedState.index === "number" &&
       shuffled.includes(storedState.champion);
     resumedRef.current = Boolean(storedIsValid);
@@ -105,14 +107,15 @@ const NameFaceOff = () => {
     const index = storedIsValid
       ? Math.min(Math.max(storedState.index, 1), shuffled.length)
       : initialIndex;
-    const winner = storedIsValid && index >= shuffled.length
-      ? storedState.champion
-      : initialWinner;
+    const winner =
+      storedIsValid && index >= shuffled.length
+        ? storedState.champion
+        : initialWinner;
 
     setOrderedNames(shuffled);
     setGameState({ champion, index, winner });
     setInitialized(true);
-  }, [names, urlSeed]);
+  }, [namesHash, urlSeed]);
 
   useEffect(() => {
     if (!initialized || !orderedNames.length || typeof window === "undefined") {
@@ -163,8 +166,8 @@ const NameFaceOff = () => {
     const newSeed = urlSeed || `${Date.now()}-${Math.random()}`;
     seedRef.current = newSeed;
     const reshuffled = shuffle(names, newSeed);
-    const namesHash = createNamesHash(reshuffled);
-    namesHashRef.current = namesHash;
+    const reshuffledHash = createNamesHash(reshuffled);
+    namesHashRef.current = reshuffledHash;
     resumedRef.current = false;
 
     const champion = reshuffled[0] ?? "";
@@ -181,7 +184,7 @@ const NameFaceOff = () => {
           champion,
           index,
           seed: newSeed,
-          namesHash,
+          namesHash: reshuffledHash,
         })
       );
     }
