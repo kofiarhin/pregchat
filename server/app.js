@@ -14,47 +14,17 @@ const appointmentRoutes = require("./routes/appointments");
 const journalRoutes = require("./routes/journals");
 const errorHandler = require("./middleware/error");
 
-const normalizeOrigins = (value) =>
-  value
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-
-const defaultAllowedOrigins = [
-  "http://localhost:5000",
-  "http://localhost:5173",
-  "https://pregchat-mu.vercel.app/",
-];
-
-const envAllowedOrigins = process.env.CORS_ALLOWED_ORIGINS
-  ? normalizeOrigins(process.env.CORS_ALLOWED_ORIGINS)
-  : [];
-
-const allowedOrigins = Array.from(
-  new Set([...envAllowedOrigins, ...defaultAllowedOrigins])
-);
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(null, false);
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 204,
-};
-
 const createApp = (configureApp) => {
   const app = express();
 
-  app.set("trust proxy", 1);
-
+  const corsOptions = {
+    origin:
+      process.env.NODE_ENV === "production"
+        ? process.env.FRONTEND_URL
+        : "http://localhost:5000",
+    credentials: true,
+  };
   app.use(cors(corsOptions));
-  app.options("*", cors(corsOptions));
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
