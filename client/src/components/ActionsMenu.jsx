@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FiChevronDown, FiMoreVertical } from "react-icons/fi";
-import styles from "./actionsMenu.styles.scss?module";
+import styles from "./actionsMenu.styles.module.scss";
 
 const ActionsMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
