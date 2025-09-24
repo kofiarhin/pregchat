@@ -25,8 +25,6 @@ const getTodayBabyImage = async (req, res) => {
       profile,
     });
 
-    console.log({ url: result.url, isCached: result.isCached });
-
     return res.json({
       url: result.url,
       week: result.week,
