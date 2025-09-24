@@ -1,26 +1,11 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
-const http = require("http");
-const createApp = require("./index");
-const connectDB = require("./config/db");
+const express = require('express');
+const cors = require('cors');
+const storeRoutes = require('./routes/store.routes');
 
-const PORT = process.env.PORT || 5001;
+const app = express();
+app.use(cors({ origin: '*' }));
+app.use(express.json());
 
-const startServer = async () => {
-  try {
-    await connectDB();
-    const app = createApp();
-    const server = http.createServer(app);
+app.use('/api/store', storeRoutes);
 
-    server.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Health check: /health`);
-    });
-  } catch (error) {
-    console.error("Failed to start server", error);
-    process.exit(1);
-  }
-};
-
-startServer();
+module.exports = app;
