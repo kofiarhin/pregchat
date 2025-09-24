@@ -4,6 +4,28 @@ const Flag = require("../models/Flag");
 const Pregnancy = require("../models/Pregnancy");
 const DailyContent = require("../models/DailyContent");
 
+const getConversations = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const conversations = await Conversation.find({ userId }).sort({
+      updatedAt: -1,
+    });
+
+    // Map to the expected format
+    const chats = conversations.map((conv) => ({
+      id: conv._id,
+      title: "Pregnancy Assistant", // Default title since model doesn't have title
+      updatedAt: conv.updatedAt,
+      createdAt: conv.createdAt,
+    }));
+
+    res.json(chats);
+  } catch (error) {
+    console.error("Get conversations error:", error);
+    res.status(500).json({ error: "Failed to fetch conversations" });
+  }
+};
+
 const ask = async (req, res) => {
   try {
     const { text, stream = false } = req.body;
@@ -103,4 +125,5 @@ const getTriageMessage = (region) => {
 
 module.exports = {
   ask,
+  getConversations,
 };

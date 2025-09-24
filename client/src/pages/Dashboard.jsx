@@ -154,6 +154,7 @@ const Dashboard = () => {
               <p className="muted baby-preview__caption">{previewCaption}</p>
               <div className="baby-preview__image-frame">
                 <img
+                  className="babyPreviewImage"
                   src={babyPreview.url}
                   alt={`Illustrative fetus render at week ${
                     babyPreview.week ?? "unknown"
@@ -251,4 +252,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

@@ -14,10 +14,38 @@ const appointmentRoutes = require("./routes/appointments");
 const journalRoutes = require("./routes/journals");
 const errorHandler = require("./middleware/error");
 
+const normalizeOrigins = (value) =>
+  value
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+const defaultAllowedOrigins = [
+  "http://localhost:5000",
+  "http://localhost:5173",
+  "https://pregchat-mu.vercel.app/",
+];
+
+const envAllowedOrigins = process.env.CORS_ALLOWED_ORIGINS
+  ? normalizeOrigins(process.env.CORS_ALLOWED_ORIGINS)
+  : [];
+
+const allowedOrigins = Array.from(
+  new Set([...envAllowedOrigins, ...defaultAllowedOrigins])
+);
+
 const corsOptions = {
-  origin: "*",
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(null, false);
+  },
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204,
 };
 
 const createApp = (configureApp) => {

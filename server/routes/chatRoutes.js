@@ -1,5 +1,5 @@
 const express = require("express");
-const { ask } = require("../controllers/chatController");
+const { ask, getConversations } = require("../controllers/chatController");
 const auth = require("../middleware/auth");
 const rateLimit = require("express-rate-limit");
 
@@ -15,6 +15,9 @@ const chatLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// GET /chat/conversations
+router.get("/conversations", auth, getConversations);
 
 // POST /chat/ask
 router.post("/ask", auth, chatLimiter, ask);
