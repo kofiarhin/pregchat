@@ -76,9 +76,13 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ["baby-image", "today", londonDateKey],
     queryFn: async () => {
-      const response = await http.get("/api/baby-image/today");
+      const response = await http.get("/api/baby-image/today", {
+        credentials: false,
+      });
 
       const resolvedUrl = resolveBabyImageUrl(response?.url);
+
+      console.log({ url: resolvedUrl });
 
       return {
         url: resolvedUrl,
