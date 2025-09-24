@@ -8,6 +8,7 @@ import Footer from "./components/Footer/Footer.jsx";
 import Profile from "./pages/Profile.jsx";
 import Onboarding from "./pages/Onboarding/Onboarding.jsx";
 import Chat from "./pages/Chat.jsx";
+import FaceOffPage from "./pages/FaceOffPage.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -95,6 +96,16 @@ const App = () => {
             path="/chat"
             element={
               isAuthenticated ? <Chat /> : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/faceoff"
+            element={
+              isAuthenticated ? (
+                <FaceOffPage />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
           <Route

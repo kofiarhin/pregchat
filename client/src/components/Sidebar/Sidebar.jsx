@@ -22,6 +22,10 @@ const navItems = [
     path: "/chat",
   },
   {
+    id: "faceoff",
+    path: "/faceoff",
+  },
+  {
     id: "store",
     path: "/store",
   },
