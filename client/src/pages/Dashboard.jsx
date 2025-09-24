@@ -8,6 +8,20 @@ import { BASE_URL } from "../constants/baseUrl.js";
 import "./dashboard.styles.scss";
 import { Link } from "react-router-dom";
 
+const getBaseUrl = () => {
+  const envBase = typeof BASE_URL === "string" ? BASE_URL.trim() : "";
+
+  if (envBase) {
+    return envBase;
+  }
+
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
+  }
+
+  return null;
+};
+
 const resolveBabyImageUrl = (rawUrl) => {
   if (!rawUrl) {
     return null;
@@ -15,10 +29,24 @@ const resolveBabyImageUrl = (rawUrl) => {
 
   const trimmed = String(rawUrl).trim();
 
-  try {
-    return new URL(trimmed, BASE_URL).toString();
-  } catch (error) {
+  if (!trimmed) {
     return null;
+  }
+
+  try {
+    return new URL(trimmed).toString();
+  } catch (error) {
+    const base = getBaseUrl();
+
+    if (!base) {
+      return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+    }
+
+    try {
+      return new URL(trimmed, base).toString();
+    } catch (fallbackError) {
+      return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+    }
   }
 };
 
