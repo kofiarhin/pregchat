@@ -18,14 +18,7 @@ const errorHandler = require("./middleware/error");
 const createApp = (configureApp) => {
   const app = express();
 
-  const corsOptions = {
-    origin:
-      process.env.NODE_ENV === "production"
-        ? process.env.FRONTEND_URL
-        : "http://localhost:5000",
-    credentials: true,
-  };
-  app.use(cors(corsOptions));
+  app.use(cors({ origin: "*", credentials: true }));
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
