@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useChatsQuery } from "../../features/chats/hooks/useChatsQuery.js";
 import { useCreateChatMutation } from "../../features/chats/hooks/useCreateChatMutation.js";
@@ -24,6 +24,43 @@ const formatTime = (value) => {
 
 const deriveDisplayMessages = (pages) =>
   pages?.flatMap((page) => page.messages ?? []) ?? [];
+
+const initialState = { convoId: null, messages: [] };
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "INIT_CONVO":
+      if (action.convoId === state.convoId) {
+        return state;
+      }
+      return { convoId: action.convoId, messages: action.history ?? [] };
+    case "SET_HISTORY_ONCE":
+      if (state.convoId !== action.convoId) {
+        return state;
+      }
+      if (state.messages.length > 0) {
+        return state;
+      }
+      return { ...state, messages: action.history ?? [] };
+    case "APPEND":
+      return { ...state, messages: [...state.messages, action.msg] };
+    case "PATCH_LAST": {
+      if (!state.messages.length) {
+        return state;
+      }
+      const nextMessages = [...state.messages];
+      nextMessages[nextMessages.length - 1] = {
+        ...nextMessages[nextMessages.length - 1],
+        ...action.patch,
+      };
+      return { ...state, messages: nextMessages };
+    }
+    default:
+      return state;
+  }
+};
+
+const useStableConvoId = (value) => useMemo(() => String(value ?? "default"), [value]);
 
 const ChatBox = ({ daySummary }) => {
   const [activeChatId, setActiveChatId] = useState(null);
@@ -66,10 +103,14 @@ const ChatBox = ({ daySummary }) => {
   );
   const { remove: removeMessagesQuery } = messagesQuery;
 
-  const messages = useMemo(
+  const serverMessages = useMemo(
     () => deriveDisplayMessages(messagesQuery.data?.pages),
     [messagesQuery.data]
   );
+
+  const convoId = useStableConvoId(chatId);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const messages = state.messages;
 
   const sendMessageMutation = useSendMessageMutation({ chatId });
 
@@ -96,7 +137,62 @@ const ChatBox = ({ daySummary }) => {
       return;
     }
     scrollAnchorRef.current.scrollIntoView({ behavior: "smooth" });
-  }, [messages, sendMessageMutation.isPending]);
+  }, [messages.length]);
+
+  useEffect(() => {
+    dispatch({ type: "INIT_CONVO", convoId, history: serverMessages });
+  }, [convoId]);
+
+  useEffect(() => {
+    dispatch({ type: "SET_HISTORY_ONCE", convoId, history: serverMessages });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverMessages?.length, convoId]);
+
+  useEffect(() => {
+    if (state.convoId !== convoId) {
+      return;
+    }
+
+    const history = serverMessages ?? [];
+    if (history.length > messages.length) {
+      history.slice(messages.length).forEach((entry) => {
+        dispatch({ type: "APPEND", msg: entry });
+      });
+      return;
+    }
+
+    if (!history.length || history.length !== messages.length) {
+      return;
+    }
+
+    const lastHistoryEntry = history[history.length - 1];
+    const lastLocalEntry = messages[messages.length - 1];
+    if (!lastHistoryEntry || !lastLocalEntry) {
+      return;
+    }
+
+    const shareId = lastHistoryEntry.id && lastLocalEntry.id
+      ? lastHistoryEntry.id === lastLocalEntry.id
+      : (lastHistoryEntry.timestamp ?? lastHistoryEntry.createdAt) ===
+          (lastLocalEntry.timestamp ?? lastLocalEntry.createdAt) &&
+        lastHistoryEntry.role === lastLocalEntry.role;
+
+    if (!shareId) {
+      return;
+    }
+
+    const stringify = (value) =>
+      value === undefined ? undefined : JSON.stringify(value);
+    const hasDiff =
+      lastHistoryEntry.content !== lastLocalEntry.content ||
+      stringify(lastHistoryEntry.meta) !== stringify(lastLocalEntry.meta) ||
+      lastHistoryEntry.error !== lastLocalEntry.error ||
+      lastHistoryEntry.pending !== lastLocalEntry.pending;
+
+    if (hasDiff) {
+      dispatch({ type: "PATCH_LAST", patch: lastHistoryEntry });
+    }
+  }, [serverMessages, messages, convoId, state.convoId]);
 
   const handleViewportScroll = () => {
     if (!messagesViewportRef.current) {
@@ -161,8 +257,8 @@ const ChatBox = ({ daySummary }) => {
     sendMessageMutation.mutate(payload);
   };
 
-  const renderMessage = (entry, index) => {
-    const key = `${entry.id}-${index}`;
+  const renderMessage = (entry) => {
+    const key = entry.id ?? `${entry.timestamp ?? entry.createdAt}-${entry.role}`;
     const tone = entry.meta?.triage ? "triage" : entry.role;
 
     return (
