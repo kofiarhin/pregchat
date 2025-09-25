@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { updateProfileField } from "../services/profile.js";
-import styles from "./inlineEditableField.styles.scss";
+import styles from "./InlineEditableField.styles.module.scss";
 
 const InlineEditableField = ({
   profileId,

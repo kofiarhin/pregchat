@@ -14,11 +14,14 @@ const appointmentRoutes = require("./routes/appointments");
 const journalRoutes = require("./routes/journals");
 const namesRoutes = require("./routes/namesRoutes");
 const errorHandler = require("./middleware/error");
+const { createCorsOptions } = require("./config/cors");
 
 const createApp = (configureApp) => {
   const app = express();
 
-  app.use(cors({ origin: "*", credentials: true }));
+  const corsOptions = createCorsOptions();
+  app.use(cors(corsOptions));
+  app.options("*", cors(corsOptions));
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
