@@ -59,12 +59,16 @@ const sampleNames = [
 ];
 
 const seedNames = async () => {
+  console.log(process.env.MONGO_URI);
+  return;
   try {
     await connectDB();
     const existingCount = await Name.countDocuments();
 
     if (existingCount > 0) {
-      console.log(`Names collection already has ${existingCount} entries. Skipping seed.`);
+      console.log(
+        `Names collection already has ${existingCount} entries. Skipping seed.`
+      );
       return;
     }
 
