@@ -1,4 +1,5 @@
 const Name = require("../models/Name");
+const { sampleNames } = require("../data/sampleNames.json");
 
 const parseLimit = (value) => {
   const parsed = Number.parseInt(value, 10);
@@ -27,23 +28,7 @@ const buildQuery = ({ gender, style, q }) => {
 };
 
 const getNames = async (req, res, next) => {
-  try {
-    const { limit = 50, gender, style, q } = req.query;
-    const query = buildQuery({ gender, style, q });
-    const parsedLimit = parseLimit(limit);
-
-    const names = await Name.find(query)
-      .sort({ name: 1 })
-      .limit(parsedLimit)
-      .select("name")
-      .lean();
-
-    const result = names.map((entry) => entry.name);
-
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
+  return res.json(sampleNames);
 };
 
 module.exports = {
