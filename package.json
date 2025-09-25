@@ -5,9 +5,9 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "dev": "concurrently \"npm run start:server\" \"npm run start:client\"",
-    "start:server": "cd server && nodemon server.js",
-    "start:client": "cd client && vite --port 5000",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
     "test:server": "cd server && jest --runInBand",
     "test:client": "cd client && vitest",
     "test:unit": "cd server && jest --config jest.unit.config.js --runInBand",
