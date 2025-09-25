@@ -1,8 +1,29 @@
+const mongoose = require("mongoose");
 const { askAya, triageCheck } = require("../config/ai");
 const Conversation = require("../models/Conversation");
 const Flag = require("../models/Flag");
 const Pregnancy = require("../models/Pregnancy");
 const DailyContent = require("../models/DailyContent");
+
+const DEFAULT_PAGE = 0;
+const DEFAULT_LIMIT = 20;
+const MAX_LIMIT = 100;
+
+const parsePage = (value) => {
+  const parsed = Number.parseInt(value, 10);
+  if (Number.isInteger(parsed) && parsed >= 0) {
+    return parsed;
+  }
+  return DEFAULT_PAGE;
+};
+
+const parseLimit = (value) => {
+  const parsed = Number.parseInt(value, 10);
+  if (Number.isInteger(parsed) && parsed > 0) {
+    return Math.min(parsed, MAX_LIMIT);
+  }
+  return DEFAULT_LIMIT;
+};
 
 const getConversations = async (req, res) => {
   try {
@@ -123,7 +144,61 @@ const getTriageMessage = (region) => {
   return messages[region] || messages["Global"];
 };
 
+const getConversationMessages = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const page = parsePage(req.query?.page);
+    const limit = parseLimit(req.query?.limit);
+    const userId = req.user?._id;
+
+    if (!conversationId || !mongoose.Types.ObjectId.isValid(conversationId)) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+      userId,
+    }).lean();
+
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    const allMessages = Array.isArray(conversation.messages)
+      ? conversation.messages
+      : [];
+    const total = allMessages.length;
+    const start = page * limit;
+    const messages = start < total ? allMessages.slice(start, start + limit) : [];
+    const hasMore = start + limit < total;
+
+    const payload = {
+      messages,
+      hasMore,
+      total,
+      page,
+      limit,
+      chat: {
+        id: conversation._id.toString(),
+        title: "Pregnancy Assistant",
+        createdAt: conversation.createdAt,
+        updatedAt: conversation.updatedAt,
+      },
+    };
+
+    if (page === 0) {
+      payload.allMessages = allMessages;
+    }
+
+    return res.json(payload);
+  } catch (error) {
+    console.error("Get conversation messages error:", error);
+    return res.status(500).json({ error: "Failed to fetch messages" });
+  }
+};
+
 module.exports = {
   ask,
   getConversations,
+  getConversationMessages,
 };

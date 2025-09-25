@@ -38,7 +38,7 @@ const Header = () => {
           <FaBars className="icon" />
         </button>
 
-        <Link to="/" className="brand_wrap">
+        <Link to="/chat" className="brand_wrap">
           <span className="brand">PregChat</span>
           <span className="model">alpha</span>
         </Link>
