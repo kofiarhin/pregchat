@@ -21,7 +21,7 @@ export default defineConfig({
   plugins: [react()],
   base: "/",
   server: {
-    port: 5000,
+    port: 4000,
     host: true,
     proxy
   },
