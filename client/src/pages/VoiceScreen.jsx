@@ -23,18 +23,19 @@ const VoiceScreen = () => {
     listening,
     startListening,
     stopListening,
-    speak,
+    play,
+    stop: stopSpeech,
+    unlock,
+    playbackState,
     supportsFullDuplex,
     voiceError,
     uiState,
     setUiState,
     speaking,
-    setSpeaking,
     isSending,
     interrupt,
     latestTranscript,
     latestTranscriptId,
-    activeUtteranceRef,
     lastSpokenRef,
     sendViaExisting,
     abortActiveRequest,
@@ -126,6 +127,7 @@ const VoiceScreen = () => {
     }
 
     hasUserGestureRef.current = true;
+    void unlock();
 
     if (statusIsSpeaking) {
       const didInterrupt = interrupt({ resumeListening: true });
@@ -146,15 +148,13 @@ const VoiceScreen = () => {
       announce("Listening started");
       vibrate();
     }
-  }, [announce, canUseVoice, interrupt, listening, setUiState, startListening, statusIsSpeaking, stopListening, vibrate]);
+  }, [announce, canUseVoice, interrupt, listening, setUiState, startListening, statusIsSpeaking, stopListening, unlock, vibrate]);
 
   const handleBack = useCallback(() => {
     abortActiveRequest();
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
+    stopSpeech();
     navigate("/chat");
-  }, [abortActiveRequest, navigate]);
+  }, [abortActiveRequest, navigate, stopSpeech]);
 
   const handleMore = useCallback(() => {
     console.log("Voice options coming soon");
@@ -164,12 +164,10 @@ const VoiceScreen = () => {
     interrupt({ resumeListening: false });
     stopListening();
     abortActiveRequest();
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
+    stopSpeech();
     setUiState(VoiceUIStates.idle);
     navigate("/chat");
-  }, [abortActiveRequest, interrupt, navigate, setUiState, stopListening]);
+  }, [abortActiveRequest, interrupt, navigate, setUiState, stopListening, stopSpeech]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) {
@@ -213,9 +211,7 @@ const VoiceScreen = () => {
     }
 
     const process = async () => {
-      if (typeof window !== "undefined" && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
+      stopSpeech();
 
       if (statusIsSpeaking) {
         abortActiveRequest();
@@ -256,6 +252,7 @@ const VoiceScreen = () => {
     startListening,
     statusIsSpeaking,
     resetTranscript,
+    stopSpeech,
   ]);
 
   useEffect(() => {
@@ -289,39 +286,21 @@ const VoiceScreen = () => {
       return;
     }
 
-    if (!supportsFullDuplex) {
+    if (!supportsFullDuplex && listening) {
       stopListening();
     }
 
     console.log("[voice] speak:", replyText);
 
-    activeUtteranceRef.current = speak(replyText, {
-      rate: 0.96,
-      pitch: 1,
-      volume: 1,
-      onStart: () => {
-        setSpeaking(true);
-        if (!supportsFullDuplex) {
-          stopListening();
-        }
-      },
-      onEnd: () => {
-        setSpeaking(false);
-        if (!supportsFullDuplex) {
-          startListening();
-        }
-      },
-    });
+    void play(replyText, { messageId: messageKey });
   }, [
-    activeUtteranceRef,
     canSpeak,
     lastSpokenRef,
     messages,
-    setSpeaking,
-    speak,
-    startListening,
     stopListening,
     supportsFullDuplex,
+    play,
+    listening,
   ]);
 
   useEffect(() => {

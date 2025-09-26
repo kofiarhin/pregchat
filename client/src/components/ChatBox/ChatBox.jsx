@@ -39,7 +39,6 @@ const WaveIcon = (props) => (
 const ChatBox = () => {
   const { messages } = useChatMessages();
   const [input, setInput] = useState("");
-  const [speakingMessageId, setSpeakingMessageId] = useState(null);
   const [voiceNotice, setVoiceNotice] = useState(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const scrollAnchorRef = useRef(null);
@@ -53,20 +52,21 @@ const ChatBox = () => {
     listening,
     startListening,
     stopListening,
-    speak,
-    supportsFullDuplex,
+    play,
+    stop: stopSpeech,
+    unlock,
+    playbackState,
     voiceError,
     uiState,
     setUiState,
     speaking,
-    setSpeaking,
     isSending,
     sendViaExisting,
     interrupt,
-    activeUtteranceRef,
     lastSpokenRef,
   } = useVoiceContext();
 
+  const speakingMessageId = playbackState?.currentMessageId;
   const statusIsSpeaking = speaking || isSending;
   const statusDotClass = `${styles.statusDot} ${
     statusIsSpeaking ? styles.statusDotSpeaking : listening ? styles.statusDotListening : ""
@@ -133,16 +133,12 @@ const ChatBox = () => {
     ({ resumeListening = false, announceInterrupt = true } = {}) => {
       const didInterrupt = interrupt({ resumeListening });
 
-      if (didInterrupt) {
-        setSpeakingMessageId(null);
-      }
-
       if (didInterrupt && announceInterrupt) {
         announce("Interrupted");
         vibrate();
       }
     },
-    [announce, interrupt, setSpeakingMessageId, vibrate]
+    [announce, interrupt, vibrate]
   );
 
   const handleSubmit = useCallback(
@@ -167,35 +163,13 @@ const ChatBox = () => {
         return;
       }
 
-      speak(message.content, {
-        rate: 0.96,
-        pitch: 1,
-        volume: 1,
-        onStart: () => {
-          setSpeaking(true);
-          setSpeakingMessageId(message.id || message.timestamp || message.content);
-          if (!supportsFullDuplex) {
-            stopListening();
-          }
-        },
-        onEnd: () => {
-          setSpeaking(false);
-          setSpeakingMessageId(null);
-          if (!supportsFullDuplex) {
-            startListening();
-          }
-        },
-      });
+      void unlock();
+      const messageKey = message.id || message.timestamp || message.content;
+      stopSpeech();
+      lastSpokenRef.current = messageKey;
+      play(message.content, { messageId: messageKey });
     },
-    [
-      canSpeak,
-      setSpeaking,
-      setSpeakingMessageId,
-      speak,
-      startListening,
-      stopListening,
-      supportsFullDuplex,
-    ]
+    [canSpeak, lastSpokenRef, play, stopSpeech, unlock]
   );
 
   const handleMicPress = useCallback(() => {
@@ -203,6 +177,7 @@ const ChatBox = () => {
       return;
     }
 
+    void unlock();
     if (statusIsSpeaking) {
       handleInterrupt({ resumeListening: true });
       return;
@@ -215,7 +190,7 @@ const ChatBox = () => {
       setUiState(VoiceUIStates.listening);
       startListening();
     }
-  }, [canUseVoice, handleInterrupt, listening, setUiState, startListening, statusIsSpeaking, stopListening]);
+  }, [canUseVoice, handleInterrupt, listening, setUiState, startListening, statusIsSpeaking, stopListening, unlock]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) {
@@ -266,36 +241,8 @@ const ChatBox = () => {
     }
 
     lastSpokenRef.current = messageKey;
-
-    activeUtteranceRef.current = speak(latestAssistant.content, {
-      rate: 0.96,
-      pitch: 1,
-      volume: 1,
-      onStart: () => {
-        setSpeaking(true);
-        setSpeakingMessageId(messageKey);
-        if (!supportsFullDuplex) {
-          stopListening();
-        }
-      },
-      onEnd: () => {
-        setSpeaking(false);
-        setSpeakingMessageId(null);
-        if (!supportsFullDuplex) {
-          startListening();
-        }
-      },
-    });
-  }, [
-    canSpeak,
-    messages,
-    setSpeaking,
-    setSpeakingMessageId,
-    speak,
-    startListening,
-    stopListening,
-    supportsFullDuplex,
-  ]);
+    play(latestAssistant.content, { messageId: messageKey });
+  }, [canSpeak, messages, play]);
 
   useEffect(() => {
     if (!messages.length) {

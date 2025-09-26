@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import useVoice from "../hooks/useVoice.js";
+import useTTS from "../hooks/useTTS.js";
 import "./chatWindow.styles.scss";
 
 const formatTime = (value) => {
@@ -16,14 +16,14 @@ const formatTime = (value) => {
 const ChatWindow = ({ messages = [], isSending = false }) => {
   const scrollAnchorRef = useRef(null);
   const lastSpokenRef = useRef(null);
-  const { supported, speak, cancelSpeech } = useVoice();
+  const { play, stop, canPlayAudio } = useTTS();
 
   useEffect(() => {
     scrollAnchorRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length, isSending]);
 
   useEffect(() => {
-    if (!supported.tts) {
+    if (!canPlayAudio) {
       return undefined;
     }
 
@@ -43,16 +43,15 @@ const ChatWindow = ({ messages = [], isSending = false }) => {
 
     lastSpokenRef.current = key;
 
-    speak(latestAssistant.content, {
-      rate: 0.96,
-      pitch: 1,
-      volume: 1,
+    stop();
+    play(latestAssistant.content, {
+      messageId: key,
     });
 
     return () => {
-      cancelSpeech();
+      stop();
     };
-  }, [messages, speak, cancelSpeech, supported.tts]);
+  }, [messages, play, stop, canPlayAudio]);
 
   useEffect(() => {
     if (!messages.length) {
@@ -61,8 +60,8 @@ const ChatWindow = ({ messages = [], isSending = false }) => {
   }, [messages.length]);
 
   useEffect(() => () => {
-    cancelSpeech();
-  }, [cancelSpeech]);
+    stop();
+  }, [stop]);
 
   const renderMessage = (entry, index) => {
     const tone = entry?.meta?.triage ? "triage" : entry?.role;
