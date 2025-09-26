@@ -12,7 +12,6 @@ import FaceOffPage from "./pages/FaceOffPage.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import ChatSessionProvider from "./features/chats/context/ChatSessionContext.jsx";
 import Store from "./pages/Store/Store.jsx";
 import ItemDetails from "./pages/ItemDetails/ItemDetails.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
@@ -26,10 +25,7 @@ import JournalDetail from "./pages/JournalDetail.jsx";
 
 const App = () => {
   const token = useAppSelector(selectAuthToken);
-  const {
-    data: currentUser,
-    isLoading: userLoading,
-  } = useCurrentUserQuery({
+  const { data: currentUser, isLoading: userLoading } = useCurrentUserQuery({
     enabled: Boolean(token),
   });
 
@@ -57,10 +53,9 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <ChatSessionProvider>
-        <div className="app dark">
-          {isAuthenticated && <Header />}
-          <Routes>
+      <div className="app dark">
+        {isAuthenticated && <Header />}
+        <Routes>
           <Route
             path="/"
             element={
@@ -133,11 +128,7 @@ const App = () => {
           <Route
             path="/checkout"
             element={
-              isAuthenticated ? (
-                <Checkout />
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              isAuthenticated ? <Checkout /> : <Navigate to="/login" replace />
             }
           />
           <Route
@@ -163,7 +154,11 @@ const App = () => {
           <Route
             path="/journals"
             element={
-              isAuthenticated ? <JournalsList /> : <Navigate to="/login" replace />
+              isAuthenticated ? (
+                <JournalsList />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
           <Route
@@ -179,7 +174,11 @@ const App = () => {
           <Route
             path="/journals/:id"
             element={
-              isAuthenticated ? <JournalDetail /> : <Navigate to="/login" replace />
+              isAuthenticated ? (
+                <JournalDetail />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
           <Route
@@ -219,10 +218,9 @@ const App = () => {
               )
             }
           />
-          </Routes>
-          {isAuthenticated && <Footer />}
-        </div>
-      </ChatSessionProvider>
+        </Routes>
+        {isAuthenticated && <Footer />}
+      </div>
     </BrowserRouter>
   );
 };

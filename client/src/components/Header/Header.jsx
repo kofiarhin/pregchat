@@ -6,14 +6,12 @@ import {
 import "./header.styles.scss";
 import { FaBars } from "react-icons/fa";
 import AvatarDropdown from "../AvatarDropdown.jsx";
-import { useChatSession } from "../../features/chats/context/ChatSessionContext.jsx";
 import Sidebar from "../Sidebar/Sidebar.jsx";
 import { Link } from "react-router-dom";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: user } = useCurrentUserQuery();
-  const { messagesSetter } = useChatSession();
   const logoutMutation = useLogoutMutation({
     onSuccess: () => {
       setMenuOpen(false);
@@ -46,7 +44,6 @@ const Header = () => {
         <div className="actions">
           <AvatarDropdown
             avatar={user?.name?.[0]?.toUpperCase() || "P"}
-            setMessages={messagesSetter}
             userId={user?._id}
           />
         </div>

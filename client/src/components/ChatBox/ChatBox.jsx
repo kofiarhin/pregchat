@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { FiSend } from "react-icons/fi";
 import { http } from "../../api/http.js";
 import "./chatBox.styles.scss";
+import { useChatMessages } from "../../features/messages/hooks/useChatMessages.js";
 
 const formatTime = (value) => {
   try {
@@ -17,10 +18,11 @@ const formatTime = (value) => {
 const genId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 const ChatBox = ({ daySummary }) => {
-  const [messages, setMessages] = useState([]);
+  const { messages, appendMessages } = useChatMessages();
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const scrollAnchorRef = useRef(null);
+  const inputRef = useRef(null);
 
   // Auto-scroll to the latest message
   useEffect(() => {
@@ -29,6 +31,7 @@ const ChatBox = ({ daySummary }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    inputRef.current?.focus();
     const text = input.trim();
     if (!text || isSending) return;
 
@@ -39,7 +42,7 @@ const ChatBox = ({ daySummary }) => {
       timestamp: new Date().toISOString(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    await appendMessages(userMessage);
     setInput("");
     setIsSending(true);
 
@@ -72,19 +75,17 @@ const ChatBox = ({ daySummary }) => {
         meta: data?.triage ? { triage: true } : undefined,
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      await appendMessages(assistantMessage);
     } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: genId(),
-          role: "assistant",
-          content: error?.message || "Failed to send message.",
-          timestamp: new Date().toISOString(),
-        },
-      ]);
+      await appendMessages({
+        id: genId(),
+        role: "assistant",
+        content: error?.message || "Failed to send message.",
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       setIsSending(false);
+      inputRef.current?.focus();
     }
   };
 
@@ -131,6 +132,8 @@ const ChatBox = ({ daySummary }) => {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask Aya about your pregnancy..."
               disabled={isSending}
+              ref={inputRef}
+              autoFocus
             />
             <button
               className="send"

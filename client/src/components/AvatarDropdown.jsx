@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./avatarDropdown.styles.module.scss";
-import { clearChatHistory } from "../utils/chatHistory.js";
+import { useChatMessages } from "../features/messages/hooks/useChatMessages.js";
 
-const AvatarDropdown = ({ avatar, setMessages, userId }) => {
+const AvatarDropdown = ({ avatar, userId }) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
+  const { clearMessages, isClearing } = useChatMessages();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -23,7 +24,7 @@ const AvatarDropdown = ({ avatar, setMessages, userId }) => {
       return;
     }
 
-    await clearChatHistory(setMessages, userId);
+    await clearMessages(userId);
     setOpen(false);
   };
 
@@ -47,8 +48,10 @@ const AvatarDropdown = ({ avatar, setMessages, userId }) => {
             type="button"
             role="menuitem"
             onClick={handleReset}
+            disabled={isClearing}
+            title={isClearing ? "Clearing..." : "Reset Chat"}
           >
-            Reset Chat
+            {isClearing ? "Clearing..." : "Reset Chat"}
           </button>
         </div>
       )}
