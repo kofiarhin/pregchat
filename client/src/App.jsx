@@ -12,6 +12,7 @@ import FaceOffPage from "./pages/FaceOffPage.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import Store from "./pages/Store/Store.jsx";
 import ItemDetails from "./pages/ItemDetails/ItemDetails.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
@@ -85,6 +86,12 @@ const App = () => {
             path="/dashboard"
             element={
               isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" replace />
             }
           />
           <Route

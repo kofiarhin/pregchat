@@ -1,3 +1,4 @@
+process.env.JWT_SECRET = process.env.JWT_SECRET || "unit-test-secret";
 const { createToken, verifyToken } = require("../../utils/token");
 
 describe("token utilities", () => {

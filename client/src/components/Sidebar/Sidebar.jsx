@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import styles from "./sidebar.styles.module.scss";
 import content from "../../content/appContent.json";
 import { useCart } from "../../context/CartContext.jsx";
+import { useCurrentUserQuery } from "../../features/auth/hooks/useAuth.js";
 
-const navItems = [
+const NAV_ITEMS = [
   {
     id: "profile",
     path: "/profile",
@@ -41,10 +42,20 @@ const navItems = [
     id: "myAppointments",
     path: "/appointments/mine",
   },
+  {
+    id: "admin",
+    path: "/admin",
+    requiresAdmin: true,
+  },
 ];
 
 const Sidebar = ({ isOpen, onClose, onLogout, isLoggingOut }) => {
   const { cartCount } = useCart();
+  const { data: user } = useCurrentUserQuery();
+  const items = useMemo(
+    () => NAV_ITEMS.filter((item) => !item.requiresAdmin || user?.isAdmin === true),
+    [user]
+  );
   const handleNavigate = () => {
     if (onClose) {
       onClose();
@@ -77,7 +88,7 @@ const Sidebar = ({ isOpen, onClose, onLogout, isLoggingOut }) => {
       </div>
       <nav>
         <ul className={styles.list}>
-          {navItems.map((item) => (
+          {items.map((item) => (
             <li key={item.id}>
               <NavLink
                 to={item.path}
