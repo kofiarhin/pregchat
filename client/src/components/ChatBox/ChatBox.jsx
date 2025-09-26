@@ -1,9 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiMenu, FiMic, FiMicOff, FiPlay, FiPlus } from "react-icons/fi";
 import { http } from "../../api/http.js";
 import { useChatMessages } from "../../features/messages/hooks/useChatMessages.js";
 import useVoiceChat from "../../hooks/useVoiceChat.js";
 import styles from "../Chat/chat.module.scss";
+
+const UI_STATES = {
+  idle: "idle",
+  listening: "listening",
+  sending: "sending",
+  speaking: "speaking",
+  interrupting: "interrupting",
+};
 
 const formatTime = (value) => {
   try {
@@ -42,25 +50,134 @@ const ChatBox = ({ daySummary }) => {
   const { messages, appendMessages } = useChatMessages();
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [uiState, setUiState] = useState(UI_STATES.idle);
+  const [speaking, setSpeaking] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState(null);
+  const [voiceNotice, setVoiceNotice] = useState(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const scrollAnchorRef = useRef(null);
   const inputRef = useRef(null);
   const lastSpokenRef = useRef(null);
   const voiceQueueRef = useRef([]);
+  const abortControllerRef = useRef(null);
+  const requestIdRef = useRef(0);
+  const currentRequestIdRef = useRef(0);
+  const liveRegionRef = useRef(null);
+  const activeUtteranceRef = useRef(null);
 
   const {
-    canListen,
-    canSpeak,
-    isListening,
-    lastTranscript,
-    resetTranscript,
-    speak,
+    canUseVoice,
+    listening,
     startListening,
     stopListening,
+    speak,
+    lastTranscript,
+    resetTranscript,
+    supportsFullDuplex,
+    voiceError,
   } = useVoiceChat();
 
-  useEffect(() => {
-    scrollAnchorRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length, isSending]);
+  const statusIsSpeaking = speaking || isSending;
+  const statusDotClass = `${styles.statusDot} ${
+    statusIsSpeaking ? styles.statusDotSpeaking : listening ? styles.statusDotListening : ""
+  }`;
+  const statusLabel = statusIsSpeaking ? "Assistant speaking" : listening ? "Listening" : "Idle";
+
+  const micLabel = statusIsSpeaking
+    ? "Tap to interrupt"
+    : listening
+    ? "Stop voice input"
+    : "Start voice input";
+
+  const micClasses = useMemo(() => {
+    const classNames = [styles.roundButton];
+
+    if (listening) {
+      classNames.push(styles.micActive);
+    }
+
+    if (statusIsSpeaking) {
+      classNames.push(styles.micInterrupt);
+    }
+
+    return classNames.join(" ");
+  }, [listening, statusIsSpeaking]);
+
+  const queueAnimationFrame = useCallback((callback) => {
+    if (typeof window === "undefined") {
+      callback();
+      return;
+    }
+
+    const raf = window.requestAnimationFrame || window.setTimeout;
+    raf(() => callback());
+  }, []);
+
+  const announce = useCallback(
+    (message) => {
+      if (!liveRegionRef.current) {
+        return;
+      }
+
+      liveRegionRef.current.textContent = "";
+      queueAnimationFrame(() => {
+        if (liveRegionRef.current) {
+          liveRegionRef.current.textContent = message;
+        }
+      });
+    },
+    [queueAnimationFrame]
+  );
+
+  const vibrate = useCallback(() => {
+    if (prefersReducedMotion) {
+      return;
+    }
+
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      navigator.vibrate(20);
+    }
+  }, [prefersReducedMotion]);
+
+  const handleInterrupt = useCallback(
+    ({ resumeListening = false, announceInterrupt = true } = {}) => {
+      let didInterrupt = false;
+
+      setUiState(UI_STATES.interrupting);
+
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+        didInterrupt = true;
+      }
+
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        didInterrupt = true;
+      }
+
+      if (activeUtteranceRef.current) {
+        activeUtteranceRef.current = null;
+      }
+
+      if (didInterrupt && announceInterrupt) {
+        announce("Interrupted");
+        vibrate();
+      }
+
+      setSpeaking(false);
+      setSpeakingMessageId(null);
+      setIsSending(false);
+
+      if (resumeListening) {
+        setUiState(UI_STATES.listening);
+        startListening();
+      } else if (!listening) {
+        setUiState(UI_STATES.idle);
+      }
+    },
+    [announce, vibrate, listening, startListening]
+  );
 
   const sendMessage = useCallback(
     async (text, { fromVoice = false } = {}) => {
@@ -90,6 +207,19 @@ const ChatBox = ({ daySummary }) => {
 
       await appendMessages(userMessage);
       setIsSending(true);
+      setVoiceNotice(null);
+      setUiState(UI_STATES.sending);
+
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+
+      const nextRequestId = requestIdRef.current + 1;
+      requestIdRef.current = nextRequestId;
+      currentRequestIdRef.current = nextRequestId;
 
       try {
         const payload = {
@@ -106,7 +236,12 @@ const ChatBox = ({ daySummary }) => {
             : {}),
         };
 
-        const data = await http.post("/chat/ask", { json: payload });
+        const data = await http.post("/chat/ask", { json: payload, signal: abortController.signal });
+
+        if (nextRequestId !== currentRequestIdRef.current) {
+          return;
+        }
+
         const assistantContent =
           data?.content ||
           data?.message ||
@@ -122,6 +257,10 @@ const ChatBox = ({ daySummary }) => {
 
         await appendMessages(assistantMessage);
       } catch (error) {
+        if (error.name === "AbortError") {
+          return;
+        }
+
         await appendMessages({
           id: genId(),
           role: "assistant",
@@ -129,13 +268,22 @@ const ChatBox = ({ daySummary }) => {
           timestamp: new Date().toISOString(),
         });
       } finally {
-        setIsSending(false);
-        if (!fromVoice) {
-          inputRef.current?.focus();
+        if (nextRequestId === currentRequestIdRef.current) {
+          setIsSending(false);
+          abortControllerRef.current = null;
+          if (!fromVoice) {
+            inputRef.current?.focus();
+          }
+
+          if (listening) {
+            setUiState(UI_STATES.listening);
+          } else if (!speaking) {
+            setUiState(UI_STATES.idle);
+          }
         }
       }
     },
-    [appendMessages, daySummary, isSending]
+    [appendMessages, daySummary, isSending, listening, speaking]
   );
 
   const handleSubmit = useCallback(
@@ -147,37 +295,102 @@ const ChatBox = ({ daySummary }) => {
     [input, sendMessage]
   );
 
-  const toggleMic = useCallback(() => {
-    if (!canListen) {
-      return;
-    }
-
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
-    }
-  }, [canListen, isListening, startListening, stopListening]);
-
   const handleReplay = useCallback(
     (message) => {
       if (!message?.content) {
         return;
       }
 
-      speak(message.content, { rate: 0.96, pitch: 1, volume: 1 });
+      speak(message.content, {
+        rate: 0.96,
+        pitch: 1,
+        volume: 1,
+        onStart: () => {
+          setSpeaking(true);
+          setSpeakingMessageId(message.id || message.timestamp || message.content);
+          if (!supportsFullDuplex) {
+            stopListening();
+          }
+        },
+        onEnd: () => {
+          setSpeaking(false);
+          setSpeakingMessageId(null);
+          if (!supportsFullDuplex) {
+            startListening();
+          }
+        },
+      });
     },
-    [speak]
+    [speak, startListening, stopListening, supportsFullDuplex]
   );
+
+  const handleMicPress = useCallback(() => {
+    if (!canUseVoice) {
+      return;
+    }
+
+    if (statusIsSpeaking) {
+      handleInterrupt({ resumeListening: true });
+      return;
+    }
+
+    if (listening) {
+      stopListening();
+      setUiState(UI_STATES.idle);
+    } else {
+      setUiState(UI_STATES.listening);
+      startListening();
+    }
+  }, [canUseVoice, handleInterrupt, listening, startListening, statusIsSpeaking, stopListening]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handleChange = (event) => setPrefersReducedMotion(event.matches);
+
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", handleChange);
+    } else {
+      mediaQuery.addListener(handleChange);
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener("change", handleChange);
+      } else {
+        mediaQuery.removeListener(handleChange);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    scrollAnchorRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length, isSending]);
 
   useEffect(() => {
     if (!lastTranscript) {
       return;
     }
 
-    void sendMessage(lastTranscript, { fromVoice: true });
+    const trimmed = lastTranscript.trim();
+
+    if (!trimmed) {
+      resetTranscript();
+      return;
+    }
+
+    if (statusIsSpeaking) {
+      handleInterrupt({ resumeListening: false });
+    }
+
+    void sendMessage(trimmed, { fromVoice: true });
     resetTranscript();
-  }, [lastTranscript, resetTranscript, sendMessage]);
+  }, [handleInterrupt, lastTranscript, resetTranscript, sendMessage, statusIsSpeaking]);
 
   useEffect(() => {
     if (isSending) {
@@ -192,7 +405,7 @@ const ChatBox = ({ daySummary }) => {
   }, [isSending, sendMessage]);
 
   useEffect(() => {
-    if (!messages.length || !canSpeak) {
+    if (!messages.length || !canUseVoice) {
       return;
     }
 
@@ -204,15 +417,34 @@ const ChatBox = ({ daySummary }) => {
       return;
     }
 
-    const key = latestAssistant.id || latestAssistant.timestamp || latestAssistant.content;
+    const messageKey = latestAssistant.id || latestAssistant.timestamp || latestAssistant.content;
 
-    if (lastSpokenRef.current === key) {
+    if (lastSpokenRef.current === messageKey) {
       return;
     }
 
-    lastSpokenRef.current = key;
-    speak(latestAssistant.content, { rate: 0.96, pitch: 1, volume: 1 });
-  }, [messages, speak, canSpeak]);
+    lastSpokenRef.current = messageKey;
+
+    activeUtteranceRef.current = speak(latestAssistant.content, {
+      rate: 0.96,
+      pitch: 1,
+      volume: 1,
+      onStart: () => {
+        setSpeaking(true);
+        setSpeakingMessageId(messageKey);
+        if (!supportsFullDuplex) {
+          stopListening();
+        }
+      },
+      onEnd: () => {
+        setSpeaking(false);
+        setSpeakingMessageId(null);
+        if (!supportsFullDuplex) {
+          startListening();
+        }
+      },
+    });
+  }, [canUseVoice, messages, speak, startListening, stopListening, supportsFullDuplex]);
 
   useEffect(() => {
     if (!messages.length) {
@@ -220,38 +452,84 @@ const ChatBox = ({ daySummary }) => {
     }
   }, [messages.length]);
 
+  useEffect(() => {
+    if (!voiceError) {
+      return;
+    }
+
+    setVoiceNotice(voiceError);
+    setUiState((previous) => (previous === UI_STATES.listening ? UI_STATES.idle : previous));
+  }, [voiceError]);
+
+  useEffect(() => {
+    if (listening) {
+      setVoiceNotice(null);
+      setUiState((previous) =>
+        previous === UI_STATES.sending || previous === UI_STATES.speaking
+          ? previous
+          : UI_STATES.listening
+      );
+      announce("Listening started");
+      vibrate();
+    } else if (uiState === UI_STATES.listening) {
+      setUiState(speaking ? UI_STATES.speaking : UI_STATES.idle);
+      announce("Listening stopped");
+    }
+  }, [announce, listening, speaking, uiState, vibrate]);
+
+  useEffect(() => {
+    if (speaking) {
+      setUiState(UI_STATES.speaking);
+      announce("Speaking…");
+    } else if (!listening && !isSending) {
+      setUiState(UI_STATES.idle);
+    }
+  }, [announce, isSending, listening, speaking]);
+
   const renderMessage = useCallback(
     (entry, index) => {
       const isUser = entry?.role === "user";
       const triage = entry?.meta?.triage;
+      const messageId = entry?.id || entry?.timestamp || index;
       const rowClass = `${styles.messageRow} ${isUser ? styles.user : styles.assistant}`;
       const bubbleClass = `${styles.bubble} ${isUser ? styles.userBubble : ""}`;
-      const key = entry?.id || entry?.timestamp || index;
 
       return (
-        <div key={key} className={rowClass}>
+        <div key={messageId} className={rowClass}>
           <div className={bubbleClass}>
             {triage && <span className={styles.triageLabel}>Important</span>}
             <div>{entry?.content}</div>
             {!isUser && (
-              <div className={styles.messageActions}>
-                <button
-                  type="button"
-                  className={styles.playButton}
-                  onClick={() => handleReplay(entry)}
-                  aria-label="Replay response"
-                  disabled={!canSpeak}
-                >
-                  <FiPlay aria-hidden="true" size={18} />
-                </button>
-              </div>
+              <>
+                <div className={styles.messageActions}>
+                  <button
+                    type="button"
+                    className={styles.playButton}
+                    onClick={() => handleReplay(entry)}
+                    aria-label="Replay response"
+                    disabled={!canUseVoice}
+                  >
+                    <FiPlay aria-hidden="true" size={18} />
+                  </button>
+                </div>
+                {speaking && speakingMessageId === messageId && (
+                  <div className={styles.speakingIndicator} aria-label="Assistant is speaking">
+                    <span className={styles.speakingWave} aria-hidden="true">
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                    <span>Speaking…</span>
+                  </div>
+                )}
+              </>
             )}
           </div>
           <time className={styles.time}>{formatTime(entry?.timestamp)}</time>
         </div>
       );
     },
-    [canSpeak, handleReplay]
+    [canUseVoice, handleReplay, speaking, speakingMessageId]
   );
 
   return (
@@ -261,8 +539,8 @@ const ChatBox = ({ daySummary }) => {
           <FiMenu aria-hidden="true" size={20} />
         </button>
         <h1 className={styles.title}>ChatGPT 5</h1>
-        <div className={styles.statusWrapper} aria-label="Online">
-          <span className={styles.statusDot} />
+        <div className={styles.statusWrapper} aria-label={statusLabel} role="status">
+          <span className={statusDotClass} />
         </div>
       </header>
 
@@ -284,50 +562,67 @@ const ChatBox = ({ daySummary }) => {
         <div ref={scrollAnchorRef} />
       </main>
 
-      <form className={styles.composer} onSubmit={handleSubmit}>
-        <div className={styles.composerRow}>
-          <button type="button" className={styles.roundButton} aria-label="Add prompt">
-            <FiPlus aria-hidden="true" size={22} />
-          </button>
-
-          <div className={styles.inputWrapper}>
-            <input
-              ref={inputRef}
-              className={styles.input}
-              type="text"
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Ask anything"
-              disabled={isSending}
-              autoFocus
-            />
+      <div className={styles.composerShell}>
+        {listening && (
+          <div className={styles.listeningChip} role="status" aria-live="polite">
+            <span className={styles.listeningGlow} aria-hidden="true" />
+            Listening…
           </div>
+        )}
 
-          <button
-            type="button"
-            className={`${styles.roundButton} ${isListening ? styles.micActive : ""}`}
-            onClick={toggleMic}
-            aria-pressed={isListening}
-            aria-label={isListening ? "Stop voice input" : "Start voice input"}
-            disabled={!canListen}
-          >
-            {isListening ? (
-              <FiMicOff aria-hidden="true" size={22} />
-            ) : (
-              <FiMic aria-hidden="true" size={22} />
-            )}
-          </button>
+        <form className={styles.composer} onSubmit={handleSubmit}>
+          <div className={styles.composerRow}>
+            <button type="button" className={styles.roundButton} aria-label="Add prompt">
+              <FiPlus aria-hidden="true" size={22} />
+            </button>
 
-          <button
-            className={styles.roundButton}
-            type="submit"
-            aria-label="Send message"
-            disabled={!input.trim() || isSending}
-          >
-            <WaveIcon />
-          </button>
-        </div>
-      </form>
+            <div className={styles.inputWrapper}>
+              <input
+                ref={inputRef}
+                className={styles.input}
+                type="text"
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder="Ask anything"
+                disabled={isSending}
+                autoFocus
+              />
+            </div>
+
+            <button
+              type="button"
+              className={micClasses}
+              onClick={handleMicPress}
+              aria-pressed={listening}
+              aria-label={micLabel}
+              disabled={!canUseVoice}
+            >
+              {listening || statusIsSpeaking ? (
+                <FiMicOff aria-hidden="true" size={22} />
+              ) : (
+                <FiMic aria-hidden="true" size={22} />
+              )}
+            </button>
+
+            <button
+              className={styles.roundButton}
+              type="submit"
+              aria-label="Send message"
+              disabled={!input.trim() || isSending}
+            >
+              <WaveIcon />
+            </button>
+          </div>
+        </form>
+
+        {voiceNotice && (
+          <div className={styles.notice} role="status" aria-live="polite">
+            {voiceNotice}
+          </div>
+        )}
+      </div>
+
+      <span className={styles.liveRegion} ref={liveRegionRef} aria-live="polite" aria-atomic="true" />
     </div>
   );
 };

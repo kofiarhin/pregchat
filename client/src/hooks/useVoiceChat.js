@@ -8,17 +8,41 @@ const getSpeechRecognition = () => {
   return window.SpeechRecognition || window.webkitSpeechRecognition;
 };
 
+const detectFullDuplexSupport = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const userAgent = window.navigator?.userAgent || "";
+  const isIOS = /iP(ad|hone|od)/i.test(userAgent);
+  const isSafari = /Safari/i.test(userAgent) && !/Chrome|CriOS|Android/i.test(userAgent);
+
+  return !(isIOS || isSafari);
+};
+
+const ERROR_MESSAGES = {
+  "no-speech": "No speech detected.",
+  "audio-capture": "Microphone not available.",
+  "not-allowed": "Microphone permission denied.",
+  "service-not-allowed": "Microphone permission denied.",
+};
+
 const useVoiceChat = () => {
   const Recognition = useMemo(() => getSpeechRecognition(), []);
   const recognitionRef = useRef(null);
-  const isExpectedStopRef = useRef(false);
-  const shouldBeListeningRef = useRef(false);
+  const shouldResumeRef = useRef(false);
+  const expectedStopRef = useRef(false);
   const restartTimeoutRef = useRef(null);
-  const [isListening, setIsListening] = useState(false);
+  const [listening, setListening] = useState(false);
   const [lastTranscript, setLastTranscript] = useState("");
+  const [voiceError, setVoiceError] = useState(null);
 
-  const canListen = Boolean(Recognition);
-  const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window;
+  const supportsFullDuplex = useMemo(() => detectFullDuplexSupport(), []);
+  const canUseVoice = Boolean(Recognition) && typeof window !== "undefined" && "speechSynthesis" in window;
+
+  const resetTranscript = useCallback(() => {
+    setLastTranscript("");
+  }, []);
 
   const clearRestartTimeout = useCallback(() => {
     if (restartTimeoutRef.current) {
@@ -27,21 +51,17 @@ const useVoiceChat = () => {
     }
   }, []);
 
-  const resetTranscript = useCallback(() => {
-    setLastTranscript("");
-  }, []);
-
   const stopListening = useCallback(() => {
-    isExpectedStopRef.current = true;
-    shouldBeListeningRef.current = false;
+    expectedStopRef.current = true;
+    shouldResumeRef.current = false;
     clearRestartTimeout();
-    setIsListening(false);
+    setListening(false);
 
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
-      } catch (error) {
-        // Some browsers throw if stop is called while inactive; ignore.
+      } catch {
+        /* ignore */
       }
     }
   }, [clearRestartTimeout]);
@@ -78,34 +98,35 @@ const useVoiceChat = () => {
 
       instance.onresult = handleResult;
       instance.onstart = () => {
-        setIsListening(true);
-        isExpectedStopRef.current = false;
+        setListening(true);
+        expectedStopRef.current = false;
+        setVoiceError(null);
       };
 
       instance.onend = () => {
-        setIsListening(false);
+        setListening(false);
 
-        if (isExpectedStopRef.current || !shouldBeListeningRef.current) {
-          isExpectedStopRef.current = false;
+        if (expectedStopRef.current || !shouldResumeRef.current) {
+          expectedStopRef.current = false;
           return;
         }
 
-        // iOS Safari often stops unexpectedly; restart to keep continuous mode alive.
         clearRestartTimeout();
-        restartTimeoutRef.current = setTimeout(() => {
+        restartTimeoutRef.current = window.setTimeout(() => {
           try {
             instance.start();
-          } catch (error) {
-            // Restart may fail if the microphone is busy; ignore and wait for next opportunity.
+          } catch {
+            /* ignore */
           }
-        }, 400);
+        }, 450);
       };
 
       instance.onerror = (event) => {
-        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-          shouldBeListeningRef.current = false;
-          isExpectedStopRef.current = true;
-        }
+        const message = ERROR_MESSAGES[event?.error] || "Voice input unavailable.";
+        setVoiceError(message);
+        shouldResumeRef.current = false;
+        expectedStopRef.current = true;
+        setListening(false);
       };
 
       recognitionRef.current = instance;
@@ -125,66 +146,91 @@ const useVoiceChat = () => {
       return;
     }
 
-    shouldBeListeningRef.current = true;
-    isExpectedStopRef.current = false;
+    shouldResumeRef.current = true;
+    expectedStopRef.current = false;
+    setVoiceError(null);
 
     try {
       recognition.start();
-    } catch (error) {
-      // Restart if already active.
+    } catch {
       try {
         recognition.stop();
         recognition.start();
-      } catch (retryError) {
-        // Ignore if retry fails; browser may still be starting.
+      } catch {
+        /* ignore */
       }
     }
   }, [Recognition, ensureRecognition]);
 
-  const speak = useCallback((text, options = {}) => {
-    if (!canSpeak || !text) {
-      return undefined;
-    }
+  const speak = useCallback(
+    (text, options = {}) => {
+      if (!canUseVoice || !text) {
+        return null;
+      }
 
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.cancel();
 
-    if (options.pitch) {
-      utterance.pitch = options.pitch;
-    }
+      const utterance = new SpeechSynthesisUtterance(text);
 
-    if (options.rate) {
-      utterance.rate = options.rate;
-    }
+      if (options.pitch !== undefined) {
+        utterance.pitch = options.pitch;
+      }
 
-    if (options.volume !== undefined) {
-      utterance.volume = options.volume;
-    }
+      if (options.rate !== undefined) {
+        utterance.rate = options.rate;
+      }
 
-    if (options.voice) {
-      utterance.voice = options.voice;
-    }
+      if (options.volume !== undefined) {
+        utterance.volume = options.volume;
+      }
 
-    window.speechSynthesis.speak(utterance);
-    return utterance;
-  }, [canSpeak]);
+      if (options.voice) {
+        utterance.voice = options.voice;
+      }
+
+      if (typeof options.onStart === "function") {
+        utterance.onstart = options.onStart;
+      }
+
+      if (typeof options.onBoundary === "function") {
+        utterance.onboundary = options.onBoundary;
+      }
+
+      const handleFinish = (event) => {
+        if (typeof options.onEnd === "function") {
+          options.onEnd(event);
+        }
+      };
+
+      utterance.onend = handleFinish;
+      utterance.oncancel = handleFinish;
+      utterance.onerror = handleFinish;
+
+      window.speechSynthesis.speak(utterance);
+      return utterance;
+    },
+    [canUseVoice]
+  );
 
   useEffect(() => () => {
     stopListening();
-    if (canSpeak) {
+    clearRestartTimeout();
+
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
-  }, [stopListening, canSpeak]);
+  }, [stopListening, clearRestartTimeout]);
 
   return {
-    canListen,
-    canSpeak,
-    isListening,
-    lastTranscript,
-    resetTranscript,
-    speak,
+    canUseVoice,
+    listening,
     startListening,
     stopListening,
+    speak,
+    lastTranscript,
+    resetTranscript,
+    supportsFullDuplex,
+    voiceError,
   };
 };
 
