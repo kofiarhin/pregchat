@@ -11,7 +11,7 @@ const Chat = () => {
 
   return (
     <div className="chat-container">
-      <VoiceChat />
+      <ChatBox />
     </div>
   );
 };
