@@ -1,17 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FiMenu, FiMic, FiMicOff, FiPlay, FiPlus } from "react-icons/fi";
-import { http } from "../../api/http.js";
+import { FiMenu, FiMic, FiMicOff, FiPlay, FiPlus, FiMaximize2 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import { useChatMessages } from "../../features/messages/hooks/useChatMessages.js";
-import useVoiceChat from "../../hooks/useVoiceChat.js";
+import { useVoiceContext, VoiceUIStates } from "../../state/voice/VoiceProvider.jsx";
 import styles from "../Chat/chat.module.scss";
-
-const UI_STATES = {
-  idle: "idle",
-  listening: "listening",
-  sending: "sending",
-  speaking: "speaking",
-  interrupting: "interrupting",
-};
 
 const formatTime = (value) => {
   try {
@@ -23,8 +15,6 @@ const formatTime = (value) => {
     return "";
   }
 };
-
-const genId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 const WaveIcon = (props) => (
   <svg
@@ -46,24 +36,16 @@ const WaveIcon = (props) => (
   </svg>
 );
 
-const ChatBox = ({ daySummary }) => {
-  const { messages, appendMessages } = useChatMessages();
+const ChatBox = () => {
+  const { messages } = useChatMessages();
   const [input, setInput] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const [uiState, setUiState] = useState(UI_STATES.idle);
-  const [speaking, setSpeaking] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState(null);
   const [voiceNotice, setVoiceNotice] = useState(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const scrollAnchorRef = useRef(null);
   const inputRef = useRef(null);
-  const lastSpokenRef = useRef(null);
-  const voiceQueueRef = useRef([]);
-  const abortControllerRef = useRef(null);
-  const requestIdRef = useRef(0);
-  const currentRequestIdRef = useRef(0);
   const liveRegionRef = useRef(null);
-  const activeUtteranceRef = useRef(null);
+  const navigate = useNavigate();
 
   const {
     canUseVoice,
@@ -71,11 +53,18 @@ const ChatBox = ({ daySummary }) => {
     startListening,
     stopListening,
     speak,
-    lastTranscript,
-    resetTranscript,
     supportsFullDuplex,
     voiceError,
-  } = useVoiceChat();
+    uiState,
+    setUiState,
+    speaking,
+    setSpeaking,
+    isSending,
+    sendViaExisting,
+    interrupt,
+    activeUtteranceRef,
+    lastSpokenRef,
+  } = useVoiceContext();
 
   const statusIsSpeaking = speaking || isSending;
   const statusDotClass = `${styles.statusDot} ${
@@ -141,158 +130,34 @@ const ChatBox = ({ daySummary }) => {
 
   const handleInterrupt = useCallback(
     ({ resumeListening = false, announceInterrupt = true } = {}) => {
-      let didInterrupt = false;
+      const didInterrupt = interrupt({ resumeListening });
 
-      setUiState(UI_STATES.interrupting);
-
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        abortControllerRef.current = null;
-        didInterrupt = true;
-      }
-
-      if (typeof window !== "undefined" && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-        didInterrupt = true;
-      }
-
-      if (activeUtteranceRef.current) {
-        activeUtteranceRef.current = null;
+      if (didInterrupt) {
+        setSpeakingMessageId(null);
       }
 
       if (didInterrupt && announceInterrupt) {
         announce("Interrupted");
         vibrate();
       }
-
-      setSpeaking(false);
-      setSpeakingMessageId(null);
-      setIsSending(false);
-
-      if (resumeListening) {
-        setUiState(UI_STATES.listening);
-        startListening();
-      } else if (!listening) {
-        setUiState(UI_STATES.idle);
-      }
     },
-    [announce, vibrate, listening, startListening]
-  );
-
-  const sendMessage = useCallback(
-    async (text, { fromVoice = false } = {}) => {
-      const trimmed = text.trim();
-
-      if (!trimmed) {
-        return;
-      }
-
-      if (isSending) {
-        if (fromVoice) {
-          voiceQueueRef.current.push(trimmed);
-        }
-        return;
-      }
-
-      const userMessage = {
-        id: genId(),
-        role: "user",
-        content: trimmed,
-        timestamp: new Date().toISOString(),
-      };
-
-      if (!fromVoice) {
-        setInput("");
-      }
-
-      await appendMessages(userMessage);
-      setIsSending(true);
-      setVoiceNotice(null);
-      setUiState(UI_STATES.sending);
-
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      const abortController = new AbortController();
-      abortControllerRef.current = abortController;
-
-      const nextRequestId = requestIdRef.current + 1;
-      requestIdRef.current = nextRequestId;
-      currentRequestIdRef.current = nextRequestId;
-
-      try {
-        const payload = {
-          text: trimmed,
-          ...(daySummary
-            ? {
-                dayData: {
-                  dayIndex: daySummary.day,
-                  babyUpdate: daySummary.babyUpdate,
-                  momUpdate: daySummary.momUpdate,
-                  tips: daySummary.tips,
-                },
-              }
-            : {}),
-        };
-
-        const data = await http.post("/chat/ask", { json: payload, signal: abortController.signal });
-
-        if (nextRequestId !== currentRequestIdRef.current) {
-          return;
-        }
-
-        const assistantContent =
-          data?.content ||
-          data?.message ||
-          "I'm not sure how to respond right now, but I'm here for you.";
-
-        const assistantMessage = {
-          id: genId(),
-          role: "assistant",
-          content: assistantContent,
-          timestamp: new Date().toISOString(),
-          meta: data?.triage ? { triage: true } : undefined,
-        };
-
-        await appendMessages(assistantMessage);
-      } catch (error) {
-        if (error.name === "AbortError") {
-          return;
-        }
-
-        await appendMessages({
-          id: genId(),
-          role: "assistant",
-          content: error?.message || "Failed to send message.",
-          timestamp: new Date().toISOString(),
-        });
-      } finally {
-        if (nextRequestId === currentRequestIdRef.current) {
-          setIsSending(false);
-          abortControllerRef.current = null;
-          if (!fromVoice) {
-            inputRef.current?.focus();
-          }
-
-          if (listening) {
-            setUiState(UI_STATES.listening);
-          } else if (!speaking) {
-            setUiState(UI_STATES.idle);
-          }
-        }
-      }
-    },
-    [appendMessages, daySummary, isSending, listening, speaking]
+    [announce, interrupt, setSpeakingMessageId, vibrate]
   );
 
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
+      const trimmed = input.trim();
+
+      if (!trimmed) {
+        return;
+      }
+
+      setInput("");
       inputRef.current?.focus();
-      void sendMessage(input);
+      void sendViaExisting(trimmed);
     },
-    [input, sendMessage]
+    [input, sendViaExisting]
   );
 
   const handleReplay = useCallback(
@@ -321,7 +186,7 @@ const ChatBox = ({ daySummary }) => {
         },
       });
     },
-    [speak, startListening, stopListening, supportsFullDuplex]
+    [setSpeaking, setSpeakingMessageId, speak, startListening, stopListening, supportsFullDuplex]
   );
 
   const handleMicPress = useCallback(() => {
@@ -336,12 +201,12 @@ const ChatBox = ({ daySummary }) => {
 
     if (listening) {
       stopListening();
-      setUiState(UI_STATES.idle);
+      setUiState(VoiceUIStates.idle);
     } else {
-      setUiState(UI_STATES.listening);
+      setUiState(VoiceUIStates.listening);
       startListening();
     }
-  }, [canUseVoice, handleInterrupt, listening, startListening, statusIsSpeaking, stopListening]);
+  }, [canUseVoice, handleInterrupt, listening, setUiState, startListening, statusIsSpeaking, stopListening]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) {
@@ -371,38 +236,6 @@ const ChatBox = ({ daySummary }) => {
   useEffect(() => {
     scrollAnchorRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length, isSending]);
-
-  useEffect(() => {
-    if (!lastTranscript) {
-      return;
-    }
-
-    const trimmed = lastTranscript.trim();
-
-    if (!trimmed) {
-      resetTranscript();
-      return;
-    }
-
-    if (statusIsSpeaking) {
-      handleInterrupt({ resumeListening: false });
-    }
-
-    void sendMessage(trimmed, { fromVoice: true });
-    resetTranscript();
-  }, [handleInterrupt, lastTranscript, resetTranscript, sendMessage, statusIsSpeaking]);
-
-  useEffect(() => {
-    if (isSending) {
-      return;
-    }
-
-    const nextQueued = voiceQueueRef.current.shift();
-
-    if (nextQueued) {
-      void sendMessage(nextQueued, { fromVoice: true });
-    }
-  }, [isSending, sendMessage]);
 
   useEffect(() => {
     if (!messages.length || !canUseVoice) {
@@ -444,7 +277,7 @@ const ChatBox = ({ daySummary }) => {
         }
       },
     });
-  }, [canUseVoice, messages, speak, startListening, stopListening, supportsFullDuplex]);
+  }, [canUseVoice, messages, setSpeaking, setSpeakingMessageId, speak, startListening, stopListening, supportsFullDuplex]);
 
   useEffect(() => {
     if (!messages.length) {
@@ -458,33 +291,33 @@ const ChatBox = ({ daySummary }) => {
     }
 
     setVoiceNotice(voiceError);
-    setUiState((previous) => (previous === UI_STATES.listening ? UI_STATES.idle : previous));
-  }, [voiceError]);
+    setUiState((previous) => (previous === VoiceUIStates.listening ? VoiceUIStates.idle : previous));
+  }, [setUiState, voiceError]);
 
   useEffect(() => {
     if (listening) {
       setVoiceNotice(null);
       setUiState((previous) =>
-        previous === UI_STATES.sending || previous === UI_STATES.speaking
+        previous === VoiceUIStates.sending || previous === VoiceUIStates.speaking
           ? previous
-          : UI_STATES.listening
+          : VoiceUIStates.listening
       );
       announce("Listening started");
       vibrate();
-    } else if (uiState === UI_STATES.listening) {
-      setUiState(speaking ? UI_STATES.speaking : UI_STATES.idle);
+    } else if (uiState === VoiceUIStates.listening) {
+      setUiState(speaking ? VoiceUIStates.speaking : VoiceUIStates.idle);
       announce("Listening stopped");
     }
-  }, [announce, listening, speaking, uiState, vibrate]);
+  }, [announce, listening, setUiState, speaking, uiState, vibrate]);
 
   useEffect(() => {
     if (speaking) {
-      setUiState(UI_STATES.speaking);
+      setUiState(VoiceUIStates.speaking);
       announce("Speaking…");
     } else if (!listening && !isSending) {
-      setUiState(UI_STATES.idle);
+      setUiState(VoiceUIStates.idle);
     }
-  }, [announce, isSending, listening, speaking]);
+  }, [announce, isSending, listening, setUiState, speaking]);
 
   const renderMessage = useCallback(
     (entry, index) => {
@@ -602,6 +435,15 @@ const ChatBox = ({ daySummary }) => {
               ) : (
                 <FiMic aria-hidden="true" size={22} />
               )}
+            </button>
+
+            <button
+              type="button"
+              className={styles.roundButton}
+              onClick={() => navigate("/voice")}
+              aria-label="Open voice screen"
+            >
+              <FiMaximize2 aria-hidden="true" size={20} />
             </button>
 
             <button

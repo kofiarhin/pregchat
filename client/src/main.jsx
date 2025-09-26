@@ -16,6 +16,7 @@ import {
 import "./styles/global.scss";
 import CartProvider from "./context/CartContext.jsx";
 import BookingProvider from "./context/BookingContext.jsx";
+import VoiceProvider from "./state/voice/VoiceProvider.jsx";
 
 const shouldRetryQuery = (failureCount, error) => {
   if (error?.status === 401) {
@@ -61,7 +62,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <QueryClientProvider client={queryClient}>
         <CartProvider>
           <BookingProvider>
-            <App />
+            <VoiceProvider>
+              <App />
+            </VoiceProvider>
           </BookingProvider>
         </CartProvider>
         <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
