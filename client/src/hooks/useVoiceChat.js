@@ -64,7 +64,10 @@ const useVoiceChat = () => {
   const [voiceError, setVoiceError] = useState(null);
 
   const supportsFullDuplex = useMemo(() => detectFullDuplexSupport(), []);
-  const canUseVoice = Boolean(Recognition) && typeof window !== "undefined" && "speechSynthesis" in window;
+  const hasSpeechSynthesis =
+    typeof window !== "undefined" && typeof window.speechSynthesis !== "undefined";
+  const canSpeak = hasSpeechSynthesis;
+  const canUseVoice = Boolean(Recognition) && hasSpeechSynthesis;
 
   const resetTranscript = useCallback(() => {
     setLastTranscript("");
@@ -223,11 +226,17 @@ const useVoiceChat = () => {
 
   const speak = useCallback(
     (text, options = {}) => {
-      if (!canUseVoice || !text) {
+      if (!canSpeak || !text) {
         return null;
       }
 
-      window.speechSynthesis.cancel();
+      const synth = window?.speechSynthesis;
+
+      if (!synth) {
+        return null;
+      }
+
+      synth.cancel();
 
       const utterance = new SpeechSynthesisUtterance(text);
 
@@ -265,10 +274,10 @@ const useVoiceChat = () => {
       utterance.oncancel = handleFinish;
       utterance.onerror = handleFinish;
 
-      window.speechSynthesis.speak(utterance);
+      synth.speak(utterance);
       return utterance;
     },
-    [canUseVoice]
+    [canSpeak]
   );
 
   useEffect(() => () => {
@@ -282,6 +291,7 @@ const useVoiceChat = () => {
 
   return {
     canUseVoice,
+    canSpeak,
     listening,
     startListening,
     stopListening,

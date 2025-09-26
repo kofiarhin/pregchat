@@ -49,6 +49,7 @@ const ChatBox = () => {
 
   const {
     canUseVoice,
+    canSpeak,
     listening,
     startListening,
     stopListening,
@@ -162,7 +163,7 @@ const ChatBox = () => {
 
   const handleReplay = useCallback(
     (message) => {
-      if (!message?.content) {
+      if (!canSpeak || !message?.content) {
         return;
       }
 
@@ -186,7 +187,15 @@ const ChatBox = () => {
         },
       });
     },
-    [setSpeaking, setSpeakingMessageId, speak, startListening, stopListening, supportsFullDuplex]
+    [
+      canSpeak,
+      setSpeaking,
+      setSpeakingMessageId,
+      speak,
+      startListening,
+      stopListening,
+      supportsFullDuplex,
+    ]
   );
 
   const handleMicPress = useCallback(() => {
@@ -238,7 +247,7 @@ const ChatBox = () => {
   }, [messages.length, isSending]);
 
   useEffect(() => {
-    if (!messages.length || !canUseVoice) {
+    if (!messages.length || !canSpeak) {
       return;
     }
 
@@ -277,7 +286,16 @@ const ChatBox = () => {
         }
       },
     });
-  }, [canUseVoice, messages, setSpeaking, setSpeakingMessageId, speak, startListening, stopListening, supportsFullDuplex]);
+  }, [
+    canSpeak,
+    messages,
+    setSpeaking,
+    setSpeakingMessageId,
+    speak,
+    startListening,
+    stopListening,
+    supportsFullDuplex,
+  ]);
 
   useEffect(() => {
     if (!messages.length) {
@@ -340,7 +358,7 @@ const ChatBox = () => {
                     className={styles.playButton}
                     onClick={() => handleReplay(entry)}
                     aria-label="Replay response"
-                    disabled={!canUseVoice}
+                    disabled={!canSpeak}
                   >
                     <FiPlay aria-hidden="true" size={18} />
                   </button>
@@ -362,7 +380,7 @@ const ChatBox = () => {
         </div>
       );
     },
-    [canUseVoice, handleReplay, speaking, speakingMessageId]
+    [canSpeak, handleReplay, speaking, speakingMessageId]
   );
 
   return (
