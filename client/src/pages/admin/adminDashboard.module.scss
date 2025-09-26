@@ -1,0 +1,302 @@
+.dashboard {
+  min-height: 100vh;
+  padding: 3rem clamp(1.5rem, 4vw, 4rem);
+  background: radial-gradient(circle at top, #1f2a44 0%, #0b0f1a 55%, #06080f 100%);
+  color: #f5f7fb;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.title {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  margin: 0;
+  color: #ffffff;
+}
+
+.subtitle {
+  margin: 0;
+  color: rgba(230, 233, 244, 0.75);
+  max-width: 40rem;
+  line-height: 1.5;
+}
+
+.disclaimer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(230, 233, 244, 0.8);
+  background: rgba(22, 29, 48, 0.7);
+  border: 1px solid rgba(120, 133, 168, 0.3);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.tab,
+.tabActive {
+  background: transparent;
+  border: 1px solid rgba(120, 133, 168, 0.4);
+  color: inherit;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.tab:hover,
+.tab:focus-visible {
+  border-color: rgba(171, 190, 255, 0.8);
+}
+
+.tabActive {
+  background: linear-gradient(135deg, rgba(84, 119, 255, 0.85), rgba(126, 223, 255, 0.6));
+  color: #0a1020;
+  border-color: transparent;
+}
+
+.tabPanel {
+  background: rgba(15, 20, 34, 0.92);
+  border: 1px solid rgba(94, 106, 141, 0.35);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.panelContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.controlsRow {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.searchInput,
+.select,
+.notesInput {
+  background: rgba(14, 18, 30, 0.9);
+  border: 1px solid rgba(120, 133, 168, 0.4);
+  color: #f5f7fb;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  min-width: 12rem;
+}
+
+.searchInput:focus-visible,
+.select:focus-visible,
+.notesInput:focus-visible {
+  outline: none;
+  border-color: rgba(173, 202, 255, 0.9);
+  box-shadow: 0 0 0 2px rgba(126, 223, 255, 0.2);
+}
+
+.filterLabel {
+  font-size: 0.85rem;
+  color: rgba(230, 233, 244, 0.75);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.table thead {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: rgba(200, 208, 232, 0.8);
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid rgba(72, 83, 120, 0.35);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.actionsHeading {
+  text-align: right;
+}
+
+.cellStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.subtle {
+  color: rgba(200, 208, 232, 0.7);
+  font-size: 0.85rem;
+}
+
+.muted {
+  color: rgba(200, 208, 232, 0.7);
+  margin: 0;
+}
+
+.error {
+  color: #ff8a8a;
+  margin: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(84, 119, 255, 0.2);
+  color: rgba(215, 226, 255, 0.95);
+  font-size: 0.85rem;
+}
+
+.orderActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.notesInput {
+  width: 100%;
+  max-width: 18rem;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.primaryAction,
+.secondaryAction {
+  border: 1px solid rgba(120, 133, 168, 0.5);
+  background: rgba(15, 20, 34, 0.9);
+  color: #f5f7fb;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.primaryAction {
+  background: linear-gradient(135deg, rgba(84, 119, 255, 0.85), rgba(126, 223, 255, 0.6));
+  color: #0a1020;
+  border-color: transparent;
+}
+
+.primaryAction:disabled,
+.secondaryAction:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondaryAction:hover:not(:disabled),
+.secondaryAction:focus-visible:not(:disabled) {
+  border-color: rgba(171, 190, 255, 0.8);
+}
+
+.primaryAction:hover:not(:disabled),
+.primaryAction:focus-visible:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.paginationRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.limitControls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.pageControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.loadingState {
+  min-height: 40vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  color: rgba(230, 233, 244, 0.85);
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 3px solid rgba(126, 223, 255, 0.2);
+  border-top-color: rgba(126, 223, 255, 0.8);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .tabPanel {
+    padding: 1.25rem;
+  }
+
+  .table {
+    min-width: 480px;
+  }
+
+  .orderActions {
+    align-items: stretch;
+  }
+
+  .actionButtons {
+    justify-content: stretch;
+  }
+}
