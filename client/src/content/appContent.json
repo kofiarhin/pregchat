@@ -167,5 +167,97 @@
       "cancelled": "Cancelled",
       "booked": "Booked"
     }
+  },
+  "auth": {
+    "register": {
+      "title": "Create an account",
+      "subtitle": "Join PregChat in a few steps",
+      "fields": {
+        "name": "Full name",
+        "email": "Email",
+        "password": "Password",
+        "region": "Region"
+      },
+      "submit": "Register",
+      "loading": "Registering...",
+      "loginPrompt": "Already have an account?",
+      "loginLink": "Log in"
+    }
+  },
+  "forms": {
+    "pregnancyDetails": {
+      "legend": "How would you like to share your timeline?",
+      "mode": {
+        "dueDate": "I know my due date",
+        "lmp": "I know my last menstrual period"
+      },
+      "fields": {
+        "dueDate": {
+          "label": "Estimated due date",
+          "helper": "Use the due date provided by your care team."
+        },
+        "lmpDate": {
+          "label": "Last menstrual period",
+          "helper": "Choose the first day of your most recent cycle."
+        }
+      },
+      "errors": {
+        "dueDateRequired": "Please enter your estimated due date.",
+        "lmpDateRequired": "Please enter the first day of your last menstrual period."
+      },
+      "buttons": {
+        "submit": "Save pregnancy details",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "emptyProfile": {
+      "title": "Let's personalize your journey",
+      "description": "Share your due date or last menstrual period so Aya can tailor updates for you.",
+      "submit": "Save and continue",
+      "success": "Pregnancy details saved!"
+    },
+    "summary": {
+      "title": "Your pregnancy timeline",
+      "dueDate": "Estimated due date",
+      "lmpDate": "Last menstrual period",
+      "gestation": "Gestational age",
+      "updated": "Last updated",
+      "edit": "Edit details",
+      "reset": "Reset",
+      "confirmReset": "Reset pregnancy details?"
+    },
+    "actions": {
+      "openChat": "Open Chat",
+      "goToOnboarding": "Update profile",
+      "viewProfile": "View profile",
+      "ask": "Ask a question",
+      "update": "Update profile",
+      "profile": "View profile"
+    },
+    "progress": {
+      "title": "Progress",
+      "empty": "Set your pregnancy details to track progress."
+    }
+  },
+  "onboarding": {
+    "page": {
+      "title": "Complete your onboarding",
+      "description": "Tell us about your pregnancy so we can tailor your support.",
+      "submit": "Save pregnancy details",
+      "success": "Thanks! Your pregnancy details have been saved.",
+      "cta": "Go to dashboard"
+    }
+  },
+  "profilePage": {
+    "title": "Your account",
+    "subtitle": "Update your basic details anytime.",
+    "labels": {
+      "name": "Full name",
+      "email": "Email",
+      "region": "Region"
+    }
   }
 }

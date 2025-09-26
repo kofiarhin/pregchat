@@ -22,6 +22,22 @@ export const useTodayPregnancyQuery = (options = {}) =>
     ...options,
   });
 
+export const usePregnancyProfileQuery = (options = {}) =>
+  useQuery({
+    queryKey: pregnancyKeys.profile(),
+    queryFn: async () => {
+      try {
+        return await http.get("/updates/profile");
+      } catch (error) {
+        if (error?.status === 404) {
+          return null;
+        }
+        throw error;
+      }
+    },
+    ...options,
+  });
+
 export const usePregnancyDayQuery = (day, options = {}) =>
   useQuery({
     queryKey: pregnancyKeys.day(day),
@@ -38,29 +54,55 @@ export const useUpdatePregnancyProfileMutation = (options = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ lmpDate, dueDate, weeks, days }) => {
-      const response = await http.put("/updates/profile", {
-        json: { lmpDate, dueDate, weeks, days },
-      });
+    mutationFn: async ({ mode, lmpDate, dueDate }) => {
+      const payload =
+        mode === "lmp"
+          ? { lmpDate, dueDate: "" }
+          : { dueDate, lmpDate: "" };
+
+      const response = await http.put("/updates/profile", { json: payload });
       return {
         lmpDate: response?.lmpDate ?? null,
         dueDate: response?.dueDate ?? null,
-        day: response?.dayIndex ?? response?.day ?? null,
+        dayIndex: response?.dayIndex ?? response?.day ?? null,
+        updatedAt: response?.updatedAt ?? null,
       };
     },
     onSuccess: (data) => {
-      if (data.day != null) {
+      if (data.dayIndex != null) {
         queryClient.setQueryData(pregnancyKeys.today(), (current) => ({
           ...(current ?? {}),
-          day: data.day,
+          day: data.dayIndex,
         }));
         queryClient.invalidateQueries({
-          queryKey: pregnancyKeys.day(data.day),
+          queryKey: pregnancyKeys.day(data.dayIndex),
         });
       }
-      queryClient.invalidateQueries({ queryKey: pregnancyKeys.profile() });
+      queryClient.setQueryData(pregnancyKeys.profile(), (current) => ({
+        ...(current ?? {}),
+        lmpDate: data.lmpDate ?? null,
+        dueDate: data.dueDate ?? null,
+        dayIndex: data.dayIndex ?? null,
+        updatedAt: data.updatedAt ?? current?.updatedAt ?? null,
+      }));
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       options.onSuccess?.(data);
+    },
+    ...options,
+  });
+};
+
+export const useResetPregnancyProfileMutation = (options = {}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      await http.delete("/updates/profile");
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(pregnancyKeys.profile(), null);
+      queryClient.invalidateQueries({ queryKey: pregnancyKeys.today() });
+      options.onSuccess?.();
     },
     ...options,
   });

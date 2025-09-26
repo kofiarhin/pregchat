@@ -1,6 +1,19 @@
 const Pregnancy = require("../models/Pregnancy");
 const DailyContent = require("../models/DailyContent");
 
+const formatPregnancy = (document) => {
+  if (!document) {
+    return null;
+  }
+
+  return {
+    lmpDate: document.lmpDate,
+    dueDate: document.dueDate,
+    dayIndex: document.dayIndex,
+    updatedAt: document.updatedAt,
+  };
+};
+
 const getToday = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -74,6 +87,26 @@ const getDay = async (req, res) => {
   }
 };
 
+const getProfile = async (req, res) => {
+  try {
+    const pregnancy = await Pregnancy.findOne({
+      userId: req.user._id,
+    })
+      .select("lmpDate dueDate dayIndex updatedAt")
+      .lean();
+
+    if (!pregnancy) {
+      return res
+        .status(404)
+        .json({ error: "Pregnancy profile not found for this user." });
+    }
+
+    return res.json(formatPregnancy(pregnancy));
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to load pregnancy profile." });
+  }
+};
+
 const updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -117,22 +150,49 @@ const updateProfile = async (req, res) => {
     // Update or create pregnancy profile
     const updatedPregnancy = await Pregnancy.findOneAndUpdate(
       { userId },
-      pregnancyData,
-      { upsert: true, new: true }
+      {
+        ...pregnancyData,
+        userId,
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    res.json({
-      lmpDate: updatedPregnancy.lmpDate,
-      dueDate: updatedPregnancy.dueDate,
-      dayIndex: updatedPregnancy.dayIndex,
-    });
+    if (!req.user.onboardingCompletedAt) {
+      req.user.onboardingCompletedAt = new Date();
+      await req.user.save();
+    }
+
+    res.json(formatPregnancy(updatedPregnancy));
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteProfile = async (req, res) => {
+  try {
+    const deleted = await Pregnancy.findOneAndDelete({ userId: req.user._id });
+
+    if (!deleted) {
+      return res
+        .status(404)
+        .json({ error: "Pregnancy profile not found for this user." });
+    }
+
+    if (req.user.onboardingCompletedAt) {
+      req.user.onboardingCompletedAt = null;
+      await req.user.save();
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to reset pregnancy profile." });
   }
 };
 
 module.exports = {
   getToday,
   getDay,
+  getProfile,
   updateProfile,
+  deleteProfile,
 };
