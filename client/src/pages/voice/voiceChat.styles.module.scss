@@ -1,0 +1,3 @@
+@use "./voiceChat.styles.scss" as voice;
+
+@include voice.voiceChat();

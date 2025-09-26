@@ -31,19 +31,48 @@ const useVoice = (options = {}) => {
     continuous = false,
     autoSendOnFinal = false,
     onFinalTranscript,
+    onError,
+    onListenStart,
+    onListenEnd,
+    onSpeakStart,
+    onSpeakEnd,
   } = options;
 
   const recognitionRef = useRef(null);
   const utteranceRef = useRef(null);
-  const finalCallbackRef = useRef({ autoSendOnFinal, onFinalTranscript });
+  const optionsRef = useRef({
+    autoSendOnFinal,
+    onFinalTranscript,
+    onError,
+    onListenStart,
+    onListenEnd,
+    onSpeakStart,
+    onSpeakEnd,
+  });
   const [supported, setSupported] = useState({ stt: false, tts: false });
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscriptState] = useState("");
   const [interim, setInterim] = useState("");
 
   useEffect(() => {
-    finalCallbackRef.current = { autoSendOnFinal, onFinalTranscript };
-  }, [autoSendOnFinal, onFinalTranscript]);
+    optionsRef.current = {
+      autoSendOnFinal,
+      onFinalTranscript,
+      onError,
+      onListenStart,
+      onListenEnd,
+      onSpeakStart,
+      onSpeakEnd,
+    };
+  }, [
+    autoSendOnFinal,
+    onFinalTranscript,
+    onError,
+    onListenStart,
+    onListenEnd,
+    onSpeakStart,
+    onSpeakEnd,
+  ]);
 
   useEffect(() => {
     const Recognition = getSpeechRecognition();
@@ -64,15 +93,31 @@ const useVoice = (options = {}) => {
 
     recognition.onstart = () => {
       setIsListening(true);
+      const { onListenStart: handleListenStart } = optionsRef.current;
+      if (typeof handleListenStart === "function") {
+        handleListenStart();
+      }
     };
 
     recognition.onend = () => {
       setIsListening(false);
       setInterim("");
+      const { onListenEnd: handleListenEnd } = optionsRef.current;
+      if (typeof handleListenEnd === "function") {
+        handleListenEnd();
+      }
     };
 
-    recognition.onerror = () => {
+    recognition.onerror = (event) => {
       setIsListening(false);
+      const { onError: handleError, onListenEnd: handleListenEnd } =
+        optionsRef.current;
+      if (typeof handleError === "function") {
+        handleError(event);
+      }
+      if (typeof handleListenEnd === "function") {
+        handleListenEnd();
+      }
     };
 
     recognition.onresult = (event) => {
@@ -115,7 +160,7 @@ const useVoice = (options = {}) => {
         setInterim("");
 
         const { autoSendOnFinal: shouldAutoSend, onFinalTranscript: finalCb } =
-          finalCallbackRef.current;
+          optionsRef.current;
 
         if (shouldAutoSend && typeof finalCb === "function") {
           finalCb(finalTranscript);
@@ -154,6 +199,10 @@ const useVoice = (options = {}) => {
 
     synth.cancel();
     utteranceRef.current = null;
+    const { onSpeakEnd: handleSpeakEnd } = optionsRef.current;
+    if (typeof handleSpeakEnd === "function") {
+      handleSpeakEnd();
+    }
   }, []);
 
   const speak = useCallback(
@@ -195,6 +244,23 @@ const useVoice = (options = {}) => {
 
       synth.speak(utterance);
       utteranceRef.current = utterance;
+      const { onSpeakStart: handleSpeakStart, onSpeakEnd: handleSpeakEnd } =
+        optionsRef.current;
+      if (typeof handleSpeakStart === "function") {
+        handleSpeakStart();
+      }
+      utterance.onend = () => {
+        utteranceRef.current = null;
+        if (typeof handleSpeakEnd === "function") {
+          handleSpeakEnd();
+        }
+      };
+      utterance.onerror = () => {
+        utteranceRef.current = null;
+        if (typeof handleSpeakEnd === "function") {
+          handleSpeakEnd();
+        }
+      };
     },
     [cancelSpeech, lang, supported.tts],
   );

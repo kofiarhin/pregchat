@@ -95,6 +95,40 @@
     "playAgain": "Play Again",
     "resume": "Resuming your latest face-off..."
   },
+  "voice": {
+    "page": {
+      "title": "Voice Mode",
+      "betaTag": "(beta)",
+      "back": "Back to chat",
+      "triageFlag": "Important",
+      "controls": {
+        "launch": "Voice Mode",
+        "start": "Start voice mode",
+        "stop": "Stop listening",
+        "processing": "Processing...",
+        "typeInstead": "Type instead",
+        "replay": "Replay last reply"
+      },
+      "status": {
+        "listening": "Listening...",
+        "processing": "Processing your message..."
+      },
+      "messages": {
+        "permission": "Enable mic access in site settings",
+        "noSpeech": "Didn't catch that—try again",
+        "recognition": "We couldn't start voice recognition right now."
+      },
+      "errors": {
+        "permission": "Enable mic access in site settings",
+        "recognition": "Voice recognition isn't available right now.",
+        "transcription": "We couldn't transcribe that just now.",
+        "recording": "We couldn't access your microphone.",
+        "unsupported": "Your browser doesn't support voice recording yet.",
+        "response": "Aya couldn't respond right now. Please try again.",
+        "tts": "We couldn't play that response aloud."
+      }
+    }
+  },
   "journals": {
     "list": {
       "title": "Daily journals",
