@@ -30,6 +30,7 @@ const VoiceProvider = ({ children }) => {
 
   const {
     canUseVoice,
+    canSpeak,
     listening,
     startListening,
     stopListening,
@@ -288,6 +289,7 @@ const VoiceProvider = ({ children }) => {
   const value = useMemo(
     () => ({
       canUseVoice,
+      canSpeak,
       listening,
       startListening,
       stopListening,
@@ -313,6 +315,7 @@ const VoiceProvider = ({ children }) => {
     [
       abortActiveRequest,
       canUseVoice,
+      canSpeak,
       currentRequestId,
       interrupt,
       isSending,

@@ -19,6 +19,7 @@ const VoiceScreen = () => {
   const { messages } = useChatMessages();
   const {
     canUseVoice,
+    canSpeak,
     listening,
     startListening,
     stopListening,
@@ -258,7 +259,7 @@ const VoiceScreen = () => {
   ]);
 
   useEffect(() => {
-    if (!messages.length || !canUseVoice) {
+    if (!messages.length || !canSpeak) {
       return;
     }
 
@@ -313,7 +314,7 @@ const VoiceScreen = () => {
     });
   }, [
     activeUtteranceRef,
-    canUseVoice,
+    canSpeak,
     lastSpokenRef,
     messages,
     setSpeaking,
