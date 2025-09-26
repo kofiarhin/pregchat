@@ -1,12 +1,19 @@
-import React, { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useCurrentUserQuery } from "../features/auth/hooks/useAuth.js";
-import { useTodayPregnancyQuery } from "../features/pregnancy/hooks/usePregnancy.js";
-import { http } from "../api/http.js";
-import ActionsMenu from "../components/ActionsMenu.jsx";
-import { BASE_URL } from "../constants/baseUrl.js";
-import "./dashboard.styles.scss";
 import { Link } from "react-router-dom";
+import content from "../content/appContent.json";
+import ActionsMenu from "../components/ActionsMenu.jsx";
+import PregnancyDetailsForm from "../components/PregnancyDetailsForm.jsx";
+import { useCurrentUserQuery } from "../features/auth/hooks/useAuth.js";
+import {
+  usePregnancyProfileQuery,
+  useResetPregnancyProfileMutation,
+  useTodayPregnancyQuery,
+  useUpdatePregnancyProfileMutation,
+} from "../features/pregnancy/hooks/usePregnancy.js";
+import { http } from "../api/http.js";
+import { BASE_URL } from "../constants/baseUrl.js";
+import styles from "./dashboard.styles.module.scss";
 
 const getBaseUrl = () => {
   const envBase = typeof BASE_URL === "string" ? BASE_URL.trim() : "";
@@ -50,13 +57,46 @@ const resolveBabyImageUrl = (rawUrl) => {
   }
 };
 
+const formatDate = (input) => {
+  if (!input) {
+    return "—";
+  }
+
+  const parsed = new Date(input);
+  if (Number.isNaN(parsed.getTime())) {
+    return "—";
+  }
+
+  return parsed.toLocaleDateString();
+};
+
+const formatGestation = (dayIndex) => {
+  if (dayIndex == null) {
+    return "—";
+  }
+
+  const weeks = Math.floor(dayIndex / 7);
+  const days = dayIndex % 7;
+  return `${weeks}w ${days}d`;
+};
+
 const Dashboard = () => {
+  const copy = content.dashboard ?? {};
+  const formCopy = content.forms?.pregnancyDetails ?? {};
   const { data: currentUser } = useCurrentUserQuery();
+  const { data: pregnancyProfile, isLoading: pregnancyLoading } =
+    usePregnancyProfileQuery();
+  const hasProfile = Boolean(
+    pregnancyProfile?.dueDate || pregnancyProfile?.lmpDate
+  );
+  const [isEditing, setIsEditing] = useState(false);
+  const [feedback, setFeedback] = useState("");
+
   const {
     data: today,
     isLoading: todayLoading,
     error: todayError,
-  } = useTodayPregnancyQuery();
+  } = useTodayPregnancyQuery({ enabled: hasProfile });
 
   const londonDateKey = useMemo(() => {
     const formatter = new Intl.DateTimeFormat("en-CA", {
@@ -80,23 +120,33 @@ const Dashboard = () => {
         credentials: "omit",
       });
 
-      const resolvedUrl = resolveBabyImageUrl(response?.url);
-
-      console.log({ url: resolvedUrl });
-
       return {
-        url: resolvedUrl,
+        url: resolveBabyImageUrl(response?.url),
         week: response?.week ?? null,
         day: response?.day ?? null,
         dateKey: response?.dateKey ?? null,
         isCached: Boolean(response?.isCached),
       };
     },
+    enabled: hasProfile,
     retry: 1,
   });
 
-  const gestationDays = today?.day ?? null;
-  const week = gestationDays != null ? Math.floor(gestationDays / 7) : null;
+  const updateMutation = useUpdatePregnancyProfileMutation({
+    onSuccess: () => {
+      setIsEditing(false);
+      setFeedback(copy.emptyProfile?.success || "");
+    },
+  });
+
+  const resetMutation = useResetPregnancyProfileMutation({
+    onSuccess: () => {
+      setIsEditing(false);
+      setFeedback("");
+    },
+  });
+
+  const gestationDays = today?.day ?? today?.dayIndex ?? null;
   const progressPct =
     gestationDays != null
       ? Math.min(100, Math.round((gestationDays / 280) * 100))
@@ -114,47 +164,146 @@ const Dashboard = () => {
 
   const previewErrorMessage = babyPreviewError
     ? babyPreviewError.status === 404
-      ? "Add your pregnancy profile to unlock the baby preview."
+      ? copy.emptyProfile?.description
       : "Unable to load today's baby preview."
     : null;
 
+  const firstName = useMemo(() => {
+    if (!currentUser?.name) {
+      return "";
+    }
+
+    return currentUser.name.split(" ")[0];
+  }, [currentUser?.name]);
+
+  const handleFormSubmit = ({ mode, dueDate, lmpDate }) => {
+    updateMutation.mutate({ mode, dueDate, lmpDate });
+  };
+
+  const handleReset = () => {
+    const message = copy.summary?.confirmReset || "Reset pregnancy details?";
+    if (window.confirm(message)) {
+      resetMutation.mutate();
+    }
+  };
+
+  const renderPregnancyCard = () => {
+    if (pregnancyLoading) {
+      return <p className={styles.muted}>Loading your details...</p>;
+    }
+
+    if (!hasProfile || isEditing) {
+      return (
+        <div className={styles.onboardingCard}>
+          <h2 className={styles.cardTitle}>{copy.emptyProfile?.title}</h2>
+          <p className={styles.muted}>{copy.emptyProfile?.description}</p>
+          <PregnancyDetailsForm
+            initialValues={{
+              mode: hasProfile ? undefined : "dueDate",
+              dueDate: pregnancyProfile?.dueDate
+                ? pregnancyProfile.dueDate.slice(0, 10)
+                : "",
+              lmpDate: pregnancyProfile?.lmpDate
+                ? pregnancyProfile.lmpDate.slice(0, 10)
+                : "",
+            }}
+            content={formCopy}
+            submitLabel={copy.emptyProfile?.submit}
+            onSubmit={handleFormSubmit}
+            onCancel={hasProfile ? () => setIsEditing(false) : undefined}
+            isSubmitting={updateMutation.isPending}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.summaryCard}>
+        <header className={styles.summaryHeader}>
+          <div>
+            <h2 className={styles.cardTitle}>{copy.summary?.title}</h2>
+            {feedback && <p className={styles.feedback}>{feedback}</p>}
+          </div>
+          <div className={styles.summaryActions}>
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={() => setIsEditing(true)}
+            >
+              {copy.summary?.edit}
+            </button>
+            <button
+              type="button"
+              className={styles.ghostButton}
+              onClick={handleReset}
+              disabled={resetMutation.isPending}
+            >
+              {copy.summary?.reset}
+            </button>
+          </div>
+        </header>
+        <dl className={styles.summaryList}>
+          <div>
+            <dt>{copy.summary?.dueDate}</dt>
+            <dd>{formatDate(pregnancyProfile?.dueDate)}</dd>
+          </div>
+          <div>
+            <dt>{copy.summary?.lmpDate}</dt>
+            <dd>{formatDate(pregnancyProfile?.lmpDate)}</dd>
+          </div>
+          <div>
+            <dt>{copy.summary?.gestation}</dt>
+            <dd>{formatGestation(pregnancyProfile?.dayIndex)}</dd>
+          </div>
+          <div>
+            <dt>{copy.summary?.updated}</dt>
+            <dd>{formatDate(pregnancyProfile?.updatedAt)}</dd>
+          </div>
+        </dl>
+      </div>
+    );
+  };
+
   return (
-    <main className="dashboard">
-      <header className="dashboard__header">
-        <div className="dashboard__header-info">
-          <h1>
-            Welcome{currentUser?.firstName ? `, ${currentUser.firstName}` : ""}
+    <main className={styles.dashboard}>
+      <header className={styles.header}>
+        <div>
+          <h1 className={styles.heading}>
+            {copy.welcome}
+            {firstName ? `, ${firstName}` : ""}
           </h1>
-          <p className="muted">
+          <p className={styles.muted}>
             {gestationDays != null
-              ? `Day ${gestationDays} - Week ${week}`
-              : "Set your due date to unlock personalised updates."}
+              ? `Day ${gestationDays} · ${formatGestation(gestationDays)}`
+              : copy.emptyProfile?.description}
           </p>
         </div>
-        <div className="dashboard__header-actions">
+        <div className={styles.headerActions}>
           <ActionsMenu />
-          <div className="dashboard__header-cta">
-            <Link className="btn" to="/chat">
-              Open Chat
+          <div className={styles.headerButtons}>
+            <Link className={styles.primaryButton} to="/chat">
+              {copy.actions?.openChat}
             </Link>
-            <Link className="btn btn--ghost" to="/onboarding">
-              Edit Profile
+            <Link className={styles.secondaryButton} to="/onboarding">
+              {copy.actions?.goToOnboarding}
             </Link>
           </div>
         </div>
       </header>
 
-      <section className="grid">
-        <article className="card baby-preview">
-          <h2>{previewTitle}</h2>
+      <section className={styles.grid}>
+        <article className={styles.primaryCard}>{renderPregnancyCard()}</article>
+
+        <article className={styles.card}>
+          <h2 className={styles.cardTitle}>{previewTitle}</h2>
           {babyPreviewLoading ? (
-            <div className="baby-preview__placeholder" aria-hidden="true" />
+            <div className={styles.previewPlaceholder} aria-hidden="true" />
           ) : babyPreview?.url ? (
             <>
-              <p className="muted baby-preview__caption">{previewCaption}</p>
-              <div className="baby-preview__image-frame">
+              <p className={styles.muted}>{previewCaption}</p>
+              <div className={styles.previewFrame}>
                 <img
-                  className="babyPreviewImage"
+                  className={styles.previewImage}
                   src={babyPreview.url}
                   alt={`Illustrative fetus render at week ${
                     babyPreview.week ?? "unknown"
@@ -165,35 +314,33 @@ const Dashboard = () => {
               {babyPreview?.isCached &&
                 babyPreview?.dateKey &&
                 babyPreview.dateKey !== londonDateKey && (
-                  <p className="muted baby-preview__message">
+                  <p className={styles.muted}>
                     Showing your most recent preview.
                   </p>
                 )}
             </>
           ) : previewErrorMessage ? (
-            <p className="muted baby-preview__message">{previewErrorMessage}</p>
+            <p className={styles.muted}>{previewErrorMessage}</p>
           ) : (
-            <p className="muted baby-preview__message">
-              Baby preview not available yet.
-            </p>
+            <p className={styles.muted}>Baby preview not available yet.</p>
           )}
         </article>
 
-        <article className="card">
-          <h2>Today's Update</h2>
+        <article className={styles.card}>
+          <h2 className={styles.cardTitle}>Today's Update</h2>
           {todayLoading ? (
-            <p>Loading...</p>
+            <p className={styles.muted}>Loading...</p>
           ) : today ? (
             <>
-              <h3 className="card__sub">Baby</h3>
+              <h3 className={styles.cardSubtitle}>Baby</h3>
               <p>{today.babyUpdate}</p>
-              <h3 className="card__sub">Mother</h3>
+              <h3 className={styles.cardSubtitle}>Mother</h3>
               <p>{today.momUpdate}</p>
-              {today.tips && <p className="muted">{today.tips}</p>}
+              {today.tips && <p className={styles.muted}>{today.tips}</p>}
               {Array.isArray(today.references) &&
                 today.references.length > 0 && (
-                  <div className="sources">
-                    <span className="muted">References:</span>
+                  <div className={styles.sources}>
+                    <span className={styles.muted}>References:</span>
                     <ul>
                       {today.references.map((reference) => (
                         <li key={reference.url || reference.title}>
@@ -211,39 +358,43 @@ const Dashboard = () => {
                 )}
             </>
           ) : (
-            <p>{todayError?.message || "No update available yet."}</p>
+            <p className={styles.muted}>
+              {todayError?.message || "No update available yet."}
+            </p>
           )}
         </article>
 
-        <article className="card">
-          <h2>Quick Actions</h2>
-          <div className="actions">
-            <a className="action" href="/chat">
-              Ask a question
-            </a>
-            <a className="action" href="/onboarding">
-              Update profile
-            </a>
-            <a className="action" href="/profile">
-              View profile
-            </a>
+        <article className={styles.card}>
+          <h2 className={styles.cardTitle}>Quick Actions</h2>
+          <div className={styles.actions}>
+            <Link className={styles.action} to="/chat">
+              {copy.actions?.ask}
+            </Link>
+            <Link className={styles.action} to="/onboarding">
+              {copy.actions?.update}
+            </Link>
+            <Link className={styles.action} to="/profile">
+              {copy.actions?.profile}
+            </Link>
           </div>
         </article>
 
-        <article className="card">
-          <h2>Progress</h2>
+        <article className={styles.card}>
+          <h2 className={styles.cardTitle}>{copy.progress?.title}</h2>
           {gestationDays != null ? (
             <>
-              <div className="progress">
+              <div className={styles.progress}>
                 <div
-                  className="progress__bar"
+                  className={styles.progressBar}
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
-              <p className="muted">{Math.min(280, gestationDays)}/280 days</p>
+              <p className={styles.muted}>
+                {Math.min(280, gestationDays)}/280 days
+              </p>
             </>
           ) : (
-            <p>Set your due date to see progress.</p>
+            <p className={styles.muted}>{copy.progress?.empty}</p>
           )}
         </article>
       </section>

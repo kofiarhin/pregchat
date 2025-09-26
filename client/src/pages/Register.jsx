@@ -1,55 +1,19 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import content from "../content/appContent.json";
+import styles from "./register.styles.module.scss";
 import { useRegisterMutation } from "../features/auth/hooks/useAuth.js";
 
-const registerStyles = {
-  wrapper: {
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background:
-      "radial-gradient(circle at top, #181818 0%, #090909 55%, #020202 100%)",
-    padding: "1rem",
-  },
-  card: {
-    background: "#141414",
-    border: "1px solid #1f1f1f",
-    padding: "2rem",
-    borderRadius: "1rem",
-    boxShadow: "0 16px 40px rgba(0, 0, 0, 0.55)",
-    width: "100%",
-    maxWidth: "420px",
-  },
-  header: { textAlign: "center", marginBottom: "2rem" },
-  title: { color: "#f5f7ff", marginBottom: "0.5rem" },
-  subtitle: { color: "#a0a5b4", marginBottom: "0.5rem" },
-  field: { marginBottom: "1rem" },
-  label: {
-    display: "block",
-    marginBottom: "0.5rem",
-    fontWeight: "500",
-    color: "#d0d3dc",
-  },
-  error: {
-    background: "#3a1212",
-    color: "#ffd6d6",
-    padding: "0.75rem",
-    borderRadius: "0.25rem",
-    marginBottom: "1rem",
-    fontSize: "0.875rem",
-    border: "1px solid #5b1c1c",
-  },
-  cta: {
-    textAlign: "center",
-    fontSize: "0.875rem",
-    color: "#9aa0a6",
-  },
-  link: { color: "#4c8bf5" },
-};
+const regionOptions = [
+  { value: "", label: "Select your region" },
+  { value: "US", label: "United States" },
+  { value: "UK", label: "United Kingdom" },
+  { value: "Global", label: "Global" },
+];
 
 const Register = () => {
   const navigate = useNavigate();
+  const registerCopy = content?.auth?.register ?? {};
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -59,7 +23,7 @@ const Register = () => {
 
   const registerMutation = useRegisterMutation({
     onSuccess: () => {
-      navigate("/dashboard");
+      navigate("/chat");
     },
   });
 
@@ -76,103 +40,101 @@ const Register = () => {
     registerMutation.mutate(formData);
   };
 
-  return (
-    <div style={registerStyles.wrapper}>
-      <div style={registerStyles.card}>
-        <div style={registerStyles.header}>
-          <h1 style={registerStyles.title}>Create an account</h1>
-          <p style={registerStyles.subtitle}>Join PregChat in a few steps</p>
-        </div>
+  const isSubmitting = registerMutation.isPending;
+  const errorMessage = registerMutation.error?.message;
 
-        <form onSubmit={handleSubmit}>
-          <div style={registerStyles.field}>
-            <label htmlFor="name" style={registerStyles.label}>
-              Full name
+  return (
+    <main className={styles.wrapper}>
+      <section className={styles.card}>
+        <header className={styles.header}>
+          <h1 className={styles.title}>{registerCopy.title}</h1>
+          <p className={styles.subtitle}>{registerCopy.subtitle}</p>
+        </header>
+
+        <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="name">
+              {registerCopy.fields?.name}
             </label>
             <input
-              type="text"
+              className={styles.input}
               id="name"
               name="name"
+              type="text"
+              autoComplete="name"
               value={formData.name}
               onChange={handleChange}
-              className="input"
               required
             />
           </div>
 
-          <div style={registerStyles.field}>
-            <label htmlFor="email" style={registerStyles.label}>
-              Email
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="email">
+              {registerCopy.fields?.email}
             </label>
             <input
-              type="email"
+              className={styles.input}
               id="email"
               name="email"
+              type="email"
+              autoComplete="email"
               value={formData.email}
               onChange={handleChange}
-              className="input"
               required
             />
           </div>
 
-          <div style={registerStyles.field}>
-            <label htmlFor="password" style={registerStyles.label}>
-              Password
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="password">
+              {registerCopy.fields?.password}
             </label>
             <input
-              type="password"
+              className={styles.input}
               id="password"
               name="password"
+              type="password"
+              autoComplete="new-password"
               value={formData.password}
               onChange={handleChange}
-              className="input"
               required
             />
           </div>
 
-          <div style={{ ...registerStyles.field, marginBottom: "1.5rem" }}>
-            <label htmlFor="region" style={registerStyles.label}>
-              Region
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="region">
+              {registerCopy.fields?.region}
             </label>
             <select
+              className={styles.input}
               id="region"
               name="region"
               value={formData.region}
               onChange={handleChange}
-              className="input"
               required
             >
-              <option value="">Select your region</option>
-              <option value="US">United States</option>
-              <option value="UK">United Kingdom</option>
-              <option value="Global">Global</option>
+              {regionOptions.map((option) => (
+                <option key={option.value || "placeholder"} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
 
-          {registerMutation.isError && (
-            <div style={registerStyles.error}>
-              {registerMutation.error?.message}
-            </div>
-          )}
+          {errorMessage && <div className={styles.error}>{errorMessage}</div>}
 
-          <button
-            type="submit"
-            className="btn"
-            style={{ width: "100%", marginBottom: "1rem" }}
-            disabled={registerMutation.isPending}
-          >
-            {registerMutation.isPending ? "Loading..." : "Register"}
+          <button className={styles.submit} type="submit" disabled={isSubmitting}>
+            {isSubmitting ? registerCopy.loading : registerCopy.submit}
           </button>
         </form>
 
-        <p style={registerStyles.cta}>
-          Already have an account? {" "}
-          <Link to="/login" style={registerStyles.link}>
-            Login
+        <p className={styles.cta}>
+          {registerCopy.loginPrompt} {" "}
+          <Link className={styles.link} to="/login">
+            {registerCopy.loginLink}
           </Link>
         </p>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 
