@@ -32,13 +32,19 @@ const VoiceScreen = () => {
     isSending,
     interrupt,
     latestTranscript,
+    latestTranscriptId,
     activeUtteranceRef,
     lastSpokenRef,
+    sendViaExisting,
+    abortActiveRequest,
+    resetTranscript,
   } = useVoiceContext();
 
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const statusAnnouncerRef = useRef(null);
-  const autoStartedRef = useRef(false);
+  const hasUserGestureRef = useRef(false);
+  const lastTranscriptTokenRef = useRef(null);
+  const lastReplyLoggedRef = useRef(null);
 
   const statusIsSpeaking = speaking || isSending;
   const statusLabel = statusIsSpeaking ? "Assistant speaking" : listening ? "Listening" : "Idle";
@@ -118,6 +124,8 @@ const VoiceScreen = () => {
       return;
     }
 
+    hasUserGestureRef.current = true;
+
     if (statusIsSpeaking) {
       const didInterrupt = interrupt({ resumeListening: true });
       if (didInterrupt) {
@@ -140,8 +148,12 @@ const VoiceScreen = () => {
   }, [announce, canUseVoice, interrupt, listening, setUiState, startListening, statusIsSpeaking, stopListening, vibrate]);
 
   const handleBack = useCallback(() => {
+    abortActiveRequest();
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
     navigate("/chat");
-  }, [navigate]);
+  }, [abortActiveRequest, navigate]);
 
   const handleMore = useCallback(() => {
     console.log("Voice options coming soon");
@@ -150,9 +162,13 @@ const VoiceScreen = () => {
   const handleEnd = useCallback(() => {
     interrupt({ resumeListening: false });
     stopListening();
+    abortActiveRequest();
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
     setUiState(VoiceUIStates.idle);
     navigate("/chat");
-  }, [interrupt, navigate, setUiState, stopListening]);
+  }, [abortActiveRequest, interrupt, navigate, setUiState, stopListening]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) {
@@ -180,17 +196,66 @@ const VoiceScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (!canUseVoice || autoStartedRef.current) {
+    const token = latestTranscriptId;
+
+    if (!token || token === lastTranscriptTokenRef.current) {
       return;
     }
 
-    if (!listening && uiState === VoiceUIStates.idle) {
-      autoStartedRef.current = true;
-      setUiState(VoiceUIStates.listening);
-      startListening();
-      announce("Listening started");
+    lastTranscriptTokenRef.current = token;
+
+    const text = (latestTranscript || "").trim();
+
+    if (!text) {
+      resetTranscript();
+      return;
     }
-  }, [announce, canUseVoice, listening, setUiState, startListening, uiState]);
+
+    const process = async () => {
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+
+      if (statusIsSpeaking) {
+        abortActiveRequest();
+        interrupt({ resumeListening: false });
+      }
+
+      resetTranscript();
+
+      if (!listening) {
+        setUiState(VoiceUIStates.listening);
+      }
+
+      startListening();
+
+      console.log("[voice] sending:", text);
+
+      try {
+        const reply = await sendViaExisting(text, { fromVoice: true });
+
+        if (reply && lastReplyLoggedRef.current?.token !== token) {
+          lastReplyLoggedRef.current = { token, text: reply };
+          console.log("[voice] reply:", reply);
+        }
+      } catch {
+        lastReplyLoggedRef.current = null;
+      }
+    };
+
+    void process();
+  }, [
+    abortActiveRequest,
+    interrupt,
+    latestTranscript,
+    latestTranscriptId,
+    listening,
+    sendViaExisting,
+    setUiState,
+    startListening,
+    statusIsSpeaking,
+    resetTranscript,
+  ]);
 
   useEffect(() => {
     if (!messages.length || !canUseVoice) {
@@ -211,9 +276,25 @@ const VoiceScreen = () => {
       return;
     }
 
+    if (!hasUserGestureRef.current) {
+      return;
+    }
+
     lastSpokenRef.current = messageKey;
 
-    activeUtteranceRef.current = speak(latestAssistant.content, {
+    const replyText = latestAssistant.content;
+
+    if (!replyText) {
+      return;
+    }
+
+    if (!supportsFullDuplex) {
+      stopListening();
+    }
+
+    console.log("[voice] speak:", replyText);
+
+    activeUtteranceRef.current = speak(replyText, {
       rate: 0.96,
       pitch: 1,
       volume: 1,

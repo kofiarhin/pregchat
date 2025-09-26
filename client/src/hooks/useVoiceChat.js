@@ -81,6 +81,7 @@ const useVoiceChat = () => {
     }
 
     if (transcript) {
+      console.log("[voice] final:", transcript);
       setLastTranscript(transcript);
     }
   }, []);
@@ -105,6 +106,7 @@ const useVoiceChat = () => {
 
       instance.onend = () => {
         setListening(false);
+        console.log("[voice] end, listening=", shouldResumeRef.current);
 
         if (expectedStopRef.current || !shouldResumeRef.current) {
           expectedStopRef.current = false;
@@ -118,7 +120,7 @@ const useVoiceChat = () => {
           } catch {
             /* ignore */
           }
-        }, 450);
+        }, 150);
       };
 
       instance.onerror = (event) => {
