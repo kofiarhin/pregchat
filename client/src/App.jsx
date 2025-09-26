@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useAppSelector } from "./store/store.js";
 import { selectAuthToken } from "./store/ui/uiSlice.js";
 import { useCurrentUserQuery } from "./features/auth/hooks/useAuth.js";
@@ -23,7 +23,195 @@ import MyAppointments from "./pages/MyAppointments.jsx";
 import JournalsList from "./pages/JournalsList.jsx";
 import JournalForm from "./pages/JournalForm.jsx";
 import JournalDetail from "./pages/JournalDetail.jsx";
-import VoiceChat from "./pages/voice/VoiceChat.jsx";
+import VoiceScreen from "./pages/VoiceScreen.jsx";
+
+const AppShell = ({ isAuthenticated }) => {
+  const location = useLocation();
+  const hideChrome = location.pathname === "/voice";
+
+  return (
+    <div className="app dark">
+      {isAuthenticated && !hideChrome && <Header />}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Navigate
+              to={isAuthenticated ? "/dashboard" : "/login"}
+              replace
+            />
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Register />
+            )
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            isAuthenticated ? <Chat /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/voice"
+          element={
+            isAuthenticated ? <VoiceScreen /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/faceoff"
+          element={
+            isAuthenticated ? (
+              <FaceOffPage />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/store"
+          element={
+            isAuthenticated ? <Store /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/store/:id"
+          element={
+            isAuthenticated ? (
+              <ItemDetails />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            isAuthenticated ? <Cart /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            isAuthenticated ? <Checkout /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/appointments"
+          element={
+            isAuthenticated ? (
+              <AppointmentBrowse />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/appointments/mine"
+          element={
+            isAuthenticated ? (
+              <MyAppointments />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/journals"
+          element={
+            isAuthenticated ? (
+              <JournalsList />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/journals/new"
+          element={
+            isAuthenticated ? (
+              <JournalForm mode="create" />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/journals/:id"
+          element={
+            isAuthenticated ? (
+              <JournalDetail />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/journals/:id/edit"
+          element={
+            isAuthenticated ? (
+              <JournalForm mode="edit" />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/appointments/:id"
+          element={
+            isAuthenticated ? (
+              <AppointmentMidwife />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated ? <Profile /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route path="/welcome" element={<Navigate to="/profile" replace />} />
+        <Route
+          path="/onboarding"
+          element={
+            isAuthenticated ? (
+              <Onboarding />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+      </Routes>
+      {isAuthenticated && !hideChrome && <Footer />}
+    </div>
+  );
+};
 
 const App = () => {
   const token = useAppSelector(selectAuthToken);
@@ -55,186 +243,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <div className="app dark">
-        {isAuthenticated && <Header />}
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Navigate
-                to={isAuthenticated ? "/dashboard" : "/login"}
-                replace
-              />
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              isAuthenticated ? (
-                <Navigate to="/dashboard" replace />
-              ) : (
-                <Register />
-              )
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route
-            path="/chat"
-            element={
-              isAuthenticated ? <Chat /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route
-            path="/voice"
-            element={
-              isAuthenticated ? <VoiceChat /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route
-            path="/faceoff"
-            element={
-              isAuthenticated ? (
-                <FaceOffPage />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/store"
-            element={
-              isAuthenticated ? <Store /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route
-            path="/store/:id"
-            element={
-              isAuthenticated ? (
-                <ItemDetails />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/cart"
-            element={
-              isAuthenticated ? <Cart /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route
-            path="/checkout"
-            element={
-              isAuthenticated ? <Checkout /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route
-            path="/appointments"
-            element={
-              isAuthenticated ? (
-                <AppointmentBrowse />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/appointments/mine"
-            element={
-              isAuthenticated ? (
-                <MyAppointments />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/journals"
-            element={
-              isAuthenticated ? (
-                <JournalsList />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/journals/new"
-            element={
-              isAuthenticated ? (
-                <JournalForm mode="create" />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/journals/:id"
-            element={
-              isAuthenticated ? (
-                <JournalDetail />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/journals/:id/edit"
-            element={
-              isAuthenticated ? (
-                <JournalForm mode="edit" />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/appointments/:id"
-            element={
-              isAuthenticated ? (
-                <AppointmentMidwife />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              isAuthenticated ? <Profile /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route path="/welcome" element={<Navigate to="/profile" replace />} />
-          <Route
-            path="/onboarding"
-            element={
-              isAuthenticated ? (
-                <Onboarding />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-        </Routes>
-        {isAuthenticated && <Footer />}
-      </div>
+      <AppShell isAuthenticated={isAuthenticated} />
     </BrowserRouter>
   );
 };
