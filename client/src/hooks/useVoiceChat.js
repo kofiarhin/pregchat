@@ -20,11 +20,37 @@ const detectFullDuplexSupport = () => {
   return !(isIOS || isSafari);
 };
 
+const DEFAULT_ERROR_MESSAGE = "Voice input unavailable.";
+
 const ERROR_MESSAGES = {
   "no-speech": "No speech detected.",
   "audio-capture": "Microphone not available.",
   "not-allowed": "Microphone permission denied.",
   "service-not-allowed": "Microphone permission denied.",
+  network: "We couldn't reach the speech service.",
+  aborted: "Speech recognition stopped unexpectedly.",
+};
+
+const normalizeErrorKey = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  const key = `${value}`.toLowerCase();
+
+  if (ERROR_MESSAGES[key]) {
+    return key;
+  }
+
+  if (key === "notallowederror" || key === "securityerror") {
+    return "not-allowed";
+  }
+
+  if (key === "notfounderror") {
+    return "audio-capture";
+  }
+
+  return null;
 };
 
 const useVoiceChat = () => {
@@ -86,6 +112,29 @@ const useVoiceChat = () => {
     }
   }, []);
 
+  const handleRecognitionFailure = useCallback(
+    (error) => {
+      const key = normalizeErrorKey(error);
+      const message = ERROR_MESSAGES[key] || DEFAULT_ERROR_MESSAGE;
+
+      setVoiceError(message);
+      shouldResumeRef.current = false;
+      expectedStopRef.current = true;
+      clearRestartTimeout();
+      setListening(false);
+
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {
+          /* ignore */
+        }
+        recognitionRef.current = null;
+      }
+    },
+    [clearRestartTimeout],
+  );
+
   const ensureRecognition = useCallback(() => {
     if (!Recognition) {
       return null;
@@ -93,7 +142,7 @@ const useVoiceChat = () => {
 
     if (!recognitionRef.current) {
       const instance = new Recognition();
-      instance.continuous = true;
+      instance.continuous = supportsFullDuplex;
       instance.interimResults = false;
       instance.lang = window?.navigator?.language || "en-US";
 
@@ -124,18 +173,14 @@ const useVoiceChat = () => {
       };
 
       instance.onerror = (event) => {
-        const message = ERROR_MESSAGES[event?.error] || "Voice input unavailable.";
-        setVoiceError(message);
-        shouldResumeRef.current = false;
-        expectedStopRef.current = true;
-        setListening(false);
+        handleRecognitionFailure(event?.error);
       };
 
       recognitionRef.current = instance;
     }
 
     return recognitionRef.current;
-  }, [Recognition, clearRestartTimeout, handleResult]);
+  }, [Recognition, clearRestartTimeout, handleRecognitionFailure, handleResult, supportsFullDuplex]);
 
   const startListening = useCallback(() => {
     if (!Recognition) {
@@ -154,15 +199,27 @@ const useVoiceChat = () => {
 
     try {
       recognition.start();
-    } catch {
+    } catch (error) {
+      const normalized = normalizeErrorKey(error?.name);
+
+      if (normalized) {
+        handleRecognitionFailure(normalized);
+        return;
+      }
+
       try {
         recognition.stop();
         recognition.start();
-      } catch {
-        /* ignore */
+      } catch (secondaryError) {
+        const secondary = normalizeErrorKey(secondaryError?.name);
+        if (secondary) {
+          handleRecognitionFailure(secondary);
+        } else {
+          handleRecognitionFailure(secondaryError?.name || null);
+        }
       }
     }
-  }, [Recognition, ensureRecognition]);
+  }, [Recognition, ensureRecognition, handleRecognitionFailure]);
 
   const speak = useCallback(
     (text, options = {}) => {
