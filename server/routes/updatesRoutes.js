@@ -6,23 +6,23 @@ const {
   updateProfile,
   deleteProfile,
 } = require("../controllers/updatesController");
-const auth = require("../middleware/auth");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
 // GET /updates/today
-router.get("/today", auth, getToday);
+router.get("/today", requireAuth, getToday);
 
 // GET /updates/profile
-router.get("/profile", auth, getProfile);
+router.get("/profile", requireAuth, getProfile);
 
 // PUT /updates/profile
-router.put("/profile", auth, updateProfile);
+router.put("/profile", requireAuth, updateProfile);
 
 // DELETE /updates/profile
-router.delete("/profile", auth, deleteProfile);
+router.delete("/profile", requireAuth, deleteProfile);
 
 // GET /updates/:day
-router.get("/:day", auth, getDay);
+router.get("/:day", requireAuth, getDay);
 
 module.exports = router;

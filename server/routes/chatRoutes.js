@@ -4,7 +4,7 @@ const {
   getConversations,
   getConversationMessages,
 } = require("../controllers/chatController");
-const auth = require("../middleware/auth");
+const { requireAuth } = require("../middleware/auth");
 const rateLimit = require("express-rate-limit");
 
 const router = express.Router();
@@ -21,16 +21,16 @@ const chatLimiter = rateLimit({
 });
 
 // GET /chat/conversations
-router.get("/conversations", auth, getConversations);
+router.get("/conversations", requireAuth, getConversations);
 
 // GET /chat/conversations/:conversationId/messages
 router.get(
   "/conversations/:conversationId/messages",
-  auth,
+  requireAuth,
   getConversationMessages
 );
 
 // POST /chat/ask
-router.post("/ask", auth, chatLimiter, ask);
+router.post("/ask", requireAuth, chatLimiter, ask);
 
 module.exports = router;

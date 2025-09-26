@@ -1,9 +1,9 @@
 const express = require("express");
 const { deleteMessagesForUser } = require("../controllers/messageController");
-const auth = require("../middleware/auth");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.delete("/:userId", auth, deleteMessagesForUser);
+router.delete("/:userId", requireAuth, deleteMessagesForUser);
 
 module.exports = router;
