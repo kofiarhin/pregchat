@@ -1,4 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import content from "../content/appContent.json";
 import { FiSend } from "react-icons/fi";
 import VoiceControls from "./VoiceControls.jsx";
 import "./chatInput.styles.scss";
@@ -9,7 +11,9 @@ const ChatInput = ({
   isSending = false,
   autoFocus = true,
 }) => {
+  const navigate = useNavigate();
   const [value, setValue] = useState("");
+  const voiceLaunchLabel = content.voice?.page?.controls?.launch ?? "Voice Mode";
   const inputRef = useRef(null);
 
   const handleSend = useCallback(
@@ -83,7 +87,17 @@ const ChatInput = ({
         </div>
       </form>
 
-      <VoiceControls onSend={handleVoiceSend} />
+      <div className="chatInput__extras">
+        <VoiceControls onSend={handleVoiceSend} />
+
+        <button
+          type="button"
+          className="chatInput__voiceMode"
+          onClick={() => navigate("/voice")}
+        >
+          {voiceLaunchLabel}
+        </button>
+      </div>
     </div>
   );
 };

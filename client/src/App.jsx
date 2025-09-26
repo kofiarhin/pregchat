@@ -23,6 +23,7 @@ import MyAppointments from "./pages/MyAppointments.jsx";
 import JournalsList from "./pages/JournalsList.jsx";
 import JournalForm from "./pages/JournalForm.jsx";
 import JournalDetail from "./pages/JournalDetail.jsx";
+import VoiceChat from "./pages/voice/VoiceChat.jsx";
 
 const App = () => {
   const token = useAppSelector(selectAuthToken);
@@ -98,6 +99,12 @@ const App = () => {
             path="/chat"
             element={
               isAuthenticated ? <Chat /> : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/voice"
+            element={
+              isAuthenticated ? <VoiceChat /> : <Navigate to="/login" replace />
             }
           />
           <Route

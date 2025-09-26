@@ -17,6 +17,20 @@ const parseJsonSafe = async (response) => {
   }
 };
 
+const parseResponse = async (response, responseType) => {
+  switch (responseType) {
+    case "blob":
+      return response.blob();
+    case "arrayBuffer":
+      return response.arrayBuffer();
+    case "text":
+      return response.text();
+    case "json":
+    default:
+      return parseJsonSafe(response);
+  }
+};
+
 const shouldRetry = (status) => status >= 500 && status < 600;
 
 const buildHeaders = (headers = {}) => {
@@ -52,6 +66,7 @@ const prepareBody = (options, headers) => {
 export const httpRequest = async (path, options = {}) => {
   const retries = options.retries ?? 2;
   const retryDelay = options.retryDelay ?? 300;
+  const responseType = options.responseType ?? "json";
   let attempt = 0;
   let lastError = null;
 
@@ -72,7 +87,7 @@ export const httpRequest = async (path, options = {}) => {
       });
 
       if (response.ok) {
-        return parseJsonSafe(response);
+        return parseResponse(response, responseType);
       }
 
       const payload = await parseJsonSafe(response);
