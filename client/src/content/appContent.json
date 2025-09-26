@@ -17,6 +17,69 @@
       "admin": "Admin"
     }
   },
+  "admin": {
+    "title": "Admin dashboard",
+    "subtitle": "Monitor user accounts and keep on top of store orders in one place.",
+    "tabs": {
+      "users": "Users",
+      "orders": "Orders"
+    },
+    "disclaimer": "Internal operations only — not medical advice.",
+    "users": {
+      "searchPlaceholder": "Search by name or email",
+      "loading": "Loading users...",
+      "error": "We couldn't load users.",
+      "empty": "No users found yet.",
+      "noResults": "No users matched your search.",
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "createdAt": "Joined"
+      },
+      "paginationLabel": "Rows per page"
+    },
+    "orders": {
+      "statusFilter": {
+        "label": "Status",
+        "all": "All statuses"
+      },
+      "loading": "Loading orders...",
+      "error": "We couldn't load orders.",
+      "empty": "No orders yet.",
+      "noResults": "No orders matched your filters.",
+      "columns": {
+        "id": "Order",
+        "customer": "Customer",
+        "total": "Total",
+        "status": "Status",
+        "createdAt": "Created"
+      },
+      "actions": {
+        "process": "Process",
+        "cancel": "Cancel",
+        "refund": "Refund"
+      },
+      "confirmations": {
+        "cancel": "Cancel this order?",
+        "refund": "Refund this order?"
+      },
+      "statusLabels": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "canceled": "Canceled",
+        "refunded": "Refunded"
+      },
+      "notesPlaceholder": "Add optional notes",
+      "paginationLabel": "Rows per page"
+    },
+    "pagination": {
+      "prev": "Previous",
+      "next": "Next"
+    }
+  },
   "faceOff": {
     "title": "Baby Name Face-Off",
     "description": "Pick your favorite names head-to-head until a single champion remains. Share a seed to replay the same bracket with friends.",
