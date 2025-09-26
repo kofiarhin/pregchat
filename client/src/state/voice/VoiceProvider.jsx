@@ -11,6 +11,7 @@ import { http } from "../../api/http.js";
 import { useChatMessages } from "../../features/messages/hooks/useChatMessages.js";
 import { useTodayPregnancyQuery } from "../../features/pregnancy/hooks/usePregnancy.js";
 import useVoiceChat from "../../hooks/useVoiceChat.js";
+import useTTS from "../../hooks/useTTS.js";
 
 export const VoiceUIStates = {
   idle: "idle",
@@ -30,16 +31,26 @@ const VoiceProvider = ({ children }) => {
 
   const {
     canUseVoice,
-    canSpeak,
     listening,
     startListening,
     stopListening,
-    speak,
     lastTranscript: recognitionTranscript,
     resetTranscript,
     supportsFullDuplex,
     voiceError,
   } = useVoiceChat();
+
+  const {
+    play,
+    pause,
+    resume,
+    stop,
+    unlock,
+    state: ttsState,
+    canPlayAudio,
+  } = useTTS();
+
+  const canSpeak = canPlayAudio;
 
   const [uiState, setUiState] = useState(VoiceUIStates.idle);
   const [speaking, setSpeaking] = useState(false);
@@ -55,20 +66,23 @@ const VoiceProvider = ({ children }) => {
   const requestCounterRef = useRef(0);
   const currentRequestIdRef = useRef(0);
   const voiceQueueRef = useRef([]);
-  const activeUtteranceRef = useRef(null);
   const lastSpokenRef = useRef(null);
+  const resumeAfterPlaybackRef = useRef(false);
+  const wasPlayingRef = useRef(false);
 
   useEffect(() => {
     listeningRef.current = listening;
   }, [listening]);
 
   useEffect(() => {
-    speakingRef.current = speaking;
-  }, [speaking]);
-
-  useEffect(() => {
     sendingRef.current = isSending;
   }, [isSending]);
+
+  useEffect(() => {
+    const isPlaying = ttsState.isPlaying && !ttsState.isPaused;
+    setSpeaking(isPlaying);
+    speakingRef.current = isPlaying;
+  }, [ttsState.isPaused, ttsState.isPlaying]);
 
   const clearAbortController = useCallback(() => {
     abortControllerRef.current = null;
@@ -100,18 +114,13 @@ const VoiceProvider = ({ children }) => {
         interrupted = true;
       }
 
-      if (typeof window !== "undefined" && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
+      if (ttsState.isPlaying || speakingRef.current) {
+        stop();
         interrupted = true;
-      }
-
-      if (activeUtteranceRef.current) {
-        activeUtteranceRef.current = null;
       }
 
       setIsSending(false);
       sendingRef.current = false;
-      setSpeaking(false);
 
       if (resumeListening) {
         setUiState(VoiceUIStates.listening);
@@ -124,7 +133,7 @@ const VoiceProvider = ({ children }) => {
 
       return interrupted;
     },
-    [startListening]
+    [startListening, stop, ttsState.isPlaying]
   );
 
   const sendViaExisting = useCallback(
@@ -279,12 +288,36 @@ const VoiceProvider = ({ children }) => {
   }, [listening]);
 
   useEffect(() => {
-    if (speaking) {
+    const isPlaying = ttsState.isPlaying && !ttsState.isPaused;
+
+    if (isPlaying && !wasPlayingRef.current) {
+      wasPlayingRef.current = true;
+      if (!supportsFullDuplex && listeningRef.current) {
+        resumeAfterPlaybackRef.current = true;
+        stopListening();
+      }
       setUiState(VoiceUIStates.speaking);
-    } else if (!listeningRef.current && !sendingRef.current) {
+    } else if (!isPlaying && wasPlayingRef.current) {
+      wasPlayingRef.current = false;
+      if (resumeAfterPlaybackRef.current && !supportsFullDuplex) {
+        resumeAfterPlaybackRef.current = false;
+        startListening();
+      }
+
+      if (!listeningRef.current && !sendingRef.current) {
+        setUiState(VoiceUIStates.idle);
+      }
+    } else if (!isPlaying && !listeningRef.current && !sendingRef.current) {
       setUiState(VoiceUIStates.idle);
     }
-  }, [speaking]);
+  }, [
+    setUiState,
+    startListening,
+    stopListening,
+    supportsFullDuplex,
+    ttsState.isPaused,
+    ttsState.isPlaying,
+  ]);
 
   const value = useMemo(
     () => ({
@@ -293,13 +326,17 @@ const VoiceProvider = ({ children }) => {
       listening,
       startListening,
       stopListening,
-      speak,
+      play,
+      pause,
+      resume,
+      stop,
+      unlock,
+      playbackState: ttsState,
       supportsFullDuplex,
       voiceError,
       uiState,
       setUiState,
       speaking,
-      setSpeaking,
       isSending,
       sendViaExisting,
       interrupt,
@@ -308,31 +345,34 @@ const VoiceProvider = ({ children }) => {
       latestTranscript,
       latestTranscriptId,
       resetTranscript,
-      activeUtteranceRef,
       lastSpokenRef,
       clearLatestTranscript,
     }),
     [
       abortActiveRequest,
-      canUseVoice,
       canSpeak,
+      canUseVoice,
+      clearLatestTranscript,
       currentRequestId,
       interrupt,
       isSending,
       latestTranscript,
       latestTranscriptId,
       listening,
-      setUiState,
-      speak,
+      pause,
+      play,
+      resume,
+      sendViaExisting,
       speaking,
       startListening,
+      stop,
       stopListening,
       supportsFullDuplex,
+      ttsState,
       uiState,
-      sendViaExisting,
-      setSpeaking,
-      clearLatestTranscript,
+      unlock,
       voiceError,
+      setUiState,
     ]
   );
 

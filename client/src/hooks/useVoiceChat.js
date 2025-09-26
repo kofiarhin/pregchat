@@ -64,10 +64,7 @@ const useVoiceChat = () => {
   const [voiceError, setVoiceError] = useState(null);
 
   const supportsFullDuplex = useMemo(() => detectFullDuplexSupport(), []);
-  const hasSpeechSynthesis =
-    typeof window !== "undefined" && typeof window.speechSynthesis !== "undefined";
-  const canSpeak = hasSpeechSynthesis;
-  const canUseVoice = Boolean(Recognition) && hasSpeechSynthesis;
+  const canUseVoice = Boolean(Recognition);
 
   const resetTranscript = useCallback(() => {
     setLastTranscript("");
@@ -110,7 +107,6 @@ const useVoiceChat = () => {
     }
 
     if (transcript) {
-      console.log("[voice] final:", transcript);
       setLastTranscript(transcript);
     }
   }, []);
@@ -158,7 +154,6 @@ const useVoiceChat = () => {
 
       instance.onend = () => {
         setListening(false);
-        console.log("[voice] end, listening=", shouldResumeRef.current);
 
         if (expectedStopRef.current || !shouldResumeRef.current) {
           expectedStopRef.current = false;
@@ -224,78 +219,16 @@ const useVoiceChat = () => {
     }
   }, [Recognition, ensureRecognition, handleRecognitionFailure]);
 
-  const speak = useCallback(
-    (text, options = {}) => {
-      if (!canSpeak || !text) {
-        return null;
-      }
-
-      const synth = window?.speechSynthesis;
-
-      if (!synth) {
-        return null;
-      }
-
-      synth.cancel();
-
-      const utterance = new SpeechSynthesisUtterance(text);
-
-      if (options.pitch !== undefined) {
-        utterance.pitch = options.pitch;
-      }
-
-      if (options.rate !== undefined) {
-        utterance.rate = options.rate;
-      }
-
-      if (options.volume !== undefined) {
-        utterance.volume = options.volume;
-      }
-
-      if (options.voice) {
-        utterance.voice = options.voice;
-      }
-
-      if (typeof options.onStart === "function") {
-        utterance.onstart = options.onStart;
-      }
-
-      if (typeof options.onBoundary === "function") {
-        utterance.onboundary = options.onBoundary;
-      }
-
-      const handleFinish = (event) => {
-        if (typeof options.onEnd === "function") {
-          options.onEnd(event);
-        }
-      };
-
-      utterance.onend = handleFinish;
-      utterance.oncancel = handleFinish;
-      utterance.onerror = handleFinish;
-
-      synth.speak(utterance);
-      return utterance;
-    },
-    [canSpeak]
-  );
-
   useEffect(() => () => {
     stopListening();
     clearRestartTimeout();
-
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
   }, [stopListening, clearRestartTimeout]);
 
   return {
     canUseVoice,
-    canSpeak,
     listening,
     startListening,
     stopListening,
-    speak,
     lastTranscript,
     resetTranscript,
     supportsFullDuplex,

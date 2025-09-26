@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { FiMic, FiMicOff, FiPlay, FiSquare } from "react-icons/fi";
 import useVoice from "../hooks/useVoice.js";
+import useTTS from "../hooks/useTTS.js";
 import styles from "./voiceControls.styles.scss?inline";
 
 const VoiceControls = ({ onSend }) => {
@@ -11,13 +12,12 @@ const VoiceControls = ({ onSend }) => {
     interim,
     start,
     stop,
-    speak,
-    cancelSpeech,
     setTranscript,
   } = useVoice();
+  const { play, stop: stopSpeech, unlock, canPlayAudio } = useTTS();
 
   const canUseStt = supported.stt;
-  const canUseTts = supported.tts;
+  const canUseTts = canPlayAudio;
 
   const combinedTranscript = useMemo(() => {
     if (transcript && interim) {
@@ -60,14 +60,11 @@ const VoiceControls = ({ onSend }) => {
       return;
     }
 
-    speak(
-      "Hello from PregChat. Your assistant will read new replies aloud whenever they arrive.",
-      {
-        rate: 0.96,
-        pitch: 1,
-        volume: 1,
-      },
-    );
+    void unlock();
+    stopSpeech();
+    play("Hello from PregChat. Your assistant will read new replies aloud whenever they arrive.", {
+      messageId: "voice-controls-sample",
+    });
   };
 
   const micLabel = isListening ? "Stop voice input" : "Start voice input";
@@ -111,7 +108,7 @@ const VoiceControls = ({ onSend }) => {
         <button
           type="button"
           className="btn"
-          onClick={cancelSpeech}
+          onClick={stopSpeech}
           disabled={!canUseTts}
           title="Stop any ongoing text-to-speech"
         >

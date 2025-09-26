@@ -70,6 +70,12 @@ MongoDB (Mongoose models)
 | `HUGGING_FACE_API_KEY` | Auth for baby image generation. (/server/services/hfGenerate.js)
 | `REGION` | Default locale for triage messaging. (/.env.example)
 | `VITE_API_BASE` | Client base URL for API requests. (/client/src/constants/baseUrl.js)
+| `ELEVENLABS_API_KEY` / `ELEVENLABS_VOICE_ID` / `ELEVENLABS_MODEL_ID` | Credentials for ElevenLabs text-to-speech proxy. (/server/controllers/ttsController.js)
+
+## Voice Playback & ElevenLabs
+- **Server proxy**: `/api/tts` forwards requests to ElevenLabs' streaming endpoint with latency-optimised settings and relays audio as `audio/mpeg`. Configure the environment variables above locally and on Vercel to enable it.
+- **Client hook**: `useTTS()` streams responses from `/api/tts`, caches audio blobs per message, and plays them through a shared `<audio>` element so every spoken reply originates from ElevenLabs. Speech requests automatically queue to mirror the chat flow.
+- **Mobile unlock**: iOS Safari requires a one-time gesture to start audio. Components call `useTTS().unlock()` on the first mic/play interaction and remember the unlocked state so subsequent playback starts automatically.
 
 ## Setup & Installation
 1. Clone the repo and install root dependencies:

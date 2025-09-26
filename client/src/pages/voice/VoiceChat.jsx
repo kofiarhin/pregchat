@@ -12,6 +12,7 @@ import { http } from "../../api/http.js";
 import { useChatMessages } from "../../features/messages/hooks/useChatMessages.js";
 import { useTodayPregnancyQuery } from "../../features/pregnancy/hooks/usePregnancy.js";
 import useVoice from "../../hooks/useVoice.js";
+import useTTS from "../../hooks/useTTS.js";
 import styles from "./voiceChat.styles.module.scss";
 
 const formatTime = (value) => {
@@ -36,21 +37,21 @@ const VoiceChat = () => {
   const errorCopy = pageCopy.errors ?? {};
 
   const conversationRef = useRef(null);
-  const audioRef = useRef(null);
-  const audioUrlRef = useRef(null);
   const recorderRef = useRef(null);
   const recordedChunksRef = useRef([]);
   const usingFallbackRef = useRef(false);
   const transcriptRef = useRef("");
   const transcriptHandlerRef = useRef(() => {});
   const micStateRef = useRef("idle");
+  const stopHandledRef = useRef(false);
 
   const [micState, setMicStateValue] = useState("idle");
   const [statusMessage, setStatusMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [lastAssistantReply, setLastAssistantReply] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const { play, stop: stopSpeech, unlock, state: playbackState, canPlayAudio } = useTTS();
+  const isSpeaking = playbackState.isPlaying && !playbackState.isPaused;
 
   const { messages, appendMessages } = useChatMessages();
   const { data: daySummary } = useTodayPregnancyQuery({ enabled: true });
@@ -61,43 +62,23 @@ const VoiceChat = () => {
   }, []);
 
   useEffect(() => {
-    if (micState === "recording") {
-      setStatusMessage(statusCopy.listening || "");
-    } else if (micState === "processing") {
-      setStatusMessage(statusCopy.processing || "");
-    } else {
-      setStatusMessage("");
-    }
-  }, [micState, statusCopy.listening, statusCopy.processing]);
-
-  const stopPlayback = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (isSpeaking) {
+      setStatusMessage(statusCopy.playing || statusCopy.processing || "");
       return;
     }
 
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current.onended = null;
-      audioRef.current.onerror = null;
-      audioRef.current = null;
+    if (micState === "recording") {
+      setStatusMessage(statusCopy.listening || "");
+      return;
     }
 
-    if (audioUrlRef.current) {
-      URL.revokeObjectURL(audioUrlRef.current);
-      audioUrlRef.current = null;
+    if (micState === "processing") {
+      setStatusMessage(statusCopy.processing || "");
+      return;
     }
 
-    setIsSpeaking(false);
-  }, []);
-
-  const handleSpeakStart = useCallback(() => {
-    setIsSpeaking(true);
-  }, []);
-
-  const handleSpeakEnd = useCallback(() => {
-    setIsSpeaking(false);
-  }, []);
+    setStatusMessage("");
+  }, [isSpeaking, micState, statusCopy.listening, statusCopy.playing, statusCopy.processing]);
 
   const handleListenStart = useCallback(() => {
     setErrorMessage("");
@@ -146,8 +127,6 @@ const VoiceChat = () => {
     transcript,
     start,
     stop,
-    speak,
-    cancelSpeech,
     setTranscript,
   } = useVoice({
     continuous: false,
@@ -161,8 +140,6 @@ const VoiceChat = () => {
     onError: handleVoiceError,
     onListenStart: handleListenStart,
     onListenEnd: handleListenEnd,
-    onSpeakStart: handleSpeakStart,
-    onSpeakEnd: handleSpeakEnd,
   });
 
   useEffect(() => {
@@ -190,10 +167,20 @@ const VoiceChat = () => {
     node.scrollTop = node.scrollHeight;
   }, [messages?.length, isSending]);
 
-  useEffect(
-    () => () => {
-      stopPlayback();
-      cancelSpeech();
+  const stopPlaybackOnce = useCallback(() => {
+    if (stopHandledRef.current) {
+      return;
+    }
+
+    stopHandledRef.current = true;
+    stopSpeech();
+  }, [stopSpeech]);
+
+  useEffect(() => {
+    stopHandledRef.current = false;
+
+    return () => {
+      stopPlaybackOnce();
       if (recorderRef.current && recorderRef.current.state !== "inactive") {
         try {
           recorderRef.current.stop();
@@ -201,72 +188,22 @@ const VoiceChat = () => {
           // ignore cleanup errors
         }
       }
-    },
-    [stopPlayback, cancelSpeech],
-  );
+    };
+  }, [stopPlaybackOnce]);
 
   const speakReply = useCallback(
     async (text) => {
       const phrase = (text || "").trim();
-      if (!phrase) {
+      if (!phrase || !canPlayAudio) {
         return;
       }
 
-      stopPlayback();
-      cancelSpeech();
-
-      if (supported.tts) {
-        speak(phrase, {
-          rate: 0.96,
-          pitch: 1,
-          volume: 1,
-        });
-        return;
-      }
-
-      try {
-        const audioBlob = await http.post("/api/speech/tts", {
-          json: { text: phrase },
-          responseType: "blob",
-        });
-
-        if (!(audioBlob instanceof Blob)) {
-          setErrorMessage(errorCopy.tts || "");
-          return;
-        }
-
-        const url = URL.createObjectURL(audioBlob);
-        audioUrlRef.current = url;
-        const audio = new Audio(url);
-        audioRef.current = audio;
-        setIsSpeaking(true);
-
-        audio.onended = () => {
-          setIsSpeaking(false);
-          if (audioUrlRef.current) {
-            URL.revokeObjectURL(audioUrlRef.current);
-            audioUrlRef.current = null;
-          }
-          audioRef.current = null;
-        };
-
-        audio.onerror = () => {
-          setIsSpeaking(false);
-          if (audioUrlRef.current) {
-            URL.revokeObjectURL(audioUrlRef.current);
-            audioUrlRef.current = null;
-          }
-          audioRef.current = null;
-          setErrorMessage(errorCopy.tts || "");
-        };
-
-        await audio.play();
-      } catch (error) {
-        setIsSpeaking(false);
-        setErrorMessage(error?.message || errorCopy.tts || "");
-      }
+      void unlock();
+      stopSpeech();
+      const messageId = `voice-reply-${Date.now()}`;
+      play(phrase, { messageId });
     },
-    [cancelSpeech, errorCopy.tts, speak, stopPlayback, supported.tts],
+    [canPlayAudio, play, stopSpeech, unlock]
   );
 
   const sendMessage = useCallback(
@@ -493,8 +430,7 @@ const VoiceChat = () => {
 
   const handleStartRecording = useCallback(() => {
     setErrorMessage("");
-    stopPlayback();
-    cancelSpeech();
+    stopSpeech();
 
     if (supported.stt) {
       setTranscript("");
@@ -505,7 +441,7 @@ const VoiceChat = () => {
     }
 
     startFallbackRecording();
-  }, [cancelSpeech, setMicState, setTranscript, start, startFallbackRecording, stopPlayback, supported.stt]);
+  }, [setMicState, setTranscript, start, startFallbackRecording, stopSpeech, supported.stt]);
 
   const handleStopRecording = useCallback(() => {
     if (usingFallbackRef.current && recorderRef.current) {
@@ -558,8 +494,7 @@ const VoiceChat = () => {
   }, [lastAssistantReply, speakReply]);
 
   const handleReturnToChat = useCallback(() => {
-    stopPlayback();
-    cancelSpeech();
+    stopPlaybackOnce();
 
     if (usingFallbackRef.current && recorderRef.current) {
       try {
@@ -577,7 +512,7 @@ const VoiceChat = () => {
     setTranscript("");
     transcriptRef.current = "";
     navigate("/chat");
-  }, [cancelSpeech, micState, navigate, setMicState, setTranscript, stop, stopPlayback, supported.stt]);
+  }, [micState, navigate, setMicState, setTranscript, stop, stopPlaybackOnce, supported.stt]);
 
   const micIcon = micState === "recording" ? <FiSquare /> : <FiMic />;
 

@@ -12,6 +12,7 @@ const midwifeRoutes = require("./routes/midwives");
 const appointmentRoutes = require("./routes/appointments");
 const journalRoutes = require("./routes/journals");
 const namesRoutes = require("./routes/namesRoutes");
+const ttsRoutes = require("./routes/ttsRoutes");
 const errorHandler = require("./middleware/error");
 const { createCorsOptions } = require("./config/cors");
 
@@ -48,6 +49,7 @@ const createApp = (configureApp) => {
   app.use("/api/appointments", appointmentRoutes);
   app.use("/api/journals", journalRoutes);
   app.use("/api/names", namesRoutes);
+  app.use("/api/tts", ttsRoutes);
 
   if (typeof configureApp === "function") {
     configureApp(app);

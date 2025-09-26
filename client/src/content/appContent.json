@@ -111,7 +111,8 @@
       },
       "status": {
         "listening": "Listening...",
-        "processing": "Processing your message..."
+        "processing": "Processing your message...",
+        "playing": "Speaking..."
       },
       "messages": {
         "permission": "Enable mic access in site settings",
