@@ -2,6 +2,7 @@ import React from "react";
 import ChatBox from "../components/ChatBox/ChatBox.jsx";
 import { useTodayPregnancyQuery } from "../features/pregnancy/hooks/usePregnancy.js";
 import "../components/ChatBox/chatBox.styles.scss";
+import VoiceChat from "./voice/VoiceChat.jsx";
 
 const Chat = () => {
   const { data: todaySummary } = useTodayPregnancyQuery({
@@ -10,7 +11,7 @@ const Chat = () => {
 
   return (
     <div className="chat-container">
-      <ChatBox daySummary={todaySummary} />
+      <VoiceChat />
     </div>
   );
 };
