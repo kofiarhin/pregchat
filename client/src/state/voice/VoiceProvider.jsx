@@ -45,6 +45,7 @@ const VoiceProvider = ({ children }) => {
   const [isSending, setIsSending] = useState(false);
   const [currentRequestId, setCurrentRequestId] = useState(0);
   const [latestTranscript, setLatestTranscript] = useState("");
+  const [latestTranscriptId, setLatestTranscriptId] = useState(0);
 
   const listeningRef = useRef(listening);
   const speakingRef = useRef(speaking);
@@ -70,6 +71,11 @@ const VoiceProvider = ({ children }) => {
 
   const clearAbortController = useCallback(() => {
     abortControllerRef.current = null;
+  }, []);
+
+  const clearLatestTranscript = useCallback(() => {
+    setLatestTranscript("");
+    setLatestTranscriptId(0);
   }, []);
 
   const abortActiveRequest = useCallback(() => {
@@ -196,9 +202,10 @@ const VoiceProvider = ({ children }) => {
         };
 
         await appendMessages(assistantMessage);
+        return assistantContent;
       } catch (error) {
         if (error?.name === "AbortError") {
-          return;
+          return null;
         }
 
         await appendMessages({
@@ -207,6 +214,7 @@ const VoiceProvider = ({ children }) => {
           content: error?.message || "Failed to send message.",
           timestamp: new Date().toISOString(),
         });
+        return null;
       } finally {
         if (currentRequestIdRef.current === nextRequestId) {
           clearAbortController();
@@ -252,14 +260,9 @@ const VoiceProvider = ({ children }) => {
     }
 
     setLatestTranscript(trimmed);
-
-    if (speakingRef.current || sendingRef.current) {
-      interrupt({ resumeListening: false });
-    }
-
-    void sendViaExisting(trimmed, { fromVoice: true });
+    setLatestTranscriptId((previous) => previous + 1);
     resetTranscript();
-  }, [interrupt, recognitionTranscript, resetTranscript, sendViaExisting]);
+  }, [recognitionTranscript, resetTranscript]);
 
   useEffect(() => {
     if (listening) {
@@ -301,9 +304,11 @@ const VoiceProvider = ({ children }) => {
       abortActiveRequest,
       currentRequestId,
       latestTranscript,
+      latestTranscriptId,
       resetTranscript,
       activeUtteranceRef,
       lastSpokenRef,
+      clearLatestTranscript,
     }),
     [
       abortActiveRequest,
@@ -312,6 +317,7 @@ const VoiceProvider = ({ children }) => {
       interrupt,
       isSending,
       latestTranscript,
+      latestTranscriptId,
       listening,
       setUiState,
       speak,
@@ -322,6 +328,7 @@ const VoiceProvider = ({ children }) => {
       uiState,
       sendViaExisting,
       setSpeaking,
+      clearLatestTranscript,
       voiceError,
     ]
   );
