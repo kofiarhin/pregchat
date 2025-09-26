@@ -1,0 +1,171 @@
+{
+  "navigation": {
+    "title": "Navigation",
+    "close": "Close",
+    "logout": "Logout",
+    "signingOut": "Signing out...",
+    "links": {
+      "profile": "Profile",
+      "dashboard": "Dashboard",
+      "journals": "Journals",
+      "chat": "Chat",
+      "faceoff": "Name Face-Off",
+      "store": "Store",
+      "cart": "Cart",
+      "bookAppointment": "Book Appointment",
+      "myAppointments": "My Appointments"
+    }
+  },
+  "faceOff": {
+    "title": "Baby Name Face-Off",
+    "description": "Pick your favorite names head-to-head until a single champion remains. Share a seed to replay the same bracket with friends.",
+    "loading": "Loading baby names...",
+    "error": "We couldn't load baby names right now.",
+    "empty": "No names are available for this face-off yet.",
+    "notEnough": "We need at least two names to start a face-off.",
+    "progressPrefix": "Round",
+    "championLabel": "Champion",
+    "challengerLabel": "Challenger",
+    "waiting": "Waiting for challenger...",
+    "winnerTitle": "Your winning name",
+    "playAgain": "Play Again",
+    "resume": "Resuming your latest face-off..."
+  },
+  "journals": {
+    "list": {
+      "title": "Daily journals",
+      "description": "Capture how you're feeling each day to spot patterns and celebrate wins.",
+      "newJournal": "New Journal",
+      "loading": "Loading your journals...",
+      "error": "We couldn't load your journals right now.",
+      "empty": "You haven't created any journal entries yet.",
+      "noUser": "Sign in to view your journals.",
+      "view": "View entry"
+    },
+    "detail": {
+      "loading": "Loading journal...",
+      "error": "We couldn't load that journal entry.",
+      "notFound": "This journal entry was not found or you don't have access to it.",
+      "recordedOn": "Recorded on",
+      "back": "Back to journals",
+      "edit": "Edit entry",
+      "delete": "Delete entry",
+      "confirmDelete": "Delete this journal entry?",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "createTitle": "New journal entry",
+      "editTitle": "Edit journal entry",
+      "description": "Reflect on your day to track mood shifts, symptoms, and moments of gratitude.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Give your entry a title",
+      "contentLabel": "How are you feeling today?",
+      "contentPlaceholder": "Write down your thoughts, symptoms, and wins...",
+      "required": "Title and content are required.",
+      "save": "Save journal",
+      "saving": "Saving...",
+      "update": "Update journal",
+      "updating": "Updating...",
+      "cancel": "Cancel",
+      "loading": "Loading journal...",
+      "loadError": "We couldn't load that journal entry.",
+      "submitError": "We couldn't save your journal. Please try again."
+    }
+  },
+  "store": {
+    "title": "Pregnancy & Baby Store",
+    "subtitle": "Curated essentials for your pregnancy and newborn journey.",
+    "detailsLinkLabel": "View details",
+    "addToCart": "Add to Cart",
+    "addMore": "Add more",
+    "empty": "No items available in the store right now.",
+    "loading": "Loading products...",
+    "error": "We couldn't load products right now. Please try again shortly.",
+    "outOfStock": "Out of stock"
+  },
+  "itemDetails": {
+    "backLink": "Back to Store",
+    "addToCart": "Add to Cart",
+    "addAnother": "Add another",
+    "priceLabel": "Price",
+    "stockLabel": "In stock",
+    "outOfStock": "Out of stock",
+    "loading": "Loading item...",
+    "error": "We couldn't find that item."
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty.",
+    "continueShopping": "Continue shopping",
+    "subtotal": "Subtotal",
+    "checkout": "Proceed to Checkout",
+    "quantity": "Quantity",
+    "remove": "Remove"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "summaryHeading": "Order Summary",
+    "formHeading": "Contact Details",
+    "nameLabel": "Full Name",
+    "emailLabel": "Email",
+    "addressLabel": "Shipping Address",
+    "confirm": "Confirm Order",
+    "success": "Thank you! Your order has been placed.",
+    "empty": "Add items to your cart before checking out.",
+    "backToStore": "Browse the store"
+  },
+  "appointments": {
+    "shared": {
+      "timezoneNote": "All times shown in London time."
+    },
+    "browse": {
+      "title": "Book a midwife appointment",
+      "description": "Browse our supportive midwives and choose the best fit for your next check-in.",
+      "loading": "Loading midwives...",
+      "error": "We couldn't load midwives right now. Please try again soon.",
+      "empty": "No midwives are available just yet. Check back shortly.",
+      "viewProfile": "View availability"
+    },
+    "midwife": {
+      "loading": "Loading midwife details...",
+      "error": "We couldn't load this midwife right now.",
+      "thisWeek": "This week",
+      "nextTwoWeeks": "Next 2 weeks",
+      "availabilityTitle": "Available slots",
+      "availabilityHelp": "Choose a range and load upcoming sessions that work for you.",
+      "loadAvailability": "Load availability",
+      "loadingSlots": "Loading slots...",
+      "noSlots": "No open slots in this range. Try another week.",
+      "modalTitle": "Confirm your appointment",
+      "nameLabel": "Full name",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Share anything you'd like your midwife to know",
+      "confirm": "Confirm appointment",
+      "submitting": "Booking...",
+      "cancel": "Cancel",
+      "required": "Name and email are required to book.",
+      "success": "Appointment booked! We'll send a confirmation to your inbox.",
+      "error": "We couldn't book that slot. Please try another time."
+    },
+    "mine": {
+      "title": "My appointments",
+      "subtitle": "Review upcoming visits and manage any changes.",
+      "loading": "Loading your appointments...",
+      "error": "We couldn't load your appointments right now.",
+      "empty": "You haven't booked any appointments yet.",
+      "cancel": "Cancel appointment",
+      "cancelling": "Cancelling...",
+      "cancelSuccess": "Appointment cancelled. You're welcome to book another slot anytime.",
+      "cancelError": "We couldn't cancel that appointment. Please try again.",
+      "statusBooked": "Booked",
+      "statusCancelled": "Cancelled",
+      "noUser": "Sign in to see your appointments.",
+      "unknownMidwife": "Midwife",
+      "cancelled": "Cancelled",
+      "booked": "Booked"
+    }
+  }
+}

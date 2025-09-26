@@ -1,9 +1,5 @@
-const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
-};
+const { createToken } = require("../utils/token");
 
 const register = async (req, res) => {
   try {
@@ -26,7 +22,7 @@ const register = async (req, res) => {
     await user.save();
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = createToken({ id: user._id });
 
     res.status(201).json({
       token,
@@ -59,7 +55,7 @@ const login = async (req, res) => {
     }
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = createToken({ id: user._id });
 
     res.json({
       token,

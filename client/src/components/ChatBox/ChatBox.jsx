@@ -1,209 +1,114 @@
-// ChatBox.jsx
-import React, { useState, useRef, useEffect } from "react";
-import { useAsk } from "../../hooks/useChat";
-import { useAppSelector, useAppDispatch } from "../../store/store";
-import {
-  addUserMessage,
-  addAssistantMessage,
-  addTriageMessage,
-  addErrorMessage,
-  setTyping,
-  setTypingMsgId,
-} from "../../store/slices/chatSlice";
+import React, { useEffect, useRef, useState } from "react";
+import { FiSend } from "react-icons/fi";
+import { http } from "../../api/http.js";
 import "./chatBox.styles.scss";
+import { useChatMessages } from "../../features/messages/hooks/useChatMessages.js";
 
-const ChatBox = () => {
-  const [message, setMessage] = useState("");
-  const [showScrollBtn, setShowScrollBtn] = useState(false);
-
-  // Typewriter state
-  const [typingText, setTypingText] = useState("");
-  const typeIntervalRef = useRef(null);
-
-  const messagesRef = useRef(null);
-  const endRef = useRef(null);
-  const lastMsgRef = useRef(null);
-
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((s) => s.auth);
-  const { dayIndex } = useAppSelector((s) => s.pregnancy);
-  const { mode } = useAppSelector((s) => s.theme);
-  const { chatHistory, isTyping, typingMsgId } = useAppSelector((s) => s.chat);
-  const askMutation = useAsk();
-
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-    lastMsgRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
+const formatTime = (value) => {
+  try {
+    return new Date(value).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
     });
-  }, [chatHistory, isTyping, typingText]);
+  } catch {
+    return "";
+  }
+};
 
+const genId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+const ChatBox = ({ daySummary }) => {
+  const { messages, appendMessages } = useChatMessages();
+  const [input, setInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const scrollAnchorRef = useRef(null);
+  const inputRef = useRef(null);
+
+  // Auto-scroll to the latest message
   useEffect(() => {
-    return () => {
-      if (typeIntervalRef.current) clearInterval(typeIntervalRef.current);
+    scrollAnchorRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length, isSending]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    inputRef.current?.focus();
+    const text = input.trim();
+    if (!text || isSending) return;
+
+    const userMessage = {
+      id: genId(),
+      role: "user",
+      content: text,
+      timestamp: new Date().toISOString(),
     };
-  }, []);
 
-  const handleScroll = () => {
-    if (!messagesRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = messagesRef.current;
-    const atBottom = scrollHeight - scrollTop - clientHeight < 40;
-    setShowScrollBtn(!atBottom);
-  };
-
-  const scrollToBottom = () => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    if (!typingMsgId) return;
-    if (typeIntervalRef.current) clearInterval(typeIntervalRef.current);
-
-    const msg = chatHistory.find((m) => m.id === typingMsgId);
-    if (!msg || !msg.content) return;
-
-    const full = msg.content;
-    setTypingText("");
-
-    const targetMs = 2000;
-    const step = Math.max(10, Math.floor(targetMs / Math.max(1, full.length)));
-    let i = 0;
-
-    typeIntervalRef.current = setInterval(() => {
-      i += 1;
-      setTypingText(full.slice(0, i));
-      lastMsgRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
-      if (i >= full.length) {
-        clearInterval(typeIntervalRef.current);
-        typeIntervalRef.current = null;
-        dispatch(setTypingMsgId(null));
-      }
-    }, step);
-  }, [typingMsgId, chatHistory, dispatch]);
-
-  const submit = async (e) => {
-    e.preventDefault();
-    if (!message.trim() || isTyping) return;
-
-    const text = message.trim();
-    setMessage("");
-    dispatch(setTyping(true));
-
-    dispatch(addUserMessage(text));
+    await appendMessages(userMessage);
+    setInput("");
+    setIsSending(true);
 
     try {
-      const dayData = dayIndex
-        ? { dayIndex, babyUpdate: "", momUpdate: "", tips: "" }
-        : null;
-
-      const res = await askMutation.mutateAsync({
+      const payload = {
         text,
-        dayData,
-        stream: false,
-      });
+        ...(daySummary
+          ? {
+              dayData: {
+                dayIndex: daySummary.day,
+                babyUpdate: daySummary.babyUpdate,
+                momUpdate: daySummary.momUpdate,
+                tips: daySummary.tips,
+              },
+            }
+          : {}),
+      };
 
-      if (res.triage) {
-        dispatch(addTriageMessage(res.message));
-      } else {
-        dispatch(addAssistantMessage(res.content));
-        setTypingText("");
-      }
-    } catch {
-      dispatch(
-        addErrorMessage("Sorry, I encountered an error. Please try again.")
-      );
-      if (typeIntervalRef.current) {
-        clearInterval(typeIntervalRef.current);
-        typeIntervalRef.current = null;
-      }
-      dispatch(setTypingMsgId(null));
-      setTypingText("");
+      const data = await http.post("/chat/ask", { json: payload });
+      const assistantContent =
+        data?.content ||
+        data?.message ||
+        "I'm not sure how to respond right now, but I'm here for you.";
+
+      const assistantMessage = {
+        id: genId(),
+        role: "assistant",
+        content: assistantContent,
+        timestamp: new Date().toISOString(),
+        meta: data?.triage ? { triage: true } : undefined,
+      };
+
+      await appendMessages(assistantMessage);
+    } catch (error) {
+      await appendMessages({
+        id: genId(),
+        role: "assistant",
+        content: error?.message || "Failed to send message.",
+        timestamp: new Date().toISOString(),
+      });
     } finally {
-      dispatch(setTyping(false));
+      setIsSending(false);
+      inputRef.current?.focus();
     }
   };
 
-  const formatTime = (date) =>
-    date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  const selectQuickPrompt = (value) => setMessage(value);
+  const renderMessage = (entry) => {
+    const tone = entry.meta?.triage ? "triage" : entry.role;
+    return (
+      <div key={entry.id} className={`bubble bubble--${tone ?? "assistant"}`}>
+        <div className="body">
+          {entry.meta?.triage && <div className="flag">Important</div>}
+          <p>{entry.content}</p>
+        </div>
+        <time className="time">{formatTime(entry.timestamp)}</time>
+      </div>
+    );
+  };
 
   return (
-    <div className={`container ${mode}`}>
-      {/* <div className="chat_title">
-        <span className="brand">Aya</span>
-        <span className="model">Pregnancy 2.5</span>
-      </div> */}
+    <div className="container dark">
+      <main className="messages">
+        {messages.map(renderMessage)}
 
-      <main className="messages" ref={messagesRef} onScroll={handleScroll}>
-        {chatHistory.length === 0 && (
-          <section className="welcome">
-            <h1 className="headline">
-              Hello, {user?.name?.split(" ")[0] || "there"}
-            </h1>
-            <div className="chips">
-              <button
-                className="chip"
-                onClick={() =>
-                  selectQuickPrompt(
-                    `What should I know today about week ${
-                      dayIndex ? Math.ceil(dayIndex / 7) : "X"
-                    }?`
-                  )
-                }
-              >
-                Inspire me
-              </button>
-              <button
-                className="chip"
-                onClick={() =>
-                  selectQuickPrompt("Give me a quick wellness checklist for today.")
-                }
-              >
-                Save me time
-              </button>
-              <button
-                className="chip"
-                onClick={() =>
-                  selectQuickPrompt("What can you do for pregnancy support?")
-                }
-              >
-                What you can do
-              </button>
-            </div>
-          </section>
-        )}
-
-        {chatHistory.map((m, idx) => {
-          const isLast = idx === chatHistory.length - 1;
-          const isAnimating = m.id === typingMsgId && m.type === "assistant";
-          const displayText = isAnimating ? typingText : m.content;
-
-          return (
-            <div
-              key={m.id}
-              className={`bubble bubble--${m.type}`}
-              ref={isLast ? lastMsgRef : null}
-            >
-              <div className={`body ${isAnimating ? "typewriter" : ""}`}>
-                {m.type === "triage" && (
-                  <div className="flag">Important</div>
-                )}
-                <p>
-                  {displayText}
-                  {isAnimating && <span className="caret" />}
-                </p>
-              </div>
-              <time className="time">{formatTime(new Date(m.timestamp))}</time>
-            </div>
-          );
-        })}
-
-        {isTyping && (
-          <div className="bubble bubble--assistant" ref={lastMsgRef}>
+        {isSending && (
+          <div className="bubble bubble--assistant">
             <div className="body">
               <div className="typing">
                 <span />
@@ -213,34 +118,31 @@ const ChatBox = () => {
             </div>
           </div>
         )}
-        <div ref={endRef} />
+
+        <div ref={scrollAnchorRef} />
       </main>
 
-      <button
-        className={`scroll-btn ${showScrollBtn ? "show" : ""}`}
-        onClick={scrollToBottom}
-        aria-label="Scroll to latest"
-      >
-        Scroll
-      </button>
-
-      <form className="composer" onSubmit={submit}>
+      <form className="composer" onSubmit={handleSubmit}>
         <div className="wrap">
           <div className="field">
             <input
               className="input"
               type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
               placeholder="Ask Aya about your pregnancy..."
-              disabled={isTyping}
+              disabled={isSending}
+              ref={inputRef}
+              autoFocus
             />
             <button
               className="send"
               type="submit"
-              disabled={!message.trim() || isTyping}
+              aria-label="Send message"
+              title="Send message"
+              disabled={!input.trim() || isSending}
             >
-              {isTyping ? "..." : "Send"}
+              <FiSend aria-hidden="true" size={20} />
             </button>
           </div>
         </div>

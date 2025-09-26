@@ -5,12 +5,16 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "dev": "concurrently \"npm run start:server\" \"npm run start:client\"",
-    "start:server": "cd server && nodemon server.js",
-    "start:client": "cd client && vite --port 5000",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
     "test:server": "cd server && jest --runInBand",
     "test:client": "cd client && vitest",
-    "install-server": "npm install && cd server && npm install"
+    "test:unit": "cd server && jest --config jest.unit.config.js --runInBand",
+    "test:integration": "cd server && jest --config jest.integration.config.js --runInBand",
+    "e2e": "jest --config jest.e2e.config.js --runInBand",
+    "install-server": "npm install && cd server && npm install",
+    "seed:store": "node server/seed/store.seed.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -28,6 +32,8 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.4",
+    "playwright": "^1.43.0",
     "supertest": "^6.3.3",
     "vitest": "^1.0.0"
   },

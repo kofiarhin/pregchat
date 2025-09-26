@@ -16,14 +16,16 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: #050505;
+  color: #e6e6e6;
 }
 
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #050505;
+  color: inherit;
 }
 
 // Mobile-first responsive breakpoints
@@ -51,8 +53,8 @@ body {
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 0.5rem;
-  background-color: #007bff;
-  color: white;
+  background-color: #4c8bf5;
+  color: #f8f9ff;
   font-size: 1rem;
   font-weight: 500;
   text-decoration: none;
@@ -60,11 +62,12 @@ body {
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #3b6dd1;
   }
 
   &:disabled {
-    background-color: #6c757d;
+    background-color: #1f1f1f;
+    color: #6f7686;
     cursor: not-allowed;
   }
 }
@@ -72,22 +75,28 @@ body {
 .input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid #2c2c2c;
   border-radius: 0.5rem;
   font-size: 1rem;
-  transition: border-color 0.2s;
+  background-color: #111;
+  color: #f4f6fb;
+  transition: border-color 0.2s, box-shadow 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    border-color: #4c8bf5;
+    box-shadow: 0 0 0 2px rgba(76, 139, 245, 0.25);
+  }
+
+  &::placeholder {
+    color: #8d94a3;
   }
 }
 
 .card {
-  background: white;
+  background: #151515;
   border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
   padding: 1.5rem;
   margin-bottom: 1rem;
 }
@@ -96,8 +105,8 @@ body {
   display: inline-block;
   width: 1rem;
   height: 1rem;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #007bff;
+  border: 2px solid #1f1f1f;
+  border-top: 2px solid #4c8bf5;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -126,6 +135,6 @@ body {
 
 // Focus states
 *:focus-visible {
-  outline: 2px solid #007bff;
+  outline: 2px solid #4c8bf5;
   outline-offset: 2px;
 }

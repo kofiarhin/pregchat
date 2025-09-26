@@ -1,28 +1,31 @@
-﻿import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
-import { useAppSelector, useAppDispatch } from "../../store/store";
-import { logout } from "../../store/slices/authSlice";
-import { toggleTheme } from "../../store/slices/themeSlice";
+import React, { useState } from "react";
+import {
+  useLogoutMutation,
+  useCurrentUserQuery,
+} from "../../features/auth/hooks/useAuth.js";
 import "./header.styles.scss";
 import { FaBars } from "react-icons/fa";
+import AvatarDropdown from "../AvatarDropdown.jsx";
+import Sidebar from "../Sidebar/Sidebar.jsx";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useAppSelector((state) => state.auth);
-  const { mode } = useAppSelector((s) => s.theme);
-  const dispatch = useAppDispatch();
+  const { data: user } = useCurrentUserQuery();
+  const logoutMutation = useLogoutMutation({
+    onSuccess: () => {
+      setMenuOpen(false);
+    },
+  });
 
   const handleLogout = () => {
-    dispatch(logout());
-    setMenuOpen(false);
+    logoutMutation.mutate();
   };
 
-  const toggleMenu = () => setMenuOpen((v) => !v);
+  const toggleMenu = () => setMenuOpen((value) => !value);
   const closeMenu = () => setMenuOpen(false);
-  const themeLabel = mode === "dark" ? "Light" : "Dark";
-
   return (
-    <header className="header">
+    <header className="header" role="banner">
       <div className="topbar">
         <button
           className="menu_btn"
@@ -33,21 +36,16 @@ const Header = () => {
           <FaBars className="icon" />
         </button>
 
-        <div className="brand_wrap">
+        <Link to="/chat" className="brand_wrap">
           <span className="brand">PregChat</span>
           <span className="model">alpha</span>
-        </div>
+        </Link>
 
         <div className="actions">
-          <button
-            className="theme_btn"
-            type="button"
-            onClick={() => dispatch(toggleTheme())}
-            aria-label="Toggle theme"
-          >
-            {themeLabel}
-          </button>
-          <div className="avatar">{user?.name?.[0]?.toUpperCase() || "P"}</div>
+          <AvatarDropdown
+            avatar={user?.name?.[0]?.toUpperCase() || "P"}
+            userId={user?._id}
+          />
         </div>
       </div>
 
@@ -55,37 +53,12 @@ const Header = () => {
         className={`overlay ${menuOpen ? "show" : ""}`}
         onClick={closeMenu}
       />
-      <nav className={`drawer ${menuOpen ? "open" : ""}`}>
-        <div className="drawer_header">
-          <span className="drawer_title">Menu</span>
-          <button
-            className="close_btn"
-            onClick={closeMenu}
-            aria-label="Close menu"
-          >
-            Close
-          </button>
-        </div>
-        <ul className="nav_list">
-          <li>
-            <NavLink to="/chat" className="link" onClick={closeMenu}>
-              Chat
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/welcome" className="link" onClick={closeMenu}>
-              Welcome
-            </NavLink>
-          </li>
-          {user && (
-            <li>
-              <button onClick={handleLogout} className="logout_btn">
-                Logout
-              </button>
-            </li>
-          )}
-        </ul>
-      </nav>
+      <Sidebar
+        isOpen={menuOpen}
+        onClose={closeMenu}
+        onLogout={handleLogout}
+        isLoggingOut={logoutMutation.isPending}
+      />
     </header>
   );
 };

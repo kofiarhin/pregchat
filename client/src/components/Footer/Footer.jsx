@@ -13,8 +13,7 @@ const Footer = () => {
             rel="noopener noreferrer"
           >
             Kofi Arhin
-          </a>{" "}
-          and <span>Socielas</span>
+          </a>
         </p>
         <div className="social-links">
           <a
