@@ -5,6 +5,7 @@ const DEFAULT_ALLOWED_ORIGINS = [
   "http://127.0.0.1:5000",
   "https://pregchat-mu.vercel.app",
   "http://localhost:4000",
+  "https://pregchat-tan.vercel.app/login",
 ];
 
 const parseAllowedOrigins = () => {
