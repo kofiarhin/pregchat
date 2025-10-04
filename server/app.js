@@ -34,7 +34,7 @@ const createApp = (configureApp) => {
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true }));
 
-  ap.get("/", async (req, res, next) => {
+  app.get("/", async (req, res, next) => {
     return res.json({ message: "hello world" });
   });
 
