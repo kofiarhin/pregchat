@@ -1,0 +1,118 @@
+.day-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+
+  &__header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  &__title {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  &__subtitle {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    font-weight: 400;
+  }
+
+  &__content {
+    padding: 2rem;
+  }
+
+  &__section {
+    margin-bottom: 2rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__section-title {
+    color: #667eea;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__text {
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  &__footer {
+    background: #f8f9fa;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e9ecef;
+  }
+
+  &__warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: #856404;
+    background: #fff3cd;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ffeaa7;
+  }
+
+  &__warning-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  &__warning-text {
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+// Mobile responsive
+@media (max-width: 767px) {
+  .day-card {
+    &__header {
+      padding: 1.5rem;
+    }
+
+    &__title {
+      font-size: 1.5rem;
+    }
+
+    &__subtitle {
+      font-size: 1rem;
+    }
+
+    &__content {
+      padding: 1.5rem;
+    }
+
+    &__section-title {
+      font-size: 1.125rem;
+    }
+
+    &__footer {
+      padding: 1rem 1.5rem;
+    }
+
+    &__warning {
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+  }
+}

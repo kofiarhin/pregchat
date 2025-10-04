@@ -1,0 +1,252 @@
+.voiceScreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: radial-gradient(circle at top, rgba(84, 87, 255, 0.25), transparent 60%),
+    radial-gradient(circle at bottom, rgba(255, 99, 132, 0.18), transparent 65%),
+    #050510;
+  color: #ffffff;
+  padding: 1.5rem 1.25rem 2rem;
+  z-index: 30;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.iconButton {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  transition: background 0.2s ease, transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.statusGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statusDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 rgba(255, 255, 255, 0.15);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.statusDotListening {
+  background: #f4b63f;
+  box-shadow: 0 0 12px rgba(244, 182, 63, 0.55);
+}
+
+.statusDotSpeaking {
+  background: #1ed760;
+  box-shadow: 0 0 16px rgba(30, 215, 96, 0.6);
+}
+
+.statusLabel {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.statusChip {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.topActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 2.5rem;
+  padding: 2rem 0 1.5rem;
+}
+
+.captionArea {
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
+}
+
+.orbWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.orb {
+  position: relative;
+  width: min(68vw, 320px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.85), rgba(81, 103, 255, 0.35));
+  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.45);
+  transition: transform 0.8s ease, box-shadow 0.4s ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -18%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(81, 103, 255, 0.2), transparent 70%);
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes orbPulse {
+  0%,
+  100% {
+    transform: scale(0.96);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes orbSpeak {
+  0% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  70% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
+.orbListening {
+  animation: orbPulse 3.2s ease-in-out infinite;
+}
+
+.orbSpeaking {
+  animation: orbPulse 1.6s ease-in-out infinite;
+
+  &::after {
+    opacity: 0.75;
+    animation: orbSpeak 1.4s ease-out infinite;
+  }
+}
+
+.orbReduceMotion {
+  animation: none;
+
+  &::after {
+    animation: none;
+    opacity: 0.4;
+  }
+}
+
+.voiceError {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 84, 84, 0.16);
+  border-radius: 12px;
+  color: #ff9d9d;
+  font-size: 0.85rem;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+.bottomActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.controlButton {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  transition: background 0.2s ease, transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.controlButtonActive {
+  background: rgba(81, 103, 255, 0.3);
+  box-shadow: 0 0 16px rgba(81, 103, 255, 0.45);
+}
+
+.statusAnnouncer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (min-width: 768px) {
+  .voiceScreen {
+    padding: 2.5rem 3rem 3rem;
+  }
+
+  .captionArea {
+    font-size: 1.4rem;
+  }
+
+  .orb {
+    width: min(38vw, 420px);
+  }
+
+  .controlButton {
+    width: 70px;
+    height: 70px;
+    font-size: 1.3rem;
+  }
+}

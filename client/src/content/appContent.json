@@ -1,0 +1,361 @@
+{
+  "navigation": {
+    "title": "Navigation",
+    "close": "Close",
+    "logout": "Logout",
+    "signingOut": "Signing out...",
+    "links": {
+      "profile": "Profile",
+      "dashboard": "Dashboard",
+      "journals": "Journals",
+      "chat": "Chat",
+      "faceoff": "Name Face-Off",
+      "store": "Store",
+      "cart": "Cart",
+      "bookAppointment": "Book Appointment",
+      "myAppointments": "My Appointments",
+      "admin": "Admin"
+    }
+  },
+  "admin": {
+    "title": "Admin dashboard",
+    "subtitle": "Monitor user accounts and keep on top of store orders in one place.",
+    "tabs": {
+      "users": "Users",
+      "orders": "Orders"
+    },
+    "disclaimer": "Internal operations only — not medical advice.",
+    "users": {
+      "searchPlaceholder": "Search by name or email",
+      "loading": "Loading users...",
+      "error": "We couldn't load users.",
+      "empty": "No users found yet.",
+      "noResults": "No users matched your search.",
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "createdAt": "Joined"
+      },
+      "paginationLabel": "Rows per page"
+    },
+    "orders": {
+      "statusFilter": {
+        "label": "Status",
+        "all": "All statuses"
+      },
+      "loading": "Loading orders...",
+      "error": "We couldn't load orders.",
+      "empty": "No orders yet.",
+      "noResults": "No orders matched your filters.",
+      "columns": {
+        "id": "Order",
+        "customer": "Customer",
+        "total": "Total",
+        "status": "Status",
+        "createdAt": "Created"
+      },
+      "actions": {
+        "process": "Process",
+        "cancel": "Cancel",
+        "refund": "Refund"
+      },
+      "confirmations": {
+        "cancel": "Cancel this order?",
+        "refund": "Refund this order?"
+      },
+      "statusLabels": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "canceled": "Canceled",
+        "refunded": "Refunded"
+      },
+      "notesPlaceholder": "Add optional notes",
+      "paginationLabel": "Rows per page"
+    },
+    "pagination": {
+      "prev": "Previous",
+      "next": "Next"
+    }
+  },
+  "faceOff": {
+    "title": "Baby Name Face-Off",
+    "description": "Pick your favorite names head-to-head until a single champion remains. Share a seed to replay the same bracket with friends.",
+    "loading": "Loading baby names...",
+    "error": "We couldn't load baby names right now.",
+    "empty": "No names are available for this face-off yet.",
+    "notEnough": "We need at least two names to start a face-off.",
+    "progressPrefix": "Round",
+    "championLabel": "Champion",
+    "challengerLabel": "Challenger",
+    "waiting": "Waiting for challenger...",
+    "winnerTitle": "Your winning name",
+    "playAgain": "Play Again",
+    "resume": "Resuming your latest face-off..."
+  },
+  "voice": {
+    "page": {
+      "title": "Voice Mode",
+      "betaTag": "(beta)",
+      "back": "Back to chat",
+      "triageFlag": "Important",
+      "controls": {
+        "launch": "Voice Mode",
+        "start": "Start voice mode",
+        "stop": "Stop listening",
+        "processing": "Processing...",
+        "typeInstead": "Type instead",
+        "replay": "Replay last reply"
+      },
+      "status": {
+        "listening": "Listening...",
+        "processing": "Processing your message..."
+      },
+      "messages": {
+        "permission": "Enable mic access in site settings",
+        "noSpeech": "Didn't catch that—try again",
+        "recognition": "We couldn't start voice recognition right now."
+      },
+      "errors": {
+        "permission": "Enable mic access in site settings",
+        "recognition": "Voice recognition isn't available right now.",
+        "transcription": "We couldn't transcribe that just now.",
+        "recording": "We couldn't access your microphone.",
+        "unsupported": "Your browser doesn't support voice recording yet.",
+        "response": "Aya couldn't respond right now. Please try again.",
+        "tts": "We couldn't play that response aloud."
+      }
+    }
+  },
+  "journals": {
+    "list": {
+      "title": "Daily journals",
+      "description": "Capture how you're feeling each day to spot patterns and celebrate wins.",
+      "newJournal": "New Journal",
+      "loading": "Loading your journals...",
+      "error": "We couldn't load your journals right now.",
+      "empty": "You haven't created any journal entries yet.",
+      "noUser": "Sign in to view your journals.",
+      "view": "View entry"
+    },
+    "detail": {
+      "loading": "Loading journal...",
+      "error": "We couldn't load that journal entry.",
+      "notFound": "This journal entry was not found or you don't have access to it.",
+      "recordedOn": "Recorded on",
+      "back": "Back to journals",
+      "edit": "Edit entry",
+      "delete": "Delete entry",
+      "confirmDelete": "Delete this journal entry?",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "createTitle": "New journal entry",
+      "editTitle": "Edit journal entry",
+      "description": "Reflect on your day to track mood shifts, symptoms, and moments of gratitude.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Give your entry a title",
+      "contentLabel": "How are you feeling today?",
+      "contentPlaceholder": "Write down your thoughts, symptoms, and wins...",
+      "required": "Title and content are required.",
+      "save": "Save journal",
+      "saving": "Saving...",
+      "update": "Update journal",
+      "updating": "Updating...",
+      "cancel": "Cancel",
+      "loading": "Loading journal...",
+      "loadError": "We couldn't load that journal entry.",
+      "submitError": "We couldn't save your journal. Please try again."
+    }
+  },
+  "store": {
+    "title": "Pregnancy & Baby Store",
+    "subtitle": "Curated essentials for your pregnancy and newborn journey.",
+    "detailsLinkLabel": "View details",
+    "addToCart": "Add to Cart",
+    "addMore": "Add more",
+    "empty": "No items available in the store right now.",
+    "loading": "Loading products...",
+    "error": "We couldn't load products right now. Please try again shortly.",
+    "outOfStock": "Out of stock"
+  },
+  "itemDetails": {
+    "backLink": "Back to Store",
+    "addToCart": "Add to Cart",
+    "addAnother": "Add another",
+    "priceLabel": "Price",
+    "stockLabel": "In stock",
+    "outOfStock": "Out of stock",
+    "loading": "Loading item...",
+    "error": "We couldn't find that item."
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty.",
+    "continueShopping": "Continue shopping",
+    "subtotal": "Subtotal",
+    "checkout": "Proceed to Checkout",
+    "quantity": "Quantity",
+    "remove": "Remove"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "summaryHeading": "Order Summary",
+    "formHeading": "Contact Details",
+    "nameLabel": "Full Name",
+    "emailLabel": "Email",
+    "addressLabel": "Shipping Address",
+    "confirm": "Confirm Order",
+    "success": "Thank you! Your order has been placed.",
+    "empty": "Add items to your cart before checking out.",
+    "backToStore": "Browse the store"
+  },
+  "appointments": {
+    "shared": {
+      "timezoneNote": "All times shown in London time."
+    },
+    "browse": {
+      "title": "Book a midwife appointment",
+      "description": "Browse our supportive midwives and choose the best fit for your next check-in.",
+      "loading": "Loading midwives...",
+      "error": "We couldn't load midwives right now. Please try again soon.",
+      "empty": "No midwives are available just yet. Check back shortly.",
+      "viewProfile": "View availability"
+    },
+    "midwife": {
+      "loading": "Loading midwife details...",
+      "error": "We couldn't load this midwife right now.",
+      "thisWeek": "This week",
+      "nextTwoWeeks": "Next 2 weeks",
+      "availabilityTitle": "Available slots",
+      "availabilityHelp": "Choose a range and load upcoming sessions that work for you.",
+      "loadAvailability": "Load availability",
+      "loadingSlots": "Loading slots...",
+      "noSlots": "No open slots in this range. Try another week.",
+      "modalTitle": "Confirm your appointment",
+      "nameLabel": "Full name",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Share anything you'd like your midwife to know",
+      "confirm": "Confirm appointment",
+      "submitting": "Booking...",
+      "cancel": "Cancel",
+      "required": "Name and email are required to book.",
+      "success": "Appointment booked! We'll send a confirmation to your inbox.",
+      "error": "We couldn't book that slot. Please try another time."
+    },
+    "mine": {
+      "title": "My appointments",
+      "subtitle": "Review upcoming visits and manage any changes.",
+      "loading": "Loading your appointments...",
+      "error": "We couldn't load your appointments right now.",
+      "empty": "You haven't booked any appointments yet.",
+      "cancel": "Cancel appointment",
+      "cancelling": "Cancelling...",
+      "cancelSuccess": "Appointment cancelled. You're welcome to book another slot anytime.",
+      "cancelError": "We couldn't cancel that appointment. Please try again.",
+      "statusBooked": "Booked",
+      "statusCancelled": "Cancelled",
+      "noUser": "Sign in to see your appointments.",
+      "unknownMidwife": "Midwife",
+      "cancelled": "Cancelled",
+      "booked": "Booked"
+    }
+  },
+  "auth": {
+    "register": {
+      "title": "Create an account",
+      "subtitle": "Join PregChat in a few steps",
+      "fields": {
+        "name": "Full name",
+        "email": "Email",
+        "password": "Password",
+        "region": "Region"
+      },
+      "submit": "Register",
+      "loading": "Registering...",
+      "loginPrompt": "Already have an account?",
+      "loginLink": "Log in"
+    }
+  },
+  "forms": {
+    "pregnancyDetails": {
+      "legend": "How would you like to share your timeline?",
+      "mode": {
+        "dueDate": "I know my due date",
+        "lmp": "I know my last menstrual period"
+      },
+      "fields": {
+        "dueDate": {
+          "label": "Estimated due date",
+          "helper": "Use the due date provided by your care team."
+        },
+        "lmpDate": {
+          "label": "Last menstrual period",
+          "helper": "Choose the first day of your most recent cycle."
+        }
+      },
+      "errors": {
+        "dueDateRequired": "Please enter your estimated due date.",
+        "lmpDateRequired": "Please enter the first day of your last menstrual period."
+      },
+      "buttons": {
+        "submit": "Save pregnancy details",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "emptyProfile": {
+      "title": "Let's personalize your journey",
+      "description": "Share your due date or last menstrual period so Aya can tailor updates for you.",
+      "submit": "Save and continue",
+      "success": "Pregnancy details saved!"
+    },
+    "summary": {
+      "title": "Your pregnancy timeline",
+      "dueDate": "Estimated due date",
+      "lmpDate": "Last menstrual period",
+      "gestation": "Gestational age",
+      "updated": "Last updated",
+      "edit": "Edit details",
+      "reset": "Reset",
+      "confirmReset": "Reset pregnancy details?"
+    },
+    "actions": {
+      "openChat": "Open Chat",
+      "goToOnboarding": "Update profile",
+      "viewProfile": "View profile",
+      "ask": "Ask a question",
+      "update": "Update profile",
+      "profile": "View profile"
+    },
+    "progress": {
+      "title": "Progress",
+      "empty": "Set your pregnancy details to track progress."
+    }
+  },
+  "onboarding": {
+    "page": {
+      "title": "Complete your onboarding",
+      "description": "Tell us about your pregnancy so we can tailor your support.",
+      "submit": "Save pregnancy details",
+      "success": "Thanks! Your pregnancy details have been saved.",
+      "cta": "Go to dashboard"
+    }
+  },
+  "profilePage": {
+    "title": "Your account",
+    "subtitle": "Update your basic details anytime.",
+    "labels": {
+      "name": "Full name",
+      "email": "Email",
+      "region": "Region"
+    }
+  }
+}

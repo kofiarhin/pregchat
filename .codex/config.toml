@@ -1,0 +1,14 @@
+[workspace]
+# Always include AGENTS.md so Codex enforces your coding rules
+context_files = ["AGENTS.md"]
+
+[defaults]
+# Automatically apply edits without asking
+approval_mode = "auto-edit"
+
+[security]
+require_shell_approval = false
+
+[tools.shell]
+require_approval = false
+allowed_shells = ["bash", "powershell", "pwsh"]

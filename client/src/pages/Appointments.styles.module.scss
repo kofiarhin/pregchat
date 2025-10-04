@@ -1,0 +1,99 @@
+.page {
+  padding: 2rem clamp(1rem, 5vw, 3rem);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    margin: 0;
+  }
+
+  p {
+    color: #cfd3ff;
+    margin: 0;
+  }
+}
+
+.timezoneNote {
+  color: #8aa3ff;
+  font-size: 0.95rem;
+}
+
+.feedback {
+  text-align: center;
+  color: #cfd3ff;
+  margin-top: 2rem;
+}
+
+.buttonRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.primaryButton {
+  padding: 0.65rem 1.4rem;
+  border-radius: 0.9rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: linear-gradient(135deg, #7583ff, #9b6bff);
+  color: #ffffff;
+  transition: opacity 0.2s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.secondaryButton {
+  padding: 0.65rem 1.4rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(155, 107, 255, 0.35);
+  background: transparent;
+  color: #cfd3ff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(117, 131, 255, 0.15);
+    color: #ffffff;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.alert {
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  background: rgba(117, 131, 255, 0.12);
+  color: #cfd3ff;
+}
+
+.alertSuccess {
+  background: rgba(139, 233, 253, 0.18);
+  color: #8be9fd;
+}
+
+.alertError {
+  background: rgba(255, 154, 162, 0.18);
+  color: #ff9aa2;
+}

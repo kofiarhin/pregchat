@@ -1,0 +1,67 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  background: radial-gradient(circle at top, rgba(20, 20, 30, 0.85), #060608);
+}
+
+.card {
+  width: min(480px, 100%);
+  background: rgba(16, 16, 24, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  padding: 2.25rem;
+  display: grid;
+  gap: 1.75rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+}
+
+.header {
+  text-align: center;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #f5f7ff;
+}
+
+.subtitle {
+  color: #9aa0a6;
+}
+
+.muted {
+  color: #9aa0a6;
+  text-align: center;
+}
+
+.list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.list div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.list dt {
+  color: #9aa0a6;
+  font-size: 0.9rem;
+}
+
+.list dd {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #f7f7fa;
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: 2rem 1.5rem;
+  }
+}
