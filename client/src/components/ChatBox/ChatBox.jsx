@@ -10,11 +10,9 @@ const ChatBox = () => {
     useChatMutation();
 
   useEffect(() => {
-    // remove if not needed
     (async () => {
       const res = await fetch(`${BASE_URL}/health`);
       const json = await res.json();
-      // console.log(json);
     })();
   }, []);
 
@@ -22,13 +20,13 @@ const ChatBox = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!text.trim()) return;
     setMessages((prev) => [...prev, { role: "user", text }]);
     setText("");
     mutate(
-      { text }, // or just `text` if your hook expects a string
+      { text },
       {
         onSuccess: (res) => {
-          // console.log("we out here", res);
           setMessages((prev) => [
             ...prev,
             { role: "system", text: res.content },
@@ -43,39 +41,40 @@ const ChatBox = () => {
 
   return (
     <div id="chat-box">
-      <div className="form-wrapper">
-        <div className="messages-wrapper">
-          {messages &&
-            messages.map((message, index) => {
-              return (
-                <div
-                  key={index}
-                  className={`message-unit  ${
-                    message.role == "system" ? "system" : "user"
-                  } `}
-                >
-                  {" "}
-                  {message.text}{" "}
-                </div>
-              );
-            })}
-        </div>
-        <p> {isPending ? "Thinking...." : ""} </p>
-        <form onSubmit={handleSubmit}>
-          <div className="input-wrapper">
-            <input
-              type="text"
-              name="text"
-              placeholder="Ask your question..."
-              value={text}
-              onChange={handleChange}
-            />
-            {/* <button disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send"}
-            </button> */}
+      <div className="messages-wrapper">
+        {messages &&
+          messages.map((message, index) => (
+            <div
+              key={index}
+              className={`message-unit ${
+                message.role === "system" ? "system" : "user"
+              }`}
+            >
+              <div className="message-bubble">{message.text}</div>
+            </div>
+          ))}
+        {isPending && (
+          <div className="message-unit system">
+            <div className="message-bubble typing">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
-        </form>
+        )}
       </div>
+
+      <form onSubmit={handleSubmit}>
+        <div className="input-wrapper">
+          <input
+            type="text"
+            name="text"
+            placeholder="Ask your question..."
+            value={text}
+            onChange={handleChange}
+          />
+        </div>
+      </form>
     </div>
   );
 };
