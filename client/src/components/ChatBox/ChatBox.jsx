@@ -1,3 +1,4 @@
+// ChatBox.jsx — ChatGPT-style, polished (no header), UI-only improvements
 import { useEffect, useRef, useState } from "react";
 import { BASE_URL } from "../../constants/baseUrl";
 import useChatMutation from "../../hooks/useChatMutation";
@@ -11,16 +12,19 @@ const ChatBox = () => {
   const endRef = useRef(null);
   const taRef = useRef(null);
 
+  // health check (kept)
   useEffect(() => {
     (async () => {
       try { await fetch(`${BASE_URL}/health`); } catch {}
     })();
   }, []);
 
+  // auto-scroll
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isPending]);
 
+  // auto-grow textarea
   const autosize = (el) => {
     if (!el) return;
     el.style.height = "0px";
@@ -45,7 +49,10 @@ const ChatBox = () => {
       { text: value },
       {
         onSuccess: (res) => {
-          setMessages((prev) => [...prev, { role: "system", text: res.content }]);
+          setMessages((prev) => [
+            ...prev,
+            { role: "system", text: res.content },
+          ]);
         },
         onError: () => {
           setMessages((prev) => [
@@ -73,14 +80,16 @@ const ChatBox = () => {
               key={i}
               className={`row ${m.role === "system" ? "assistant" : "user"}`}
             >
-              <div className="avatar">{m.role === "system" ? "🤖" : "🧑"}</div>
+              <div className="avatar" aria-hidden>
+                {m.role === "system" ? "🤖" : "🧑"}
+              </div>
               <div className="bubble">{m.text}</div>
             </div>
           ))}
 
           {isPending && (
             <div className="row assistant">
-              <div className="avatar">🤖</div>
+              <div className="avatar" aria-hidden>🤖</div>
               <div className="bubble typing">
                 <span></span><span></span><span></span>
               </div>
@@ -95,20 +104,4 @@ const ChatBox = () => {
         <div className="composer-inner">
           <textarea
             ref={taRef}
-            value={text}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Send a message..."
-            rows={1}
-          />
-          <button type="submit" disabled={isPending || !text.trim()}>
-            ➤
-          </button>
-        </div>
-        <p className="hint">Press Enter to send • Shift+Enter for newline</p>
-      </form>
-    </div>
-  );
-};
-
-export default ChatBox;
+            value={text
