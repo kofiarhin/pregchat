@@ -51,8 +51,8 @@ const loginStyles = {
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: "kofiarhin@gmail.com",
+    password: "password",
   });
 
   const loginMutation = useLoginMutation({
@@ -117,9 +117,7 @@ const Login = () => {
           </div>
 
           {loginMutation.isError && (
-            <div style={loginStyles.error}>
-              {loginMutation.error?.message}
-            </div>
+            <div style={loginStyles.error}>{loginMutation.error?.message}</div>
           )}
 
           <button
@@ -133,7 +131,7 @@ const Login = () => {
         </form>
 
         <p style={loginStyles.cta}>
-          Don't have an account? {" "}
+          Don't have an account?{" "}
           <Link to="/register" style={loginStyles.link}>
             Register
           </Link>
