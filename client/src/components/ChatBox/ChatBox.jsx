@@ -1,4 +1,3 @@
-// ChatBox.jsx — ChatGPT-style, polished (no header), UI-only improvements
 import { useEffect, useRef, useState } from "react";
 import { BASE_URL } from "../../constants/baseUrl";
 import useChatMutation from "../../hooks/useChatMutation";
@@ -12,19 +11,21 @@ const ChatBox = () => {
   const endRef = useRef(null);
   const taRef = useRef(null);
 
-  // health check (kept)
+  // Health check (kept from original)
   useEffect(() => {
     (async () => {
-      try { await fetch(`${BASE_URL}/health`); } catch {}
+      try {
+        await fetch(`${BASE_URL}/health`);
+      } catch {}
     })();
   }, []);
 
-  // auto-scroll
+  // Auto-scroll to latest
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isPending]);
 
-  // auto-grow textarea
+  // Auto-grow textarea (ChatGPT-like)
   const autosize = (el) => {
     if (!el) return;
     el.style.height = "0px";
@@ -41,23 +42,28 @@ const ChatBox = () => {
     const value = text.trim();
     if (!value) return;
 
+    // Show user message immediately
     setMessages((prev) => [...prev, { role: "user", text: value }]);
     setText("");
     autosize(taRef.current);
 
+    // Send to API
     mutate(
       { text: value },
       {
         onSuccess: (res) => {
           setMessages((prev) => [
             ...prev,
-            { role: "system", text: res.content },
+            { role: "system", text: res?.content || "" },
           ]);
         },
         onError: () => {
           setMessages((prev) => [
             ...prev,
-            { role: "system", text: "Sorry, something went wrong. Try again." },
+            {
+              role: "system",
+              text: "Sorry, something went wrong. Please try again.",
+            },
           ]);
         },
       }
@@ -89,9 +95,13 @@ const ChatBox = () => {
 
           {isPending && (
             <div className="row assistant">
-              <div className="avatar" aria-hidden>🤖</div>
-              <div className="bubble typing">
-                <span></span><span></span><span></span>
+              <div className="avatar" aria-hidden>
+                🤖
+              </div>
+              <div className="bubble typing" aria-live="polite">
+                <span></span>
+                <span></span>
+                <span></span>
               </div>
             </div>
           )}
@@ -104,4 +114,26 @@ const ChatBox = () => {
         <div className="composer-inner">
           <textarea
             ref={taRef}
-            value={text
+            value={text}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            placeholder="Send a message…"
+            rows={1}
+            aria-label="Message input"
+          />
+          <button
+            type="submit"
+            disabled={isPending || !text.trim()}
+            aria-label="Send message"
+            title="Send"
+          >
+            ➤
+          </button>
+        </div>
+        <p className="hint">Press Enter to send • Shift+Enter for newline</p>
+      </form>
+    </div>
+  );
+};
+
+export default ChatBox;
