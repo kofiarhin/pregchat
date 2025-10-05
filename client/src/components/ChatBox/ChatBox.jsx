@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { BASE_URL } from "../../constants/baseUrl";
 import useChatMutation from "../../hooks/useChatMutation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import "./chatBox.styles.scss";
 
 const ChatBox = () => {
@@ -11,21 +13,16 @@ const ChatBox = () => {
   const endRef = useRef(null);
   const taRef = useRef(null);
 
-  // Health check (kept from original)
   useEffect(() => {
     (async () => {
-      try {
-        await fetch(`${BASE_URL}/health`);
-      } catch {}
+      try { await fetch(`${BASE_URL}/health`); } catch {}
     })();
   }, []);
 
-  // Auto-scroll to latest
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isPending]);
 
-  // Auto-grow textarea (ChatGPT-like)
   const autosize = (el) => {
     if (!el) return;
     el.style.height = "0px";
@@ -42,12 +39,10 @@ const ChatBox = () => {
     const value = text.trim();
     if (!value) return;
 
-    // Show user message immediately
     setMessages((prev) => [...prev, { role: "user", text: value }]);
     setText("");
     autosize(taRef.current);
 
-    // Send to API
     mutate(
       { text: value },
       {
@@ -60,10 +55,7 @@ const ChatBox = () => {
         onError: () => {
           setMessages((prev) => [
             ...prev,
-            {
-              role: "system",
-              text: "Sorry, something went wrong. Please try again.",
-            },
+            { role: "system", text: "Sorry, something went wrong. Please try again." },
           ]);
         },
       }
@@ -82,27 +74,24 @@ const ChatBox = () => {
       <main className="chat-scroll">
         <div className="chat-content">
           {messages.map((m, i) => (
-            <div
-              key={i}
-              className={`row ${m.role === "system" ? "assistant" : "user"}`}
-            >
+            <div key={i} className={`row ${m.role === "system" ? "assistant" : "user"}`}>
               <div className="avatar" aria-hidden>
                 {m.role === "system" ? "🤖" : "🧑"}
               </div>
-              <div className="bubble">{m.text}</div>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                className="bubble markdown"
+                linkTarget="_blank"
+              >
+                {m.text}
+              </ReactMarkdown>
             </div>
           ))}
 
           {isPending && (
             <div className="row assistant">
-              <div className="avatar" aria-hidden>
-                🤖
-              </div>
-              <div className="bubble typing" aria-live="polite">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
+              <div className="avatar" aria-hidden>🤖</div>
+              <div className="bubble typing"><span></span><span></span><span></span></div>
             </div>
           )}
 
@@ -121,14 +110,7 @@ const ChatBox = () => {
             rows={1}
             aria-label="Message input"
           />
-          <button
-            type="submit"
-            disabled={isPending || !text.trim()}
-            aria-label="Send message"
-            title="Send"
-          >
-            ➤
-          </button>
+          <button type="submit" disabled={isPending || !text.trim()} aria-label="Send">➤</button>
         </div>
         <p className="hint">Press Enter to send • Shift+Enter for newline</p>
       </form>
