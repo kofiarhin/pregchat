@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BASE_URL } from "../../constants/baseUrl";
 import useChatMutation from "../../hooks/useChatMutation";
 import "./chatBox.styles.scss";
@@ -6,74 +6,106 @@ import "./chatBox.styles.scss";
 const ChatBox = () => {
   const [text, setText] = useState("give me a 5 day meal plan");
   const [messages, setMessages] = useState([]);
-  const { data, mutate, isLoading, isError, error, isPending } =
-    useChatMutation();
+  const { mutate, isPending } = useChatMutation();
+
+  const endRef = useRef(null);
+  const taRef = useRef(null);
 
   useEffect(() => {
     (async () => {
-      const res = await fetch(`${BASE_URL}/health`);
-      const json = await res.json();
+      try { await fetch(`${BASE_URL}/health`); } catch {}
     })();
   }, []);
 
-  const handleChange = (e) => setText(e.target.value);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isPending]);
+
+  const autosize = (el) => {
+    if (!el) return;
+    el.style.height = "0px";
+    el.style.height = Math.min(el.scrollHeight, 160) + "px";
+  };
+
+  const handleChange = (e) => {
+    setText(e.target.value);
+    autosize(e.target);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!text.trim()) return;
-    setMessages((prev) => [...prev, { role: "user", text }]);
+    const value = text.trim();
+    if (!value) return;
+
+    setMessages((prev) => [...prev, { role: "user", text: value }]);
     setText("");
+    autosize(taRef.current);
+
     mutate(
-      { text },
+      { text: value },
       {
         onSuccess: (res) => {
+          setMessages((prev) => [...prev, { role: "system", text: res.content }]);
+        },
+        onError: () => {
           setMessages((prev) => [
             ...prev,
-            { role: "system", text: res.content },
+            { role: "system", text: "Sorry, something went wrong. Try again." },
           ]);
-        },
-        onError: (err) => {
-          console.error("chat failed", err);
         },
       }
     );
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
   return (
-    <div id="chat-box">
-      <div className="messages-wrapper">
-        {messages &&
-          messages.map((message, index) => (
+    <div id="chatgpt-shell">
+      <main className="chat-scroll">
+        <div className="chat-content">
+          {messages.map((m, i) => (
             <div
-              key={index}
-              className={`message-unit ${
-                message.role === "system" ? "system" : "user"
-              }`}
+              key={i}
+              className={`row ${m.role === "system" ? "assistant" : "user"}`}
             >
-              <div className="message-bubble">{message.text}</div>
+              <div className="avatar">{m.role === "system" ? "🤖" : "🧑"}</div>
+              <div className="bubble">{m.text}</div>
             </div>
           ))}
-        {isPending && (
-          <div className="message-unit system">
-            <div className="message-bubble typing">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-        )}
-      </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="input-wrapper">
-          <input
-            type="text"
-            name="text"
-            placeholder="Ask your question..."
+          {isPending && (
+            <div className="row assistant">
+              <div className="avatar">🤖</div>
+              <div className="bubble typing">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          )}
+
+          <div ref={endRef} />
+        </div>
+      </main>
+
+      <form className="composer" onSubmit={handleSubmit}>
+        <div className="composer-inner">
+          <textarea
+            ref={taRef}
             value={text}
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            placeholder="Send a message..."
+            rows={1}
           />
+          <button type="submit" disabled={isPending || !text.trim()}>
+            ➤
+          </button>
         </div>
+        <p className="hint">Press Enter to send • Shift+Enter for newline</p>
       </form>
     </div>
   );
