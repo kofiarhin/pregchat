@@ -14,7 +14,8 @@
     "test:integration": "cd server && jest --config jest.integration.config.js --runInBand",
     "e2e": "jest --config jest.e2e.config.js --runInBand",
     "install-server": "npm install && cd server && npm install",
-    "seed:store": "node server/seed/store.seed.js"
+    "seed:store": "node server/seed/store.seed.js",
+    "test": "jest --watchAll server"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
