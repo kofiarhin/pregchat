@@ -1,6 +1,8 @@
 # PregChat
 Pregnancy wellness companion that pairs Groq-powered chat guidance with scheduling, journaling, and commerce workflows in a MERN stack.
 
+ **Live Demo:** [https://pregchat-tan.vercel.app](https://pregchat-tan.vercel.app)
+
 ## Key Features
 - **Aya chat assistant** – Authenticated users chat with Aya, who enriches prompts with pregnancy day data and enforces red-flag triage before persisting messages. (/client/src/components/ChatBox/ChatBox.jsx, /server/controllers/chatController.js, /server/config/ai.js)
 - **Daily insights & imagery** – Updates endpoints serve gestational tips, and the baby image service generates or reuses day-specific renders backed by Hugging Face. (/server/controllers/updatesController.js, /server/controllers/babyImageController.js)
