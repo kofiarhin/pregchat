@@ -15,7 +15,9 @@ const ChatBox = () => {
 
   useEffect(() => {
     (async () => {
-      try { await fetch(`${BASE_URL}/health`); } catch {}
+      try {
+        await fetch(`${BASE_URL}/health`);
+      } catch {}
     })();
   }, []);
 
@@ -55,7 +57,10 @@ const ChatBox = () => {
         onError: () => {
           setMessages((prev) => [
             ...prev,
-            { role: "system", text: "Sorry, something went wrong. Please try again." },
+            {
+              role: "system",
+              text: "Sorry, something went wrong. Please try again.",
+            },
           ]);
         },
       }
@@ -74,24 +79,48 @@ const ChatBox = () => {
       <main className="chat-scroll">
         <div className="chat-content">
           {messages.map((m, i) => (
-            <div key={i} className={`row ${m.role === "system" ? "assistant" : "user"}`}>
+            <div
+              key={i}
+              className={`row ${m.role === "system" ? "assistant" : "user"}`}
+            >
               <div className="avatar" aria-hidden>
                 {m.role === "system" ? "🤖" : "🧑"}
               </div>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                className="bubble markdown"
-                linkTarget="_blank"
-              >
-                {m.text}
-              </ReactMarkdown>
+
+              {/* Wrap to keep styling; v9 disallows className/linkTarget on ReactMarkdown */}
+              <div className="bubble markdown">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    a: (props) => (
+                      <a target="_blank" rel="noreferrer" {...props} />
+                    ),
+                    code: ({ inline, ...props }) =>
+                      inline ? (
+                        <code {...props} />
+                      ) : (
+                        <pre>
+                          <code {...props} />
+                        </pre>
+                      ),
+                  }}
+                >
+                  {m.text}
+                </ReactMarkdown>
+              </div>
             </div>
           ))}
 
           {isPending && (
             <div className="row assistant">
-              <div className="avatar" aria-hidden>🤖</div>
-              <div className="bubble typing"><span></span><span></span><span></span></div>
+              <div className="avatar" aria-hidden>
+                🤖
+              </div>
+              <div className="bubble typing">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
             </div>
           )}
 
@@ -110,7 +139,13 @@ const ChatBox = () => {
             rows={1}
             aria-label="Message input"
           />
-          <button type="submit" disabled={isPending || !text.trim()} aria-label="Send">➤</button>
+          <button
+            type="submit"
+            disabled={isPending || !text.trim()}
+            aria-label="Send"
+          >
+            ➤
+          </button>
         </div>
         <p className="hint">Press Enter to send • Shift+Enter for newline</p>
       </form>
