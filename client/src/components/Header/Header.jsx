@@ -12,7 +12,9 @@ import { Link, useLocation } from "react-router-dom";
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isElevated, setIsElevated] = useState(false);
-  const [isOnline, setIsOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator !== "undefined" ? navigator.onLine : true
+  );
 
   const { data: user } = useCurrentUserQuery();
   const logoutMutation = useLogoutMutation({
@@ -22,12 +24,12 @@ const Header = () => {
   const location = useLocation();
 
   const userInitial = useMemo(
-    () => (user?.name?.[0]?.toUpperCase() || "P"),
+    () => user?.name?.[0]?.toUpperCase() || "P",
     [user]
   );
 
   const handleLogout = () => logoutMutation.mutate();
-  const toggleMenu = () => setMenuOpen(v => !v);
+  const toggleMenu = () => setMenuOpen((v) => !v);
   const closeMenu = () => setMenuOpen(false);
 
   // Close menu on route change
@@ -66,7 +68,9 @@ const Header = () => {
 
   return (
     <header className={`header ${isElevated ? "elevated" : ""}`} role="banner">
-      <a href="#app-content" className="skip-link">Skip to content</a>
+      <a href="#app-content" className="skip-link">
+        Skip to content
+      </a>
 
       <div className="topbar" role="navigation" aria-label="Main">
         {/* Left: Menu */}
@@ -83,9 +87,8 @@ const Header = () => {
 
         {/* Center: Brand + alpha pill */}
         <Link to="/chat" className="brand_wrap" aria-label="Go to chat">
-          <span className="brand">PregChat</span>
+          <span className="brand">Aya</span>
           <span className="separator">·</span>
-          <span className="route_title">Chat</span>
           <span
             className="model"
             role="button"
@@ -102,16 +105,20 @@ const Header = () => {
 
         {/* Right: Actions */}
         <div className="actions">
-          <Link to="/chat" className="action_btn new_chat" aria-label="New chat">
+          <Link
+            to="/chat"
+            className="action_btn new_chat"
+            aria-label="New chat"
+          >
             <FaPlus />
             <span className="label">New Chat</span>
           </Link>
 
-          <div className="avatar_wrap" data-online={isOnline ? "true" : "false"}>
-            <AvatarDropdown
-              avatar={userInitial}
-              userId={user?._id}
-            />
+          <div
+            className="avatar_wrap"
+            data-online={isOnline ? "true" : "false"}
+          >
+            <AvatarDropdown avatar={userInitial} userId={user?._id} />
             <span className="status_dot" aria-hidden="true" />
           </div>
         </div>
