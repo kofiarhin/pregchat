@@ -105,14 +105,14 @@ const Header = () => {
 
         {/* Right: Actions */}
         <div className="actions">
-          <Link
+          {/* <Link
             to="/chat"
             className="action_btn new_chat"
             aria-label="New chat"
           >
             <FaPlus />
             <span className="label">New Chat</span>
-          </Link>
+          </Link> */}
 
           <div
             className="avatar_wrap"
