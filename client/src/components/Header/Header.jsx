@@ -109,7 +109,7 @@ const Header = () => {
 
         {/* Right: Actions */}
         <div className="actions">
-          <button
+          {/* <button
             type="button"
             className="action_btn new_chat"
             aria-label="New chat"
@@ -117,7 +117,7 @@ const Header = () => {
           >
             <FaPlus />
             <span className="label">New Chat</span>
-          </button>
+          </button> */}
 
           <div
             className="avatar_wrap"
