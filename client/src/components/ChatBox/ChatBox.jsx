@@ -1,17 +1,23 @@
+// ChatBox.jsx
 import { useEffect, useRef, useState } from "react";
 import { BASE_URL } from "../../constants/baseUrl";
 import useChatMutation from "../../hooks/useChatMutation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { FiCopy, FiCheck } from "react-icons/fi"; // ✅ React Icons
 import "./chatBox.styles.scss";
 
 const ChatBox = () => {
   const [text, setText] = useState("give me a 5 day meal plan");
   const [messages, setMessages] = useState([]);
+  const [copiedIndex, setCopiedIndex] = useState(null);
   const { mutate, isPending } = useChatMutation();
 
   const endRef = useRef(null);
   const taRef = useRef(null);
+
+  const nowTime = () =>
+    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   useEffect(() => {
     (async () => {
@@ -41,7 +47,10 @@ const ChatBox = () => {
     const value = text.trim();
     if (!value) return;
 
-    setMessages((prev) => [...prev, { role: "user", text: value }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", text: value, time: nowTime() },
+    ]);
     setText("");
     autosize(taRef.current);
 
@@ -51,7 +60,11 @@ const ChatBox = () => {
         onSuccess: (res) => {
           setMessages((prev) => [
             ...prev,
-            { role: "system", text: res?.content || "" },
+            {
+              role: "system",
+              text: res?.content || "",
+              time: nowTime(),
+            },
           ]);
         },
         onError: () => {
@@ -60,6 +73,7 @@ const ChatBox = () => {
             {
               role: "system",
               text: "Sorry, something went wrong. Please try again.",
+              time: nowTime(),
             },
           ]);
         },
@@ -72,6 +86,14 @@ const ChatBox = () => {
       e.preventDefault();
       handleSubmit(e);
     }
+  };
+
+  const handleCopy = async (content, index) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 1200);
+    } catch {}
   };
 
   return (
@@ -87,7 +109,6 @@ const ChatBox = () => {
                 {m.role === "system" ? "🤖" : "🧑"}
               </div>
 
-              {/* Wrap to keep styling; v9 disallows className/linkTarget on ReactMarkdown */}
               <div className="bubble markdown">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
@@ -107,6 +128,21 @@ const ChatBox = () => {
                 >
                   {m.text}
                 </ReactMarkdown>
+
+                <div className="meta">
+                  <span className="timestamp">{m.time}</span>
+                  <button
+                    className="copy-btn"
+                    onClick={() => handleCopy(m.text, i)}
+                    title="Copy message"
+                  >
+                    {copiedIndex === i ? (
+                      <FiCheck className="icon success" />
+                    ) : (
+                      <FiCopy className="icon" />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -147,7 +183,6 @@ const ChatBox = () => {
             ➤
           </button>
         </div>
-        <p className="hint">Press Enter to send • Shift+Enter for newline</p>
       </form>
     </div>
   );

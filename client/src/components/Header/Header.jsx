@@ -31,6 +31,9 @@ const Header = () => {
   const handleLogout = () => logoutMutation.mutate();
   const toggleMenu = () => setMenuOpen((v) => !v);
   const closeMenu = () => setMenuOpen(false);
+  const handleNewChat = () => {
+    window.dispatchEvent(new CustomEvent("pregchat:clear-chat"));
+  };
 
   // Close menu on route change
   useEffect(() => {
@@ -89,6 +92,7 @@ const Header = () => {
         <Link to="/chat" className="brand_wrap" aria-label="Go to chat">
           <span className="brand">Aya</span>
           <span className="separator">·</span>
+          <span>PregChat</span>
           <span
             className="model"
             role="button"
@@ -105,14 +109,15 @@ const Header = () => {
 
         {/* Right: Actions */}
         <div className="actions">
-          {/* <Link
-            to="/chat"
+          <button
+            type="button"
             className="action_btn new_chat"
             aria-label="New chat"
+            onClick={handleNewChat}
           >
             <FaPlus />
             <span className="label">New Chat</span>
-          </Link> */}
+          </button>
 
           <div
             className="avatar_wrap"

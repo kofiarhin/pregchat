@@ -1,4 +1,5 @@
-/* ChatGPT-style UI with markdown, refined spacing, and mobile polish */
+/* chatBox.styles.scss */
+/* ChatGPT-style chat UI with timestamp + copy icon */
 
 #chatgpt-shell {
   --bg: #0e0f13;
@@ -6,8 +7,6 @@
   --text: #ececf1;
   --muted: #8e8e93;
   --userBubble: #343541;
-  --assistantBubbleTop: #ffffff;
-  --assistantBubbleBottom: #f6f6f6;
   --border: #2a2b31;
   --accent: #10a37f;
 
@@ -21,13 +20,6 @@
   .chat-scroll {
     overflow-y: auto;
     scroll-behavior: smooth;
-    mask-image: linear-gradient(
-      to bottom,
-      transparent,
-      black 5%,
-      black 95%,
-      transparent
-    );
   }
 
   .chat-content {
@@ -61,24 +53,66 @@
         padding: 16px 18px;
         line-height: 1.6;
         font-size: 15px;
-        letter-spacing: 0.01em;
-        word-break: break-word;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        position: relative;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
       }
 
       &.assistant .bubble {
-        color: white;
-        border: 1px solid rgba(0, 0, 0, 0.06);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        background: linear-gradient(180deg, #1b1c23, #15161c);
       }
 
       &.user .bubble {
         background: var(--userBubble);
         color: #fff;
-        border: 1px solid #2f3040;
       }
 
-      /* typing dots */
+      /* timestamp + copy icon */
+      .bubble .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        padding-top: 6px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.08);
+        font-size: 12px;
+        color: var(--muted);
+
+        .timestamp {
+          opacity: 0.8;
+        }
+
+        .copy-btn {
+          background: none;
+          border: none;
+          color: #aaa;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px;
+          border-radius: 6px;
+          transition: color 0.2s ease, background 0.2s ease, transform 0.1s ease;
+
+          &:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+          }
+
+          .icon {
+            width: 15px;
+            height: 15px;
+          }
+
+          .success {
+            color: var(--accent);
+          }
+        }
+      }
+
+      /* typing indicator */
       .typing {
         display: inline-flex;
         gap: 6px;
@@ -95,92 +129,6 @@
         }
         span:nth-child(3) {
           animation-delay: 0.3s;
-        }
-      }
-
-      /* Markdown defaults to match ChatGPT look */
-      .markdown {
-        p {
-          margin: 0 0 10px;
-        }
-        p:last-child {
-          margin-bottom: 0;
-        }
-        strong {
-          font-weight: 700;
-        }
-        em {
-          font-style: italic;
-        }
-        ul,
-        ol {
-          margin: 0 0 10px 1.25rem;
-        }
-        li {
-          margin: 4px 0;
-        }
-        code {
-          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-          background: rgba(0, 0, 0, 0.06);
-          padding: 2px 6px;
-          border-radius: 6px;
-        }
-        pre {
-          background: #0f1115;
-          color: #eaeef2;
-          padding: 12px;
-          border-radius: 10px;
-          overflow: auto;
-          border: 1px solid #23242c;
-          code {
-            background: transparent;
-            padding: 0;
-          }
-        }
-        a {
-          color: #0ea5e9;
-          text-decoration: none;
-        }
-        a:hover {
-          text-decoration: underline;
-        }
-        h1,
-        h2,
-        h3 {
-          margin: 0 0 8px;
-          line-height: 1.25;
-        }
-        h1 {
-          font-size: 1.25rem;
-        }
-        h2 {
-          font-size: 1.1rem;
-        }
-        h3 {
-          font-size: 1rem;
-        }
-        blockquote {
-          margin: 8px 0;
-          padding: 8px 12px;
-          border-left: 3px solid #e5e7eb;
-          background: #f8fafc;
-          color: #111217;
-          border-radius: 6px;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 8px 0;
-          th,
-          td {
-            border: 1px solid #e5e7eb;
-            padding: 6px 8px;
-            color: #111217;
-          }
-          th {
-            background: #f3f4f6;
-            font-weight: 600;
-          }
         }
       }
     }
@@ -205,13 +153,10 @@
       display: grid;
       grid-template-columns: 1fr 44px;
       gap: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 
       textarea {
         resize: none;
         height: 40px;
-        max-height: 160px;
-        overflow-y: auto;
         background: transparent;
         border: none;
         outline: none;
@@ -236,13 +181,7 @@
         &:hover {
           background: var(--accent);
           color: #fff;
-          box-shadow: 0 0 10px #10a37f80;
           transform: translateY(-1px);
-        }
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-          transform: none;
         }
       }
     }
@@ -251,7 +190,6 @@
       margin-top: 6px;
       font-size: 12px;
       color: var(--muted);
-      text-align: center;
     }
   }
 
@@ -267,6 +205,7 @@
       opacity: 1;
     }
   }
+
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -285,12 +224,11 @@
     .chat-content .row {
       gap: 10px;
     }
-    .composer-inner {
-      border-radius: 16px;
-      padding: 6px;
-    }
-    .composer-inner textarea {
-      font-size: 14px;
+    .bubble .meta {
+      font-size: 11px;
+      .copy-btn {
+        padding: 2px;
+      }
     }
   }
 }
