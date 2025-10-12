@@ -39,7 +39,12 @@ const AppShell = ({ isAuthenticated }) => {
     <div className="app dark">
       {isAuthenticated && !hideChrome && <Header />}
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <Navigate to="/chat" replace /> : <Login />
+          }
+        />
         <Route
           path="/login"
           element={
