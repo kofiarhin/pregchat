@@ -22,7 +22,7 @@ const ChatBox = () => {
     const el = taRef.current;
     if (!el) return;
     el.style.height = "0px";
-    const next = Math.min(el.scrollHeight, 160); // cap height
+    const next = Math.min(el.scrollHeight, 160);
     el.style.height = `${next}px`;
   };
 
@@ -71,18 +71,6 @@ const ChatBox = () => {
 
   return (
     <div className="chat">
-      <header className="chat__header">
-        <div className="chat__brand">
-          <div className="chat__title">Aya · PregChat</div>
-          <div className="chat__subtitle">Private, fast answers</div>
-        </div>
-
-        <div className="chat__right">
-          <span className="chat__badge">alpha</span>
-          <span className="chat__dot" aria-hidden="true" />
-        </div>
-      </header>
-
       <main className="chat__viewport" aria-live="polite">
         {messages.length === 0 ? (
           <div className="chat__empty">

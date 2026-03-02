@@ -1,17 +1,11 @@
-/* Professional, clean chat UI (dark) */
-
 .chat {
   --bg: #07080a;
   --panel: rgba(18, 19, 24, 0.75);
-  --panelSolid: #121318;
   --border: rgba(255, 255, 255, 0.08);
-  --border2: rgba(255, 255, 255, 0.12);
   --text: rgba(255, 255, 255, 0.92);
   --muted: rgba(255, 255, 255, 0.58);
-  --muted2: rgba(255, 255, 255, 0.42);
 
   --accent: #2563eb;
-  --accent2: rgba(37, 99, 235, 0.18);
   --userBubble: linear-gradient(
     180deg,
     rgba(37, 99, 235, 0.95),
@@ -35,62 +29,7 @@
     linear-gradient(180deg, #06070a, #05060a 60%, #070812);
 
   display: grid;
-  grid-template-rows: auto 1fr auto;
-}
-
-/* Header */
-.chat__header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(7, 8, 10, 0.65);
-  backdrop-filter: blur(10px);
-}
-
-.chat__brand {
-  display: grid;
-  gap: 2px;
-}
-
-.chat__title {
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  line-height: 1.1;
-}
-
-.chat__subtitle {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.chat__right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.chat__badge {
-  font-size: 12px;
-  padding: 6px 10px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 999px;
-  color: var(--text);
-}
-
-.chat__dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  background: rgba(34, 197, 94, 0.9);
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+  grid-template-rows: 1fr auto;
 }
 
 /* Viewport */
@@ -184,16 +123,17 @@
   display: grid;
   grid-template-columns: 38px minmax(0, 1fr);
   gap: 12px;
-
   align-items: flex-start;
   padding: 10px 0;
 }
 
 .chat__row--user {
   grid-template-columns: minmax(0, 1fr) 38px;
+
   .chat__avatar {
     grid-column: 2;
   }
+
   .chat__bubble {
     grid-column: 1;
     justify-self: end;
@@ -574,7 +514,6 @@
   }
 
   .chat__composerInner {
-    grid-template-columns: 1fr auto;
     gap: 10px;
     padding: 9px;
   }
