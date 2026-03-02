@@ -46,10 +46,6 @@ const ChatBox = () => {
 
   return (
     <div className="chat-container">
-      <header className="chat-header">
-        <div className="logo">Aya · PregChat</div>
-        <div className="status-badge">alpha</div>
-      </header>
       <main className="chat-viewport">
         {messages.map((m, i) => (
           <div key={i} className={`message-row ${m.role}`}>
