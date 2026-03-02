@@ -56,9 +56,7 @@ const Login = () => {
   });
 
   const loginMutation = useLoginMutation({
-    onSuccess: () => {
-      navigate("/dashboard");
-    },
+    // onSuccess: () => navigate("/chat", { replace: true }),
   });
 
   const handleChange = (event) => {
@@ -81,7 +79,7 @@ const Login = () => {
     <div style={loginStyles.wrapper}>
       <div style={loginStyles.card}>
         <div style={loginStyles.header}>
-          <h1 style={loginStyles.title}>Welcome Back</h1>
+          <h1 style={loginStyles.title}>Welcome Back!</h1>
           <p style={loginStyles.subtitle}>Sign in to PregChat</p>
         </div>
 

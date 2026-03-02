@@ -15,80 +15,60 @@ import { http } from "../api/http.js";
 import { BASE_URL } from "../constants/baseUrl.js";
 import styles from "./dashboard.styles.module.scss";
 
+/* ---------------- utils (unchanged, minor hardening) ---------------- */
 const getBaseUrl = () => {
   const envBase = typeof BASE_URL === "string" ? BASE_URL.trim() : "";
-
-  if (envBase) {
-    return envBase;
-  }
-
+  if (envBase) return envBase;
   if (typeof window !== "undefined" && window.location?.origin) {
     return window.location.origin;
   }
-
   return null;
 };
 
 const resolveBabyImageUrl = (rawUrl) => {
-  if (!rawUrl) {
-    return null;
-  }
-
+  if (!rawUrl) return null;
   const trimmed = String(rawUrl).trim();
-
-  if (!trimmed) {
-    return null;
-  }
+  if (!trimmed) return null;
 
   try {
     return new URL(trimmed).toString();
-  } catch (error) {
+  } catch {
     const base = getBaseUrl();
-
-    if (!base) {
-      return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
-    }
-
+    if (!base) return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
     try {
       return new URL(trimmed, base).toString();
-    } catch (fallbackError) {
+    } catch {
       return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
     }
   }
 };
 
 const formatDate = (input) => {
-  if (!input) {
-    return "—";
-  }
-
+  if (!input) return "—";
   const parsed = new Date(input);
-  if (Number.isNaN(parsed.getTime())) {
-    return "—";
-  }
-
+  if (Number.isNaN(parsed.getTime())) return "—";
   return parsed.toLocaleDateString();
 };
 
 const formatGestation = (dayIndex) => {
-  if (dayIndex == null) {
-    return "—";
-  }
-
+  if (dayIndex == null) return "—";
   const weeks = Math.floor(dayIndex / 7);
   const days = dayIndex % 7;
   return `${weeks}w ${days}d`;
 };
 
+/* ---------------- component ---------------- */
 const Dashboard = () => {
   const copy = content.dashboard ?? {};
   const formCopy = content.forms?.pregnancyDetails ?? {};
   const { data: currentUser } = useCurrentUserQuery();
   const { data: pregnancyProfile, isLoading: pregnancyLoading } =
     usePregnancyProfileQuery();
+
   const hasProfile = Boolean(
     pregnancyProfile?.dueDate || pregnancyProfile?.lmpDate
   );
+
   const [isEditing, setIsEditing] = useState(false);
   const [feedback, setFeedback] = useState("");
 
@@ -105,7 +85,6 @@ const Dashboard = () => {
       month: "2-digit",
       day: "2-digit",
     });
-
     return formatter.format(new Date());
   }, []);
 
@@ -119,7 +98,6 @@ const Dashboard = () => {
       const response = await http.get("/api/baby-image/today", {
         credentials: "omit",
       });
-
       return {
         url: resolveBabyImageUrl(response?.url),
         week: response?.week ?? null,
@@ -169,10 +147,7 @@ const Dashboard = () => {
     : null;
 
   const firstName = useMemo(() => {
-    if (!currentUser?.name) {
-      return "";
-    }
-
+    if (!currentUser?.name) return "";
     return currentUser.name.split(" ")[0];
   }, [currentUser?.name]);
 
@@ -187,9 +162,16 @@ const Dashboard = () => {
     }
   };
 
+  /* ---------- UI fragments ---------- */
   const renderPregnancyCard = () => {
     if (pregnancyLoading) {
-      return <p className={styles.muted}>Loading your details...</p>;
+      return (
+        <div className={styles.skeletonCard} aria-hidden="true">
+          <div className={styles.skeletonTitle} />
+          <div className={styles.skeletonLine} />
+          <div className={styles.skeletonLine} />
+        </div>
+      );
     }
 
     if (!hasProfile || isEditing) {
@@ -222,7 +204,11 @@ const Dashboard = () => {
         <header className={styles.summaryHeader}>
           <div>
             <h2 className={styles.cardTitle}>{copy.summary?.title}</h2>
-            {feedback && <p className={styles.feedback}>{feedback}</p>}
+            {feedback && (
+              <p className={styles.feedback} aria-live="polite">
+                {feedback}
+              </p>
+            )}
           </div>
           <div className={styles.summaryActions}>
             <button
@@ -232,14 +218,14 @@ const Dashboard = () => {
             >
               {copy.summary?.edit}
             </button>
-            <button
+            {/* <button
               type="button"
               className={styles.ghostButton}
               onClick={handleReset}
               disabled={resetMutation.isPending}
             >
               {copy.summary?.reset}
-            </button>
+            </button> */}
           </div>
         </header>
         <dl className={styles.summaryList}>
@@ -264,6 +250,11 @@ const Dashboard = () => {
     );
   };
 
+  const friendlyTodayFallback = !hasProfile
+    ? copy.emptyProfile?.description
+    : todayError?.message || "No update available yet.";
+
+  /* ---------- render ---------- */
   return (
     <main className={styles.dashboard}>
       <header className={styles.header}>
@@ -278,13 +269,22 @@ const Dashboard = () => {
               : copy.emptyProfile?.description}
           </p>
         </div>
+
         <div className={styles.headerActions}>
           <ActionsMenu />
           <div className={styles.headerButtons}>
-            <Link className={styles.primaryButton} to="/chat">
+            {/* <Link
+              className={styles.primaryButton}
+              to="/chat"
+              aria-label="Open chat"
+            >
               {copy.actions?.openChat}
-            </Link>
-            <Link className={styles.secondaryButton} to="/onboarding">
+            </Link> */}
+            <Link
+              className={styles.secondaryButton}
+              to="/onboarding"
+              aria-label="Update pregnancy details"
+            >
               {copy.actions?.goToOnboarding}
             </Link>
           </div>
@@ -292,7 +292,9 @@ const Dashboard = () => {
       </header>
 
       <section className={styles.grid}>
-        <article className={styles.primaryCard}>{renderPregnancyCard()}</article>
+        <article className={styles.primaryCard}>
+          {renderPregnancyCard()}
+        </article>
 
         <article className={styles.card}>
           <h2 className={styles.cardTitle}>{previewTitle}</h2>
@@ -329,7 +331,7 @@ const Dashboard = () => {
         <article className={styles.card}>
           <h2 className={styles.cardTitle}>Today's Update</h2>
           {todayLoading ? (
-            <p className={styles.muted}>Loading...</p>
+            <div className={styles.skeletonBlock} aria-hidden="true" />
           ) : today ? (
             <>
               <h3 className={styles.cardSubtitle}>Baby</h3>
@@ -358,22 +360,32 @@ const Dashboard = () => {
                 )}
             </>
           ) : (
-            <p className={styles.muted}>
-              {todayError?.message || "No update available yet."}
-            </p>
+            <p className={styles.muted}>{friendlyTodayFallback}</p>
           )}
         </article>
 
         <article className={styles.card}>
           <h2 className={styles.cardTitle}>Quick Actions</h2>
           <div className={styles.actions}>
-            <Link className={styles.action} to="/chat">
+            <Link
+              className={styles.action}
+              to="/chat"
+              aria-label="Ask a question"
+            >
               {copy.actions?.ask}
             </Link>
-            <Link className={styles.action} to="/onboarding">
+            <Link
+              className={styles.action}
+              to="/onboarding"
+              aria-label="Update details"
+            >
               {copy.actions?.update}
             </Link>
-            <Link className={styles.action} to="/profile">
+            <Link
+              className={styles.action}
+              to="/profile"
+              aria-label="View profile"
+            >
               {copy.actions?.profile}
             </Link>
           </div>
@@ -383,7 +395,13 @@ const Dashboard = () => {
           <h2 className={styles.cardTitle}>{copy.progress?.title}</h2>
           {gestationDays != null ? (
             <>
-              <div className={styles.progress}>
+              <div
+                className={styles.progress}
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={280}
+                aria-valuenow={Math.min(280, gestationDays)}
+              >
                 <div
                   className={styles.progressBar}
                   style={{ width: `${progressPct}%` }}
@@ -398,6 +416,22 @@ const Dashboard = () => {
           )}
         </article>
       </section>
+
+      {/* bottom nav (mobile) */}
+      <nav className={styles.bottomNav} aria-label="Primary">
+        <Link to="/dashboard" className={styles.bottomNavLink}>
+          Home
+        </Link>
+        <Link to="/chat" className={styles.bottomNavLink}>
+          Chat
+        </Link>
+        <Link to="/onboarding" className={styles.bottomNavLink}>
+          Progress
+        </Link>
+        <Link to="/profile" className={styles.bottomNavLink}>
+          Profile
+        </Link>
+      </nav>
     </main>
   );
 };

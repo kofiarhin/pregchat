@@ -1,5 +1,11 @@
 import React from "react";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { useAppSelector } from "./store/store.js";
 import { selectAuthToken } from "./store/ui/uiSlice.js";
 import { useCurrentUserQuery } from "./features/auth/hooks/useAuth.js";
@@ -33,19 +39,11 @@ const AppShell = ({ isAuthenticated }) => {
     <div className="app dark">
       {isAuthenticated && !hideChrome && <Header />}
       <Routes>
-        <Route
-          path="/"
-          element={
-            <Navigate
-              to={isAuthenticated ? "/dashboard" : "/login"}
-              replace
-            />
-          }
-        />
+        <Route path="/" element={<Login />} />
         <Route
           path="/login"
           element={
-            isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+            isAuthenticated ? <Navigate to="/chat" replace /> : <Login />
           }
         />
         <Route
@@ -67,7 +65,11 @@ const AppShell = ({ isAuthenticated }) => {
         <Route
           path="/admin"
           element={
-            isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" replace />
+            isAuthenticated ? (
+              <AdminDashboard />
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
         <Route
@@ -85,11 +87,7 @@ const AppShell = ({ isAuthenticated }) => {
         <Route
           path="/faceoff"
           element={
-            isAuthenticated ? (
-              <FaceOffPage />
-            ) : (
-              <Navigate to="/login" replace />
-            )
+            isAuthenticated ? <FaceOffPage /> : <Navigate to="/login" replace />
           }
         />
         <Route
@@ -101,11 +99,7 @@ const AppShell = ({ isAuthenticated }) => {
         <Route
           path="/store/:id"
           element={
-            isAuthenticated ? (
-              <ItemDetails />
-            ) : (
-              <Navigate to="/login" replace />
-            )
+            isAuthenticated ? <ItemDetails /> : <Navigate to="/login" replace />
           }
         />
         <Route
@@ -200,11 +194,7 @@ const AppShell = ({ isAuthenticated }) => {
         <Route
           path="/onboarding"
           element={
-            isAuthenticated ? (
-              <Onboarding />
-            ) : (
-              <Navigate to="/login" replace />
-            )
+            isAuthenticated ? <Onboarding /> : <Navigate to="/login" replace />
           }
         />
       </Routes>
