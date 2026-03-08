@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import content from "../content/appContent.json";
-import styles from "./register.styles.module.scss";
 import { useRegisterMutation } from "../features/auth/hooks/useAuth.js";
+import "./login.styles.scss";
 
 const regionOptions = [
   { value: "", label: "Select your region" },
@@ -23,7 +23,7 @@ const Register = () => {
 
   const registerMutation = useRegisterMutation({
     onSuccess: () => {
-      navigate("/chat");
+      navigate("/dashboard", { replace: true });
     },
   });
 
@@ -44,20 +44,20 @@ const Register = () => {
   const errorMessage = registerMutation.error?.message;
 
   return (
-    <main className={styles.wrapper}>
-      <section className={styles.card}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>{registerCopy.title}</h1>
-          <p className={styles.subtitle}>{registerCopy.subtitle}</p>
+    <main className="auth-page">
+      <section className="auth-card">
+        <header className="auth-header">
+          <h1 className="auth-title">{registerCopy.title}</h1>
+          <p className="auth-subtitle">{registerCopy.subtitle}</p>
         </header>
 
-        <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="name">
+        <form onSubmit={handleSubmit} noValidate>
+          <div className="auth-field">
+            <label className="auth-label" htmlFor="name">
               {registerCopy.fields?.name}
             </label>
             <input
-              className={styles.input}
+              className="input"
               id="name"
               name="name"
               type="text"
@@ -68,12 +68,12 @@ const Register = () => {
             />
           </div>
 
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="email">
+          <div className="auth-field">
+            <label className="auth-label" htmlFor="email">
               {registerCopy.fields?.email}
             </label>
             <input
-              className={styles.input}
+              className="input"
               id="email"
               name="email"
               type="email"
@@ -84,12 +84,12 @@ const Register = () => {
             />
           </div>
 
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="password">
+          <div className="auth-field">
+            <label className="auth-label" htmlFor="password">
               {registerCopy.fields?.password}
             </label>
             <input
-              className={styles.input}
+              className="input"
               id="password"
               name="password"
               type="password"
@@ -100,12 +100,12 @@ const Register = () => {
             />
           </div>
 
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="region">
+          <div className="auth-field">
+            <label className="auth-label" htmlFor="region">
               {registerCopy.fields?.region}
             </label>
             <select
-              className={styles.input}
+              className="input"
               id="region"
               name="region"
               value={formData.region}
@@ -120,18 +120,15 @@ const Register = () => {
             </select>
           </div>
 
-          {errorMessage && <div className={styles.error}>{errorMessage}</div>}
+          {errorMessage && <div className="auth-error">{errorMessage}</div>}
 
-          <button className={styles.submit} type="submit" disabled={isSubmitting}>
+          <button className="btn auth-submit" type="submit" disabled={isSubmitting}>
             {isSubmitting ? registerCopy.loading : registerCopy.submit}
           </button>
         </form>
 
-        <p className={styles.cta}>
-          {registerCopy.loginPrompt} {" "}
-          <Link className={styles.link} to="/login">
-            {registerCopy.loginLink}
-          </Link>
+        <p className="auth-cta">
+          {registerCopy.loginPrompt} <Link to="/login">{registerCopy.loginLink}</Link>
         </p>
       </section>
     </main>

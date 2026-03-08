@@ -1,0 +1,128 @@
+.public-header {
+  position: sticky;
+  top: 0;
+  z-index: 70;
+  background: rgba(7, 10, 22, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.public-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72px;
+}
+
+.public-brand {
+  color: #f6f2f2;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+}
+
+.public-nav {
+  display: none;
+  gap: 0.5rem;
+}
+
+.public-nav-link {
+  color: #d9d4df;
+  text-decoration: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+}
+
+.public-nav-link.active,
+.public-nav-link:hover {
+  background: rgba(197, 168, 233, 0.18);
+  color: #fff;
+}
+
+.public-nav-cta {
+  border: 1px solid rgba(224, 191, 145, 0.45);
+}
+
+.public-menu-btn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.public-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.public-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.public-mobile-nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(300px, 86vw);
+  height: 100vh;
+  padding: 2rem 1.25rem;
+  background: #0c1024;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 80;
+}
+
+.public-mobile-nav.open {
+  transform: translateX(0);
+}
+
+.public-mobile-title {
+  color: #e8e5ec;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.public-mobile-link {
+  display: block;
+  color: #dcd6e5;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.8rem 0.95rem;
+}
+
+.public-mobile-link + .public-mobile-link {
+  margin-top: 0.65rem;
+}
+
+.public-mobile-link.active {
+  color: #fff;
+  border-color: rgba(214, 182, 140, 0.8);
+}
+
+@media (min-width: 900px) {
+  .public-nav {
+    display: flex;
+  }
+
+  .public-menu-btn,
+  .public-overlay,
+  .public-mobile-nav {
+    display: none;
+  }
+}

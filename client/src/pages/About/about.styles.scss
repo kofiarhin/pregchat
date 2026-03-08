@@ -1,0 +1,47 @@
+.about-page {
+  padding: 2.5rem 1rem 4rem;
+}
+
+.about-kicker {
+  color: #dbc39d;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.78rem;
+  margin-bottom: 0.8rem;
+}
+
+.about-page h1 {
+  color: #fff;
+  max-width: 16ch;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.about-page p {
+  color: #d4cfde;
+  max-width: 70ch;
+}
+
+.about-card-grid {
+  margin-top: 2rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.about-card-grid article {
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.about-card-grid h2 {
+  color: #f4eff8;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 900px) {
+  .about-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
