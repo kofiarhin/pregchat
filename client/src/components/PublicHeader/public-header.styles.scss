@@ -2,64 +2,98 @@
   position: sticky;
   top: 0;
   z-index: 70;
-  background: rgba(7, 10, 22, 0.92);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
+  background: rgba(8, 13, 31, 0.76);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(195, 201, 230, 0.12);
 }
 
 .public-header-inner {
+  min-height: 76px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 72px;
 }
 
 .public-brand {
-  color: #f6f2f2;
   text-decoration: none;
+  color: #f4f1ff;
   font-weight: 700;
-  font-size: 1.2rem;
-  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.01em;
+}
+
+.brand-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at 25% 25%, #f8d7b3 0%, #c89df3 70%);
+  box-shadow: 0 0 14px rgba(219, 177, 255, 0.7);
 }
 
 .public-nav {
   display: none;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .public-nav-link {
-  color: #d9d4df;
   text-decoration: none;
-  padding: 0.5rem 0.9rem;
+  color: #d5d9ef;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.86rem;
   border-radius: 999px;
-  transition: background-color 0.2s ease;
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
-.public-nav-link.active,
 .public-nav-link:hover {
-  background: rgba(197, 168, 233, 0.18);
+  background: rgba(220, 226, 250, 0.08);
+  color: #f4f5ff;
+}
+
+.public-nav-link.active {
+  border-color: rgba(208, 183, 237, 0.36);
+  background: rgba(198, 168, 234, 0.15);
   color: #fff;
 }
 
+.public-nav-subtle {
+  color: #bcc2dd;
+}
+
 .public-nav-cta {
-  border: 1px solid rgba(224, 191, 145, 0.45);
+  border: 1px solid rgba(255, 208, 158, 0.46);
+  background: linear-gradient(140deg, #d5b3fb 0%, #f2c792 100%);
+  color: #201833;
+  font-weight: 600;
+}
+
+.public-nav-cta:hover {
+  background: linear-gradient(140deg, #e0c4ff 0%, #f6d4aa 100%);
+  color: #1f1732;
+}
+
+.public-nav-cta.active {
+  border-color: rgba(255, 214, 169, 0.8);
 }
 
 .public-menu-btn {
   width: 40px;
   height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(201, 207, 233, 0.23);
+  background: rgba(197, 204, 230, 0.07);
+  color: #f2f4ff;
   display: grid;
   place-items: center;
-  color: #fff;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.08);
 }
 
 .public-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(3, 7, 18, 0.55);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
@@ -74,11 +108,11 @@
   position: fixed;
   top: 0;
   right: 0;
-  width: min(300px, 86vw);
+  width: min(310px, 88vw);
   height: 100vh;
-  padding: 2rem 1.25rem;
-  background: #0c1024;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.8rem 1.1rem;
+  background: #0f1733;
+  border-left: 1px solid rgba(200, 205, 231, 0.16);
   transform: translateX(100%);
   transition: transform 0.25s ease;
   z-index: 80;
@@ -89,30 +123,34 @@
 }
 
 .public-mobile-title {
-  color: #e8e5ec;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
+  color: #d4d9ef;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.13em;
+  margin-bottom: 0.9rem;
 }
 
 .public-mobile-link {
   display: block;
-  color: #dcd6e5;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 0.8rem 0.95rem;
+  color: #e1e4f5;
+  border-radius: 11px;
+  padding: 0.72rem 0.84rem;
+  border: 1px solid rgba(200, 206, 233, 0.15);
+  background: rgba(198, 204, 231, 0.07);
 }
 
 .public-mobile-link + .public-mobile-link {
-  margin-top: 0.65rem;
+  margin-top: 0.55rem;
 }
 
 .public-mobile-link.active {
-  color: #fff;
-  border-color: rgba(214, 182, 140, 0.8);
+  border-color: rgba(210, 181, 243, 0.45);
+  background: rgba(201, 174, 233, 0.15);
+}
+
+.public-mobile-cta {
+  border-color: rgba(255, 210, 163, 0.52);
 }
 
 @media (min-width: 900px) {
