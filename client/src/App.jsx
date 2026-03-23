@@ -6,6 +6,7 @@ import { useCurrentUserQuery } from "./features/auth/hooks/useAuth.js";
 import PublicLayout from "./layouts/PublicLayout/PublicLayout.jsx";
 import AppLayout from "./layouts/AppLayout/AppLayout.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
+import OnboardingGuard from "./routes/OnboardingGuard.jsx";
 import PublicOnlyRoute from "./routes/PublicOnlyRoute.jsx";
 import Home from "./pages/Home/Home.jsx";
 import About from "./pages/About/About.jsx";
@@ -59,25 +60,28 @@ const AppShell = ({ isAuthenticated }) => {
         element={<ProtectedRoute isAuthenticated={isAuthenticated} redirectTo="/login" />}
       >
         <Route element={<AppLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/voice" element={<VoiceScreen />} />
-          <Route path="/faceoff" element={<FaceOffPage />} />
-          <Route path="/store" element={<Store />} />
-          <Route path="/store/:id" element={<ItemDetails />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/appointments" element={<AppointmentBrowse />} />
-          <Route path="/appointments/mine" element={<MyAppointments />} />
-          <Route path="/appointments/:id" element={<AppointmentMidwife />} />
-          <Route path="/journals" element={<JournalsList />} />
-          <Route path="/journals/new" element={<JournalForm mode="create" />} />
-          <Route path="/journals/:id" element={<JournalDetail />} />
-          <Route path="/journals/:id/edit" element={<JournalForm mode="edit" />} />
-          <Route path="/profile" element={<Profile />} />
           <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/welcome" element={<Navigate to="/profile" replace />} />
+
+          <Route element={<OnboardingGuard />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/voice" element={<VoiceScreen />} />
+            <Route path="/faceoff" element={<FaceOffPage />} />
+            <Route path="/store" element={<Store />} />
+            <Route path="/store/:id" element={<ItemDetails />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/appointments" element={<AppointmentBrowse />} />
+            <Route path="/appointments/mine" element={<MyAppointments />} />
+            <Route path="/appointments/:id" element={<AppointmentMidwife />} />
+            <Route path="/journals" element={<JournalsList />} />
+            <Route path="/journals/new" element={<JournalForm mode="create" />} />
+            <Route path="/journals/:id" element={<JournalDetail />} />
+            <Route path="/journals/:id/edit" element={<JournalForm mode="edit" />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/welcome" element={<Navigate to="/profile" replace />} />
+          </Route>
         </Route>
       </Route>
 

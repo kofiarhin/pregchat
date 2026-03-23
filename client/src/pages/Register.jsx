@@ -23,7 +23,7 @@ const Register = () => {
 
   const registerMutation = useRegisterMutation({
     onSuccess: () => {
-      navigate("/dashboard", { replace: true });
+      navigate("/onboarding", { replace: true });
     },
   });
 

@@ -23,6 +23,7 @@ const buildUserResponse = (user) => ({
   email: user.email,
   region: user.region,
   isAdmin: user.isAdmin === true,
+  onboardingCompletedAt: user.onboardingCompletedAt ?? null,
 });
 
 const register = async (req, res) => {

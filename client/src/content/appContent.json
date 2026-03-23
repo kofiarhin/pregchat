@@ -347,6 +347,28 @@
       "submit": "Save pregnancy details",
       "success": "Thanks! Your pregnancy details have been saved.",
       "cta": "Go to dashboard"
+    },
+    "steps": {
+      "pregnancy": {
+        "title": "When is your baby due?",
+        "subtitle": "This helps us give you the right updates for your stage.",
+        "submit": "Continue"
+      },
+      "details": {
+        "title": "A bit about you",
+        "subtitle": "Optional — helps us personalise your experience.",
+        "isFirstPregnancy": "Is this your first pregnancy?",
+        "babyGender": "Do you know the baby's gender?",
+        "updateFrequency": "How often would you like updates?",
+        "healthConsiderations": "Any health considerations? (optional)",
+        "skip": "Skip for now",
+        "submit": "Continue"
+      },
+      "complete": {
+        "title": "You're all set!",
+        "subtitle": "Your dashboard is ready with personalised updates.",
+        "cta": "Go to my dashboard"
+      }
     }
   },
   "profilePage": {

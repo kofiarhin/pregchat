@@ -1,0 +1,111 @@
+.form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.fieldset {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  background: rgba(12, 12, 14, 0.6);
+}
+
+.legend {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f7f7fa;
+}
+
+.radioGroup {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.radioOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: #d0d3dc;
+  cursor: pointer;
+}
+
+.radioOption input {
+  accent-color: #ff6f91;
+}
+
+.fieldGroup {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f5f7ff;
+}
+
+.input,
+.textarea {
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 10, 12, 0.9);
+  color: #f7f7fa;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 4rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.primary,
+.secondary {
+  padding: 0.65rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.primary {
+  background: linear-gradient(135deg, #ff6f91, #ff9671);
+  color: #101015;
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f7f7fa;
+}
+
+.secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .actions {
+    justify-content: stretch;
+  }
+
+  .primary,
+  .secondary {
+    flex: 1;
+  }
+}

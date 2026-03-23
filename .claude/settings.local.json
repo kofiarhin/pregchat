@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find '/c/Users/laura.bolas/OneDrive - Roundel Kitchens/Desktop/workspace/dev/pregchat/client/src' -name *.test.jsx -o -name *.test.js)",
+      "Bash(npx vite:*)"
+    ]
+  }
+}

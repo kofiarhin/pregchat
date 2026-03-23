@@ -174,14 +174,13 @@ const Dashboard = () => {
       );
     }
 
-    if (!hasProfile || isEditing) {
+    if (isEditing) {
       return (
         <div className={styles.onboardingCard}>
           <h2 className={styles.cardTitle}>{copy.emptyProfile?.title}</h2>
           <p className={styles.muted}>{copy.emptyProfile?.description}</p>
           <PregnancyDetailsForm
             initialValues={{
-              mode: hasProfile ? undefined : "dueDate",
               dueDate: pregnancyProfile?.dueDate
                 ? pregnancyProfile.dueDate.slice(0, 10)
                 : "",
@@ -192,7 +191,7 @@ const Dashboard = () => {
             content={formCopy}
             submitLabel={copy.emptyProfile?.submit}
             onSubmit={handleFormSubmit}
-            onCancel={hasProfile ? () => setIsEditing(false) : undefined}
+            onCancel={() => setIsEditing(false)}
             isSubmitting={updateMutation.isPending}
           />
         </div>
