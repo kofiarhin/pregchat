@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./pregnancyDetailsForm.styles.module.scss";
 
+const getToday = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = `${today.getMonth() + 1}`.padStart(2, "0");
+  const day = `${today.getDate()}`.padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
 const PregnancyDetailsForm = ({
   initialValues,
   content,
@@ -26,6 +35,8 @@ const PregnancyDetailsForm = ({
   const submitLabelCopy = buttonCopy.submit || "Save details";
   const cancelLabelCopy = buttonCopy.cancel || "Cancel";
 
+  const today = useMemo(() => getToday(), []);
+
   const defaultValues = useMemo(
     () => ({
       mode:
@@ -33,12 +44,12 @@ const PregnancyDetailsForm = ({
         (initialValues?.dueDate
           ? "dueDate"
           : initialValues?.lmpDate
-          ? "lmp"
-          : "dueDate"),
+            ? "lmp"
+            : "dueDate"),
       dueDate: initialValues?.dueDate || "",
       lmpDate: initialValues?.lmpDate || "",
     }),
-    [initialValues]
+    [initialValues],
   );
 
   const [mode, setMode] = useState(defaultValues.mode);
@@ -58,11 +69,21 @@ const PregnancyDetailsForm = ({
     setError("");
   };
 
+  const handleDueDateChange = (event) => {
+    setDueDate(event.target.value);
+    setError("");
+  };
+
+  const handleLmpDateChange = (event) => {
+    setLmpDate(event.target.value);
+    setError("");
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
     if (mode === "dueDate" && !dueDate) {
-    setError(errorCopy.dueDateRequired || "Please provide a due date.");
+      setError(errorCopy.dueDateRequired || "Please provide a due date.");
       return;
     }
 
@@ -83,6 +104,7 @@ const PregnancyDetailsForm = ({
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
       <fieldset className={styles.modeSelector}>
         <legend className={styles.legend}>{legendCopy}</legend>
+
         <label className={styles.modeOption}>
           <input
             type="radio"
@@ -93,6 +115,7 @@ const PregnancyDetailsForm = ({
           />
           <span>{dueModeLabel}</span>
         </label>
+
         <label className={styles.modeOption}>
           <input
             type="radio"
@@ -115,8 +138,9 @@ const PregnancyDetailsForm = ({
           type="date"
           className={styles.input}
           value={dueDate}
-          onChange={(event) => setDueDate(event.target.value)}
+          onChange={handleDueDateChange}
           disabled={mode !== "dueDate"}
+          min={today}
           aria-describedby="dueDate-helper"
         />
         <p id="dueDate-helper" className={styles.helper}>
@@ -134,8 +158,9 @@ const PregnancyDetailsForm = ({
           type="date"
           className={styles.input}
           value={lmpDate}
-          onChange={(event) => setLmpDate(event.target.value)}
+          onChange={handleLmpDateChange}
           disabled={mode !== "lmp"}
+          max={today}
           aria-describedby="lmpDate-helper"
         />
         <p id="lmpDate-helper" className={styles.helper}>
@@ -143,10 +168,14 @@ const PregnancyDetailsForm = ({
         </p>
       </div>
 
-      {error && <div className={styles.error}>{error}</div>}
+      {error ? (
+        <div className={styles.error} role="alert" aria-live="polite">
+          {error}
+        </div>
+      ) : null}
 
       <div className={styles.actions}>
-        {onCancel && (
+        {onCancel ? (
           <button
             type="button"
             className={styles.secondary}
@@ -155,8 +184,13 @@ const PregnancyDetailsForm = ({
           >
             {cancelLabelCopy}
           </button>
-        )}
-        <button type="submit" className={styles.primary} disabled={isSubmitting}>
+        ) : null}
+
+        <button
+          type="submit"
+          className={styles.primary}
+          disabled={isSubmitting}
+        >
           {submitLabel || submitLabelCopy}
         </button>
       </div>

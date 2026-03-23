@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import content from "../content/appContent.json";
-import ActionsMenu from "../components/ActionsMenu.jsx";
 import PregnancyDetailsForm from "../components/PregnancyDetailsForm.jsx";
 import { useCurrentUserQuery } from "../features/auth/hooks/useAuth.js";
 import {
@@ -15,7 +14,7 @@ import { http } from "../api/http.js";
 import { BASE_URL } from "../constants/baseUrl.js";
 import styles from "./dashboard.styles.module.scss";
 
-/* ---------------- utils (unchanged, minor hardening) ---------------- */
+/* ---------------- utils ---------------- */
 const getBaseUrl = () => {
   const envBase = typeof BASE_URL === "string" ? BASE_URL.trim() : "";
   if (envBase) return envBase;
@@ -29,7 +28,6 @@ const resolveBabyImageUrl = (rawUrl) => {
   if (!rawUrl) return null;
   const trimmed = String(rawUrl).trim();
   if (!trimmed) return null;
-
   try {
     return new URL(trimmed).toString();
   } catch {
@@ -44,17 +42,36 @@ const resolveBabyImageUrl = (rawUrl) => {
 };
 
 const formatDate = (input) => {
-  if (!input) return "—";
+  if (!input) return "\u2014";
   const parsed = new Date(input);
-  if (Number.isNaN(parsed.getTime())) return "—";
-  return parsed.toLocaleDateString();
+  if (Number.isNaN(parsed.getTime())) return "\u2014";
+  return parsed.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 };
 
 const formatGestation = (dayIndex) => {
-  if (dayIndex == null) return "—";
+  if (dayIndex == null) return "\u2014";
   const weeks = Math.floor(dayIndex / 7);
   const days = dayIndex % 7;
   return `${weeks}w ${days}d`;
+};
+
+const getTrimester = (dayIndex) => {
+  if (dayIndex == null) return null;
+  if (dayIndex < 84) return { label: "1st Trimester", number: 1 };
+  if (dayIndex < 189) return { label: "2nd Trimester", number: 2 };
+  return { label: "3rd Trimester", number: 3 };
+};
+
+const getDaysRemaining = (dueDate) => {
+  if (!dueDate) return null;
+  const due = new Date(dueDate);
+  if (Number.isNaN(due.getTime())) return null;
+  const diff = Math.ceil((due - new Date()) / (1000 * 60 * 60 * 24));
+  return Math.max(0, diff);
 };
 
 /* ---------------- component ---------------- */
@@ -130,9 +147,12 @@ const Dashboard = () => {
       ? Math.min(100, Math.round((gestationDays / 280) * 100))
       : 0;
 
+  const trimester = getTrimester(gestationDays);
+  const daysRemaining = getDaysRemaining(pregnancyProfile?.dueDate);
+
   const previewTitle =
     babyPreview?.week != null
-      ? `Baby Preview — Week ${babyPreview.week}`
+      ? `Week ${babyPreview.week}`
       : "Baby Preview";
 
   const previewCaption =
@@ -155,100 +175,6 @@ const Dashboard = () => {
     updateMutation.mutate({ mode, dueDate, lmpDate });
   };
 
-  const handleReset = () => {
-    const message = copy.summary?.confirmReset || "Reset pregnancy details?";
-    if (window.confirm(message)) {
-      resetMutation.mutate();
-    }
-  };
-
-  /* ---------- UI fragments ---------- */
-  const renderPregnancyCard = () => {
-    if (pregnancyLoading) {
-      return (
-        <div className={styles.skeletonCard} aria-hidden="true">
-          <div className={styles.skeletonTitle} />
-          <div className={styles.skeletonLine} />
-          <div className={styles.skeletonLine} />
-        </div>
-      );
-    }
-
-    if (isEditing) {
-      return (
-        <div className={styles.onboardingCard}>
-          <h2 className={styles.cardTitle}>{copy.emptyProfile?.title}</h2>
-          <p className={styles.muted}>{copy.emptyProfile?.description}</p>
-          <PregnancyDetailsForm
-            initialValues={{
-              dueDate: pregnancyProfile?.dueDate
-                ? pregnancyProfile.dueDate.slice(0, 10)
-                : "",
-              lmpDate: pregnancyProfile?.lmpDate
-                ? pregnancyProfile.lmpDate.slice(0, 10)
-                : "",
-            }}
-            content={formCopy}
-            submitLabel={copy.emptyProfile?.submit}
-            onSubmit={handleFormSubmit}
-            onCancel={() => setIsEditing(false)}
-            isSubmitting={updateMutation.isPending}
-          />
-        </div>
-      );
-    }
-
-    return (
-      <div className={styles.summaryCard}>
-        <header className={styles.summaryHeader}>
-          <div>
-            <h2 className={styles.cardTitle}>{copy.summary?.title}</h2>
-            {feedback && (
-              <p className={styles.feedback} aria-live="polite">
-                {feedback}
-              </p>
-            )}
-          </div>
-          <div className={styles.summaryActions}>
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              onClick={() => setIsEditing(true)}
-            >
-              {copy.summary?.edit}
-            </button>
-            {/* <button
-              type="button"
-              className={styles.ghostButton}
-              onClick={handleReset}
-              disabled={resetMutation.isPending}
-            >
-              {copy.summary?.reset}
-            </button> */}
-          </div>
-        </header>
-        <dl className={styles.summaryList}>
-          <div>
-            <dt>{copy.summary?.dueDate}</dt>
-            <dd>{formatDate(pregnancyProfile?.dueDate)}</dd>
-          </div>
-          <div>
-            <dt>{copy.summary?.lmpDate}</dt>
-            <dd>{formatDate(pregnancyProfile?.lmpDate)}</dd>
-          </div>
-          <div>
-            <dt>{copy.summary?.gestation}</dt>
-            <dd>{formatGestation(pregnancyProfile?.dayIndex)}</dd>
-          </div>
-          <div>
-            <dt>{copy.summary?.updated}</dt>
-            <dd>{formatDate(pregnancyProfile?.updatedAt)}</dd>
-          </div>
-        </dl>
-      </div>
-    );
-  };
-
   const friendlyTodayFallback = !hasProfile
     ? copy.emptyProfile?.description
     : todayError?.message || "No update available yet.";
@@ -256,69 +182,147 @@ const Dashboard = () => {
   /* ---------- render ---------- */
   return (
     <main className={styles.dashboard}>
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.heading}>
-            {copy.welcome}
-            {firstName ? `, ${firstName}` : ""}
-          </h1>
-          <p className={styles.muted}>
-            {gestationDays != null
-              ? `Day ${gestationDays} · ${formatGestation(gestationDays)}`
-              : copy.emptyProfile?.description}
+      {/* ---- Hero header ---- */}
+      <header className={styles.hero}>
+        <div className={styles.heroContent}>
+          <p className={styles.heroGreeting}>
+            {copy.welcome}{firstName ? `, ${firstName}` : ""}
           </p>
+          <h1 className={styles.heroHeadline}>
+            {gestationDays != null ? (
+              <>
+                <span className={styles.heroDay}>Day {Math.min(280, gestationDays)}</span>
+                <span className={styles.heroDivider}>/</span>
+                <span className={styles.heroGestation}>{formatGestation(gestationDays)}</span>
+              </>
+            ) : (
+              "Your pregnancy dashboard"
+            )}
+          </h1>
+          {trimester && (
+            <span className={styles.trimesterBadge}>{trimester.label}</span>
+          )}
         </div>
 
-        <div className={styles.headerActions}>
-          <ActionsMenu />
-          <div className={styles.headerButtons}>
-            {/* <Link
-              className={styles.primaryButton}
-              to="/chat"
-              aria-label="Open chat"
-            >
-              {copy.actions?.openChat}
-            </Link> */}
-            <Link
-              className={styles.secondaryButton}
-              to="/onboarding"
-              aria-label="Update pregnancy details"
-            >
-              {copy.actions?.goToOnboarding}
-            </Link>
-          </div>
+        <div className={styles.heroRight}>
+          {gestationDays != null && (
+            <div className={styles.progressRing}>
+              <svg viewBox="0 0 120 120" className={styles.ringSvg}>
+                <circle
+                  cx="60" cy="60" r="52"
+                  className={styles.ringTrack}
+                />
+                <circle
+                  cx="60" cy="60" r="52"
+                  className={styles.ringFill}
+                  strokeDasharray={`${2 * Math.PI * 52}`}
+                  strokeDashoffset={`${2 * Math.PI * 52 * (1 - progressPct / 100)}`}
+                />
+              </svg>
+              <div className={styles.ringLabel}>
+                <span className={styles.ringPct}>{progressPct}%</span>
+                <span className={styles.ringCaption}>complete</span>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
+      {/* ---- Stat strip ---- */}
+      {hasProfile && (
+        <section className={styles.statStrip}>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{formatDate(pregnancyProfile?.dueDate)}</span>
+            <span className={styles.statLabel}>Due date</span>
+          </div>
+          <div className={styles.statDivider} />
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{formatGestation(pregnancyProfile?.dayIndex)}</span>
+            <span className={styles.statLabel}>Gestational age</span>
+          </div>
+          <div className={styles.statDivider} />
+          <div className={styles.stat}>
+            <span className={styles.statValue}>
+              {daysRemaining != null ? daysRemaining : "\u2014"}
+            </span>
+            <span className={styles.statLabel}>Days remaining</span>
+          </div>
+          <div className={styles.statDivider} />
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{formatDate(pregnancyProfile?.lmpDate)}</span>
+            <span className={styles.statLabel}>Last period</span>
+          </div>
+        </section>
+      )}
+
+      {/* ---- Main grid ---- */}
       <section className={styles.grid}>
-        <article className={styles.primaryCard}>
-          {renderPregnancyCard()}
+        {/* Today's update */}
+        <article className={styles.card}>
+          <header className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>Today's Update</h2>
+            {gestationDays != null && (
+              <span className={styles.cardBadge}>Day {Math.min(280, gestationDays)}</span>
+            )}
+          </header>
+
+          {todayLoading ? (
+            <div className={styles.skeletonBlock} aria-hidden="true" />
+          ) : today ? (
+            <div className={styles.updateBody}>
+              <div className={styles.updateSection}>
+                <h3 className={styles.updateLabel}>Baby</h3>
+                <p className={styles.updateText}>{today.babyUpdate}</p>
+              </div>
+              <div className={styles.updateSection}>
+                <h3 className={styles.updateLabel}>Mother</h3>
+                <p className={styles.updateText}>{today.momUpdate}</p>
+              </div>
+              {today.tips && (
+                <p className={styles.tipText}>{today.tips}</p>
+              )}
+              {Array.isArray(today.references) && today.references.length > 0 && (
+                <div className={styles.references}>
+                  <span className={styles.referencesLabel}>References</span>
+                  <ul>
+                    {today.references.map((ref) => (
+                      <li key={ref.url || ref.title}>
+                        <a href={ref.url} target="_blank" rel="noreferrer">
+                          {ref.title || ref.url}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className={styles.muted}>{friendlyTodayFallback}</p>
+          )}
         </article>
 
+        {/* Baby preview */}
         <article className={styles.card}>
-          <h2 className={styles.cardTitle}>{previewTitle}</h2>
+          <header className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>Baby Preview</h2>
+            {babyPreview?.week != null && (
+              <span className={styles.cardBadge}>{previewTitle}</span>
+            )}
+          </header>
+
           {babyPreviewLoading ? (
             <div className={styles.previewPlaceholder} aria-hidden="true" />
           ) : babyPreview?.url ? (
             <>
-              <p className={styles.muted}>{previewCaption}</p>
               <div className={styles.previewFrame}>
                 <img
                   className={styles.previewImage}
                   src={babyPreview.url}
-                  alt={`Illustrative fetus render at week ${
-                    babyPreview.week ?? "unknown"
-                  }`}
+                  alt={`Illustrative fetus render at week ${babyPreview.week ?? "unknown"}`}
                   loading="lazy"
                 />
               </div>
-              {babyPreview?.isCached &&
-                babyPreview?.dateKey &&
-                babyPreview.dateKey !== londonDateKey && (
-                  <p className={styles.muted}>
-                    Showing your most recent preview.
-                  </p>
-                )}
+              <p className={styles.previewCaption}>{previewCaption}</p>
             </>
           ) : previewErrorMessage ? (
             <p className={styles.muted}>{previewErrorMessage}</p>
@@ -327,110 +331,95 @@ const Dashboard = () => {
           )}
         </article>
 
+        {/* Pregnancy timeline / edit form */}
         <article className={styles.card}>
-          <h2 className={styles.cardTitle}>Today's Update</h2>
-          {todayLoading ? (
-            <div className={styles.skeletonBlock} aria-hidden="true" />
-          ) : today ? (
+          {isEditing ? (
             <>
-              <h3 className={styles.cardSubtitle}>Baby</h3>
-              <p>{today.babyUpdate}</p>
-              <h3 className={styles.cardSubtitle}>Mother</h3>
-              <p>{today.momUpdate}</p>
-              {today.tips && <p className={styles.muted}>{today.tips}</p>}
-              {Array.isArray(today.references) &&
-                today.references.length > 0 && (
-                  <div className={styles.sources}>
-                    <span className={styles.muted}>References:</span>
-                    <ul>
-                      {today.references.map((reference) => (
-                        <li key={reference.url || reference.title}>
-                          <a
-                            href={reference.url}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {reference.title || reference.url}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+              <header className={styles.cardHeader}>
+                <h2 className={styles.cardTitle}>Edit Timeline</h2>
+              </header>
+              <PregnancyDetailsForm
+                initialValues={{
+                  dueDate: pregnancyProfile?.dueDate
+                    ? pregnancyProfile.dueDate.slice(0, 10)
+                    : "",
+                  lmpDate: pregnancyProfile?.lmpDate
+                    ? pregnancyProfile.lmpDate.slice(0, 10)
+                    : "",
+                }}
+                content={formCopy}
+                submitLabel="Save changes"
+                onSubmit={handleFormSubmit}
+                onCancel={() => setIsEditing(false)}
+                isSubmitting={updateMutation.isPending}
+              />
             </>
           ) : (
-            <p className={styles.muted}>{friendlyTodayFallback}</p>
+            <>
+              <header className={styles.cardHeader}>
+                <h2 className={styles.cardTitle}>Your Timeline</h2>
+                <button
+                  type="button"
+                  className={styles.editButton}
+                  onClick={() => setIsEditing(true)}
+                >
+                  Edit
+                </button>
+              </header>
+              {pregnancyLoading ? (
+                <div className={styles.skeletonBlock} aria-hidden="true" />
+              ) : (
+                <dl className={styles.timelineList}>
+                  <div className={styles.timelineItem}>
+                    <dt>Due date</dt>
+                    <dd>{formatDate(pregnancyProfile?.dueDate)}</dd>
+                  </div>
+                  <div className={styles.timelineItem}>
+                    <dt>Last period</dt>
+                    <dd>{formatDate(pregnancyProfile?.lmpDate)}</dd>
+                  </div>
+                  <div className={styles.timelineItem}>
+                    <dt>Gestational age</dt>
+                    <dd>{formatGestation(pregnancyProfile?.dayIndex)}</dd>
+                  </div>
+                  <div className={styles.timelineItem}>
+                    <dt>Last updated</dt>
+                    <dd>{formatDate(pregnancyProfile?.updatedAt)}</dd>
+                  </div>
+                </dl>
+              )}
+              {feedback && (
+                <p className={styles.feedback} aria-live="polite">{feedback}</p>
+              )}
+            </>
           )}
         </article>
 
+        {/* Quick actions */}
         <article className={styles.card}>
-          <h2 className={styles.cardTitle}>Quick Actions</h2>
-          <div className={styles.actions}>
-            <Link
-              className={styles.action}
-              to="/chat"
-              aria-label="Ask a question"
-            >
-              {copy.actions?.ask}
+          <header className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>Quick Actions</h2>
+          </header>
+          <div className={styles.quickActions}>
+            <Link className={styles.quickAction} to="/chat">
+              <span className={styles.quickActionIcon}>&#x1F4AC;</span>
+              <span className={styles.quickActionLabel}>Chat with Aya</span>
             </Link>
-            <Link
-              className={styles.action}
-              to="/onboarding"
-              aria-label="Update details"
-            >
-              {copy.actions?.update}
+            <Link className={styles.quickAction} to="/journals">
+              <span className={styles.quickActionIcon}>&#x1F4D3;</span>
+              <span className={styles.quickActionLabel}>Journal</span>
             </Link>
-            <Link
-              className={styles.action}
-              to="/profile"
-              aria-label="View profile"
-            >
-              {copy.actions?.profile}
+            <Link className={styles.quickAction} to="/appointments">
+              <span className={styles.quickActionIcon}>&#x1F4C5;</span>
+              <span className={styles.quickActionLabel}>Appointments</span>
+            </Link>
+            <Link className={styles.quickAction} to="/store">
+              <span className={styles.quickActionIcon}>&#x1F6CD;</span>
+              <span className={styles.quickActionLabel}>Store</span>
             </Link>
           </div>
         </article>
-
-        <article className={styles.card}>
-          <h2 className={styles.cardTitle}>{copy.progress?.title}</h2>
-          {gestationDays != null ? (
-            <>
-              <div
-                className={styles.progress}
-                role="progressbar"
-                aria-valuemin={0}
-                aria-valuemax={280}
-                aria-valuenow={Math.min(280, gestationDays)}
-              >
-                <div
-                  className={styles.progressBar}
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-              <p className={styles.muted}>
-                {Math.min(280, gestationDays)}/280 days
-              </p>
-            </>
-          ) : (
-            <p className={styles.muted}>{copy.progress?.empty}</p>
-          )}
-        </article>
       </section>
-
-      {/* bottom nav (mobile) */}
-      <nav className={styles.bottomNav} aria-label="Primary">
-        <Link to="/dashboard" className={styles.bottomNavLink}>
-          Home
-        </Link>
-        <Link to="/chat" className={styles.bottomNavLink}>
-          Chat
-        </Link>
-        <Link to="/onboarding" className={styles.bottomNavLink}>
-          Progress
-        </Link>
-        <Link to="/profile" className={styles.bottomNavLink}>
-          Profile
-        </Link>
-      </nav>
     </main>
   );
 };

@@ -82,12 +82,15 @@ const Onboarding = () => {
                   "This helps us give you the right updates for your stage."}
               </p>
             </header>
+
             <PregnancyDetailsForm
               initialValues={{ mode: "dueDate", dueDate: "", lmpDate: "" }}
               content={formCopy}
               submitLabel={steps.pregnancy?.submit || "Continue"}
               onSubmit={handlePregnancySubmit}
               isSubmitting={updateMutation.isPending}
+              dueDateInputType="date"
+              lmpDateInputType="date"
             />
           </>
         )}

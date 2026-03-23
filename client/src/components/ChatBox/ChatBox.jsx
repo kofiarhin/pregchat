@@ -1,11 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { FiCopy, FiCheck } from "react-icons/fi";
+import { FiCopy, FiCheck, FiSend } from "react-icons/fi";
 import useChatMutation from "../../hooks/useChatMutation";
 import "./chatBox.styles.scss";
 
-const ChatBox = () => {
+const SUGGESTIONS = [
+  {
+    label: "Daily update",
+    text: "I'm 24 days in. What changes should I expect today?",
+  },
+  {
+    label: "Foods to avoid",
+    text: "What foods should I avoid in early pregnancy?",
+  },
+  {
+    label: "Is this normal?",
+    text: "Is cramping normal in week 4?",
+  },
+  {
+    label: "Exercise tips",
+    text: "What exercises are safe during the first trimester?",
+  },
+];
+
+const ChatBox = ({ dayData }) => {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
@@ -13,6 +32,7 @@ const ChatBox = () => {
 
   const taRef = useRef(null);
   const endRef = useRef(null);
+  const viewportRef = useRef(null);
 
   const scrollToBottom = () => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -36,7 +56,7 @@ const ChatBox = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim() || isPending) return;
 
     const userMsg = {
       role: "user",
@@ -69,47 +89,43 @@ const ChatBox = () => {
     );
   };
 
+  const handleCopy = (msgText, index) => {
+    navigator.clipboard.writeText(msgText);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 1500);
+  };
+
+  const handleSuggestion = (suggestion) => {
+    setText(suggestion);
+    taRef.current?.focus();
+  };
+
   return (
     <div className="chat">
-      <main className="chat__viewport" aria-live="polite">
+      <main className="chat__viewport" ref={viewportRef} aria-live="polite">
         {messages.length === 0 ? (
-          <div className="chat__empty">
-            <div className="chat__emptyCard">
-              <div className="chat__emptyTitle">
-                Ask anything about pregnancy
-              </div>
-              <div className="chat__emptyText">
-                Try: “I’m 24 days in. What changes should I expect today?”
-              </div>
-              <div className="chat__chips">
+          <div className="chat__welcome">
+            <div className="chat__welcomeIcon" aria-hidden="true">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <h2 className="chat__welcomeTitle">Chat with Aya</h2>
+            <p className="chat__welcomeText">
+              Your pregnancy wellness assistant. Ask about symptoms, nutrition, milestones, or anything on your mind.
+            </p>
+            <div className="chat__suggestions">
+              {SUGGESTIONS.map((s) => (
                 <button
+                  key={s.label}
                   type="button"
-                  className="chat__chip"
-                  onClick={() =>
-                    setText(
-                      "I’m 24 days in. What changes should I expect today?",
-                    )
-                  }
+                  className="chat__suggestion"
+                  onClick={() => handleSuggestion(s.text)}
                 >
-                  Daily update
+                  <span className="chat__suggestionLabel">{s.label}</span>
+                  <span className="chat__suggestionPreview">{s.text}</span>
                 </button>
-                <button
-                  type="button"
-                  className="chat__chip"
-                  onClick={() =>
-                    setText("What foods should I avoid in early pregnancy?")
-                  }
-                >
-                  Foods to avoid
-                </button>
-                <button
-                  type="button"
-                  className="chat__chip"
-                  onClick={() => setText("Is cramping normal in week 4?")}
-                >
-                  Is this normal?
-                </button>
-              </div>
+              ))}
             </div>
           </div>
         ) : null}
@@ -117,67 +133,71 @@ const ChatBox = () => {
         <div className="chat__messages">
           {messages.map((m, i) => {
             const isUser = m.role === "user";
-            const rowClass = isUser
-              ? "chat__row chat__row--user"
-              : "chat__row chat__row--assistant";
-            const name = isUser ? "You" : "Aya";
-            const initial = isUser ? "Y" : "A";
 
             return (
-              <div key={i} className={rowClass}>
-                <div className="chat__avatar" aria-hidden="true">
-                  {initial}
-                </div>
+              <div
+                key={i}
+                className={`chat__row ${isUser ? "chat__row--user" : "chat__row--assistant"}`}
+              >
+                {!isUser && (
+                  <div className="chat__avatar chat__avatar--aya" aria-hidden="true">
+                    A
+                  </div>
+                )}
 
                 <div className="chat__bubble">
-                  <div className="chat__bubbleHeader">
-                    <span className="chat__name">{name}</span>
-                    <span className="chat__time">{m.time}</span>
-                  </div>
-
                   <div className="chat__content">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {m.text}
-                    </ReactMarkdown>
+                    {isUser ? (
+                      <p>{m.text}</p>
+                    ) : (
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {m.text}
+                      </ReactMarkdown>
+                    )}
                   </div>
 
-                  <div className="chat__actions">
-                    <button
-                      type="button"
-                      className="chat__iconBtn"
-                      aria-label="Copy message"
-                      onClick={() => {
-                        navigator.clipboard.writeText(m.text);
-                        setCopiedIndex(i);
-                        setTimeout(() => setCopiedIndex(null), 1200);
-                      }}
-                    >
-                      {copiedIndex === i ? <FiCheck /> : <FiCopy />}
-                    </button>
+                  <div className="chat__meta">
+                    <span className="chat__time">{m.time}</span>
+                    {!isUser && (
+                      <button
+                        type="button"
+                        className="chat__copyBtn"
+                        aria-label="Copy message"
+                        onClick={() => handleCopy(m.text, i)}
+                      >
+                        {copiedIndex === i ? (
+                          <FiCheck size={13} />
+                        ) : (
+                          <FiCopy size={13} />
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
+
+                {isUser && (
+                  <div className="chat__avatar chat__avatar--user" aria-hidden="true">
+                    Y
+                  </div>
+                )}
               </div>
             );
           })}
 
-          {isPending ? (
+          {isPending && (
             <div className="chat__row chat__row--assistant">
-              <div className="chat__avatar" aria-hidden="true">
+              <div className="chat__avatar chat__avatar--aya" aria-hidden="true">
                 A
               </div>
               <div className="chat__bubble chat__bubble--typing">
-                <div className="chat__bubbleHeader">
-                  <span className="chat__name">Aya</span>
-                  <span className="chat__time">…</span>
-                </div>
-                <div className="chat__typing" aria-label="Assistant typing">
+                <div className="chat__typing" aria-label="Aya is typing">
                   <span />
                   <span />
                   <span />
                 </div>
               </div>
             </div>
-          ) : null}
+          )}
 
           <div ref={endRef} />
         </div>
@@ -189,7 +209,7 @@ const ChatBox = () => {
             ref={taRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Ask Aya..."
+            placeholder="Message Aya..."
             rows={1}
             className="chat__textarea"
             onKeyDown={(e) => {
@@ -199,19 +219,14 @@ const ChatBox = () => {
               }
             }}
           />
-
           <button
             type="submit"
             className="chat__send"
             disabled={isPending || !text.trim()}
+            aria-label="Send message"
           >
-            Send
+            <FiSend size={18} />
           </button>
-        </div>
-
-        <div className="chat__hint">
-          Press <kbd>Enter</kbd> to send · <kbd>Shift</kbd> + <kbd>Enter</kbd>{" "}
-          for new line
         </div>
       </form>
     </div>

@@ -1,130 +1,317 @@
+/* ============================================================
+   Dashboard — professional dark layout
+   ============================================================ */
+
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 2.5rem;
+  gap: 1.75rem;
+  padding: 2rem 2.5rem 3rem;
   min-height: 100vh;
-  background: radial-gradient(circle at top, rgba(20, 20, 30, 0.85), #060608);
+  max-width: 1120px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-.header {
+/* ---- Hero header ---- */
+.hero {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  gap: 1.5rem;
-  align-items: flex-start;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 2.25rem;
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, rgba(22, 20, 36, 0.95) 0%, rgba(10, 10, 16, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.heading {
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.heroGreeting {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #9aa0a6;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.heroHeadline {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
   font-size: 2rem;
   font-weight: 700;
-  color: #f7f7fa;
-  margin-bottom: 0.25rem;
+  color: #f5f7ff;
+  line-height: 1.2;
 }
 
-.muted {
-  color: #9aa0a6;
-  font-size: 0.95rem;
-}
-
-.headerActions {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
-.headerButtons {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.primaryButton,
-.secondaryButton,
-.ghostButton,
-.secondaryButton:link,
-.secondaryButton:visited,
-.primaryButton:link,
-.primaryButton:visited,
-.ghostButton:link,
-.ghostButton:visited {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  border-radius: 999px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.primaryButton {
-  background: linear-gradient(135deg, #ff6f91, #ff9671);
-  color: #101015;
-  border: none;
-}
-
-.secondaryButton {
-  background: rgba(255, 255, 255, 0.08);
-  color: #f7f7fa;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.ghostButton {
-  background: transparent;
-  color: #ff9fb0;
-  border: 1px solid rgba(255, 159, 176, 0.4);
-}
-
-.primaryButton:hover,
-.secondaryButton:hover,
-.ghostButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-}
-
-.grid {
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.primaryCard {
-  grid-column: 1 / -1;
-}
-
-.card,
-.primaryCard > * {
-  background: rgba(15, 16, 24, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 1.25rem;
-  padding: 1.75rem;
-  display: grid;
-  gap: 1rem;
-}
-
-.cardTitle {
-  font-size: 1.25rem;
-  font-weight: 600;
+.heroDay {
   color: #f5f7ff;
 }
 
-.cardSubtitle {
+.heroDivider {
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 300;
+}
+
+.heroGestation {
+  color: #ff9671;
+  font-weight: 600;
+}
+
+.trimesterBadge {
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  background: rgba(255, 111, 145, 0.12);
+  color: #ff9fb0;
+  border: 1px solid rgba(255, 111, 145, 0.2);
+}
+
+/* Progress ring */
+.heroRight {
+  flex-shrink: 0;
+}
+
+.progressRing {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.ringSvg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ringTrack {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 8;
+}
+
+.ringFill {
+  fill: none;
+  stroke: url(#ringGradient);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+  stroke: #ff6f91;
+}
+
+.ringLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ringPct {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #f5f7ff;
+  line-height: 1;
+}
+
+.ringCaption {
+  font-size: 0.65rem;
+  color: #9aa0a6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* ---- Stat strip ---- */
+.statStrip {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 2rem;
+  border-radius: 1rem;
+  background: rgba(15, 16, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-x: auto;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f5f7ff;
+  white-space: nowrap;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  color: #9aa0a6;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.statDivider {
+  width: 1px;
+  height: 2rem;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+/* ---- Card grid ---- */
+.grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+.card {
+  background: rgba(15, 16, 24, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardTitle {
   font-size: 1rem;
   font-weight: 600;
   color: #f5f7ff;
 }
 
+.cardBadge {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  color: #9aa0a6;
+  white-space: nowrap;
+}
+
+.editButton {
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d0d3dc;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.editButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ---- Today's update ---- */
+.updateBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.updateSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.updateLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #ff9fb0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.updateText {
+  font-size: 0.92rem;
+  color: #d0d3dc;
+  line-height: 1.55;
+}
+
+.tipText {
+  padding: 0.85rem 1rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 150, 113, 0.08);
+  border-left: 3px solid rgba(255, 150, 113, 0.5);
+  font-size: 0.85rem;
+  color: #d0d3dc;
+  line-height: 1.5;
+}
+
+.references {
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.referencesLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9aa0a6;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.references ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1rem;
+  list-style: none;
+}
+
+.references li {
+  font-size: 0.82rem;
+}
+
+.references a {
+  color: #7eb8ff;
+  text-decoration: none;
+}
+
+.references a:hover {
+  text-decoration: underline;
+}
+
+/* ---- Baby preview ---- */
 .previewPlaceholder {
-  height: 220px;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  height: 200px;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
 .previewFrame {
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .previewImage {
@@ -132,95 +319,92 @@
   display: block;
 }
 
-.sources ul {
-  margin: 0.5rem 0 0;
-  padding-left: 1.25rem;
-  color: #c9cedb;
-}
-
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem;
-  border-radius: 0.85rem;
-  background: rgba(255, 255, 255, 0.06);
-  color: #f7f7fa;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.action:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.progress {
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-
-.progressBar {
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(135deg, #ff6f91, #ff9671);
-}
-
-.summaryCard {
-  display: grid;
-  gap: 1.25rem;
-}
-
-.summaryHeader {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
-}
-
-.feedback {
-  color: #7ce5b1;
-  font-size: 0.9rem;
-}
-
-.summaryActions {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.summaryList {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.summaryList div {
-  display: grid;
-  gap: 0.25rem;
-}
-
-.summaryList dt {
-  font-size: 0.9rem;
+.previewCaption {
+  font-size: 0.78rem;
   color: #9aa0a6;
+  text-align: center;
 }
 
-.summaryList dd {
-  font-size: 1.05rem;
-  color: #f7f7fa;
+/* ---- Timeline card ---- */
+.timelineList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
   margin: 0;
 }
 
-.onboardingCard {
+.timelineItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.timelineItem dt {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #9aa0a6;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.timelineItem dd {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f5f7ff;
+  margin: 0;
+}
+
+.feedback {
+  font-size: 0.85rem;
+  color: #7ce5b1;
+}
+
+/* ---- Quick actions ---- */
+.quickActions {
   display: grid;
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.quickAction {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.quickAction:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.quickActionIcon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.quickActionLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #d0d3dc;
+}
+
+/* ---- Shared ---- */
+.muted {
+  color: #9aa0a6;
+  font-size: 0.88rem;
+}
+
+.skeletonBlock {
+  height: 80px;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.04);
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
@@ -233,16 +417,61 @@
   }
 }
 
+/* ---- Responsive ---- */
 @media (max-width: 768px) {
   .dashboard {
-    padding: 2rem 1.5rem 3rem;
+    padding: 1.5rem 1rem 2rem;
+    gap: 1.25rem;
   }
 
-  .headerButtons {
-    flex-wrap: wrap;
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .heroHeadline {
+    font-size: 1.5rem;
+  }
+
+  .heroRight {
+    align-self: center;
+  }
+
+  .statStrip {
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .stat {
+    min-width: max-content;
+  }
+
+  .statValue {
+    font-size: 0.9rem;
   }
 
   .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .timelineList {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .quickActions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .quickActions {
+    grid-template-columns: 1fr;
+  }
+
+  .timelineList {
     grid-template-columns: 1fr;
   }
 }
