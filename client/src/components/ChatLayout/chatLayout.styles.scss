@@ -1,0 +1,96 @@
+/* ============================================================
+   ChatLayout — two-panel wrapper (sidebar + chat panel)
+   ============================================================ */
+
+.chatLayout {
+  --bg: #08090c;
+  --border: rgba(255, 255, 255, 0.07);
+
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  position: relative;
+}
+
+/* ---- Sidebar ---- */
+.chatLayout__sidebar {
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* ---- Chat panel ---- */
+.chatLayout__panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---- Mobile menu toggle button ---- */
+.chatLayout__menuBtn {
+  display: none;
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 110;
+  width: 36px;
+  height: 36px;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: rgba(18, 19, 26, 0.9);
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  place-items: center;
+  backdrop-filter: blur(8px);
+  transition: background 0.12s, color 0.12s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* ---- Mobile overlay ---- */
+.chatLayout__overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .chatLayout__menuBtn {
+    display: grid;
+  }
+
+  .chatLayout__sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+  }
+
+  .chatLayout--sidebarOpen {
+    .chatLayout__sidebar {
+      transform: translateX(0);
+    }
+
+    .chatLayout__overlay {
+      display: block;
+    }
+  }
+
+  .chatLayout__panel {
+    // Slight top padding to clear the menu button on mobile
+    padding-top: 3rem;
+  }
+}

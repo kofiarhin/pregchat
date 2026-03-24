@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { FiCopy, FiCheck, FiSend } from "react-icons/fi";
+import { useQueryClient } from "@tanstack/react-query";
 import useChatMutation from "../../hooks/useChatMutation";
+import { useMessagesQuery } from "../../features/messages/hooks/useMessagesQuery";
+import { messagesKeys } from "../../features/messages/queryKeys";
+import { useChatSession } from "../../features/chats/context/ChatSessionContext";
 import "./chatBox.styles.scss";
 
 const SUGGESTIONS = [
@@ -24,11 +28,46 @@ const SUGGESTIONS = [
   },
 ];
 
-const ChatBox = ({ dayData }) => {
+const ChatBox = ({ dayData, conversationId, onNewThread }) => {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
-  const { mutate, isPending } = useChatMutation();
+
+  const queryClient = useQueryClient();
+  const context = useChatSession();
+
+  // Register setMessages with ChatSessionContext so ChatLayout can clear it on thread switch
+  useEffect(() => {
+    context.setMessagesSetter(setMessages);
+    return () => context.setMessagesSetter(null);
+  }, [context]);
+
+  // Fetch messages from server when a thread is active
+  const { data: messagesData } = useMessagesQuery(
+    { chatId: conversationId, page: 0 },
+    { enabled: Boolean(conversationId) }
+  );
+
+  // Seed local state from server data on initial load or after messages are cleared
+  useEffect(() => {
+    if (messages.length > 0) return;
+    const serverMessages = messagesData?.messages ?? [];
+    if (serverMessages.length === 0) return;
+    const seeded = serverMessages.map((m) => ({
+      role: m.role,
+      text: m.content,
+      time: m.timestamp
+        ? new Date(m.timestamp).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "",
+    }));
+    setMessages(seeded);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messagesData, messages.length]);
+
+  const { mutate, isPending } = useChatMutation({ onNewThread });
 
   const taRef = useRef(null);
   const endRef = useRef(null);
@@ -58,34 +97,68 @@ const ChatBox = ({ dayData }) => {
     e.preventDefault();
     if (!text.trim() || isPending) return;
 
+    const submittedText = text.trim();
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
     const userMsg = {
       role: "user",
-      text: text.trim(),
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      text: submittedText,
+      time: timeStr,
     };
 
     setMessages((prev) => [...prev, userMsg]);
     setText("");
 
     mutate(
-      { text: userMsg.text },
+      { text: submittedText, conversationId },
       {
-        onSuccess: (res) =>
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "system",
-              text: res?.content || "",
-              time: new Date().toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-            },
-          ]),
-      },
+        onSuccess: (res) => {
+          const assistantMsg = {
+            role: "assistant",
+            text: res?.content || "",
+            time: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          };
+
+          setMessages((prev) => [...prev, assistantMsg]);
+
+          // Write completed exchange to React Query cache to keep it in sync.
+          // Only update when we have a known conversationId — the fallback
+          // auto-create path will get the correct cache populated on the next
+          // useMessagesQuery fetch once activeThreadId is set.
+          if (conversationId) {
+            const cacheNow = new Date().toISOString();
+            queryClient.setQueryData(
+              messagesKeys.list({ chatId: conversationId, page: 0 }),
+              (existing) => {
+                if (!existing) return existing;
+                const userCacheMsg = {
+                  id: `${Date.now()}-u`,
+                  role: "user",
+                  content: submittedText,
+                  timestamp: cacheNow,
+                };
+                const asstCacheMsg = {
+                  id: `${Date.now()}-a`,
+                  role: "assistant",
+                  content: res?.content || "",
+                  timestamp: cacheNow,
+                };
+                return {
+                  ...existing,
+                  messages: [...(existing.messages || []), userCacheMsg, asstCacheMsg],
+                };
+              }
+            );
+          }
+        },
+      }
     );
   };
 
@@ -100,19 +173,31 @@ const ChatBox = ({ dayData }) => {
     taRef.current?.focus();
   };
 
+  const showWelcome = !conversationId || messages.length === 0;
+
   return (
     <div className="chat">
       <main className="chat__viewport" ref={viewportRef} aria-live="polite">
-        {messages.length === 0 ? (
+        {showWelcome ? (
           <div className="chat__welcome">
             <div className="chat__welcomeIcon" aria-hidden="true">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
             <h2 className="chat__welcomeTitle">Chat with Aya</h2>
             <p className="chat__welcomeText">
-              Your pregnancy wellness assistant. Ask about symptoms, nutrition, milestones, or anything on your mind.
+              Your pregnancy wellness assistant. Ask about symptoms, nutrition,
+              milestones, or anything on your mind.
             </p>
             <div className="chat__suggestions">
               {SUGGESTIONS.map((s) => (

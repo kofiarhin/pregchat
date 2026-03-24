@@ -39,3 +39,31 @@ export const saveChatsToStorage = (updater) => {
 };
 
 export const generateChatId = () => `${Date.now()}-${Math.round(Math.random() * 1000)}`;
+
+// ── Active thread persistence ─────────────────────────────────────────────────
+// Keyed per user so switching accounts never bleeds state.
+
+const activeThreadKey = (userId) => `pregchat:activeThreadId:${userId}`;
+
+export const saveActiveThreadId = (userId, threadId) => {
+  if (!isBrowser() || !userId) return;
+  try {
+    if (threadId) {
+      window.localStorage.setItem(activeThreadKey(userId), threadId);
+    } else {
+      window.localStorage.removeItem(activeThreadKey(userId));
+    }
+  } catch (error) {
+    console.error("Failed to persist activeThreadId", error);
+  }
+};
+
+export const loadActiveThreadId = (userId) => {
+  if (!isBrowser() || !userId) return null;
+  try {
+    return window.localStorage.getItem(activeThreadKey(userId)) || null;
+  } catch (error) {
+    console.error("Failed to read activeThreadId from storage", error);
+    return null;
+  }
+};

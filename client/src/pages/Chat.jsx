@@ -1,17 +1,10 @@
-import ChatBox from "../components/ChatBox/ChatBox.jsx";
+import ChatLayout from "../components/ChatLayout/ChatLayout.jsx";
 import { useTodayPregnancyQuery } from "../features/pregnancy/hooks/usePregnancy.js";
-import "../components/ChatBox/chatBox.styles.scss";
 
 const Chat = () => {
-  const { data: todaySummary } = useTodayPregnancyQuery({
-    enabled: true,
-  });
+  const { data: todaySummary } = useTodayPregnancyQuery({ enabled: true });
 
-  return (
-    <div className="chat-container">
-      <ChatBox dayData={todaySummary} />
-    </div>
-  );
+  return <ChatLayout dayData={todaySummary} />;
 };
 
 export default Chat;

@@ -7,6 +7,10 @@ const conversationSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    title: {
+      type: String,
+      default: "",
+    },
     messages: [
       {
         role: {
@@ -30,7 +34,7 @@ const conversationSchema = new mongoose.Schema(
   }
 );
 
-// Index for efficient queries
-conversationSchema.index({ userId: 1, createdAt: -1 });
+// Index for efficient queries — sorted by updatedAt desc for restore/fallback
+conversationSchema.index({ userId: 1, updatedAt: -1 });
 
 module.exports = mongoose.model("Conversation", conversationSchema);

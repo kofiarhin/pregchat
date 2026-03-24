@@ -8,6 +8,7 @@ const DailyContent = require("../models/DailyContent");
 const DEFAULT_PAGE = 0;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
+const AUTO_TITLE_MAX_CHARS = 60;
 
 const parsePage = (value) => {
   const parsed = Number.parseInt(value, 10);
@@ -25,25 +26,112 @@ const parseLimit = (value) => {
   return DEFAULT_LIMIT;
 };
 
+const buildAutoTitle = (text) => {
+  if (!text || typeof text !== "string") return "";
+  const trimmed = text.trim();
+  if (trimmed.length <= AUTO_TITLE_MAX_CHARS) return trimmed;
+  return trimmed.slice(0, AUTO_TITLE_MAX_CHARS) + "…";
+};
+
+const formatConversation = (conv) => ({
+  id: conv._id,
+  title: conv.title || "",
+  updatedAt: conv.updatedAt,
+  createdAt: conv.createdAt,
+});
+
+// ── Management handlers ───────────────────────────────────────────────────────
+
+const createConversation = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { title = "" } = req.body || {};
+
+    if (typeof title === "string" && title.length > 120) {
+      return res.status(400).json({ error: "Title must be 120 characters or fewer" });
+    }
+
+    const conversation = await Conversation.create({ userId, title: title || "" });
+
+    return res.status(201).json(formatConversation(conversation));
+  } catch (error) {
+    console.error("Create conversation error:", error);
+    return res.status(500).json({ error: "Failed to create conversation" });
+  }
+};
+
+const updateConversation = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { conversationId } = req.params;
+    const { title } = req.body || {};
+
+    if (!title || typeof title !== "string" || !title.trim()) {
+      return res.status(400).json({ error: "Title is required" });
+    }
+
+    if (title.length > 120) {
+      return res.status(400).json({ error: "Title must be 120 characters or fewer" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(conversationId)) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    const conversation = await Conversation.findOneAndUpdate(
+      { _id: conversationId, userId },
+      { title: title.trim() },
+      { new: true }
+    );
+
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    return res.json(formatConversation(conversation));
+  } catch (error) {
+    console.error("Update conversation error:", error);
+    return res.status(500).json({ error: "Failed to update conversation" });
+  }
+};
+
+const deleteConversation = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { conversationId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(conversationId)) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    const conversation = await Conversation.findOneAndDelete({ _id: conversationId, userId });
+
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Delete conversation error:", error);
+    return res.status(500).json({ error: "Failed to delete conversation" });
+  }
+};
+
+// ── Existing handlers (updated) ───────────────────────────────────────────────
+
 const getConversations = async (req, res) => {
   try {
     const userId = req.user._id;
-    const conversations = await Conversation.find({ userId }).sort({
-      updatedAt: -1,
-    });
+    const conversations = await Conversation.find({ userId })
+      .sort({ updatedAt: -1 })
+      .lean();
 
-    // Map to the expected format
-    const chats = conversations.map((conv) => ({
-      id: conv._id,
-      title: "Pregnancy Assistant", // Default title since model doesn't have title
-      updatedAt: conv.updatedAt,
-      createdAt: conv.createdAt,
-    }));
+    const chats = conversations.map(formatConversation);
 
-    res.json(chats);
+    return res.json(chats);
   } catch (error) {
     console.error("Get conversations error:", error);
-    res.status(500).json({ error: "Failed to fetch conversations" });
+    return res.status(500).json({ error: "Failed to fetch conversations" });
   }
 };
 
@@ -52,6 +140,7 @@ const ask = async (req, res) => {
     const {
       message,
       text: textPayload,
+      conversationId: conversationIdPayload,
       stream: streamPayload = false,
     } = req.body || {};
 
@@ -80,6 +169,25 @@ const ask = async (req, res) => {
 
     const userId = req.user._id;
 
+    // Resolve conversation document
+    let conversation;
+
+    if (conversationIdPayload) {
+      if (!mongoose.Types.ObjectId.isValid(conversationIdPayload)) {
+        return res.status(400).json({ error: "Invalid conversationId" });
+      }
+      conversation = await Conversation.findOne({ _id: conversationIdPayload, userId });
+      if (!conversation) {
+        return res.status(404).json({ error: "Conversation not found" });
+      }
+    } else {
+      // Fallback: auto-create a new thread
+      conversation = await Conversation.create({
+        userId,
+        title: buildAutoTitle(text),
+      });
+    }
+
     // Get user's pregnancy profile for day context
     const pregnancy = await Pregnancy.findOne({ userId });
     let dayData = null;
@@ -100,29 +208,18 @@ const ask = async (req, res) => {
 
     // Check for red flags
     if (triageCheck(text)) {
-      // Log the flag
-      await Flag.create({
-        userId,
-        text,
-        reason: "red_flag",
-      });
-
+      await Flag.create({ userId, text, reason: "red_flag" });
       return res.json({
         triage: true,
         message: getTriageMessage(req.user.region),
+        conversationId: conversation._id,
       });
     }
 
     // Get AI response
-    const result = await askAya({
-      text,
-      region: req.user.region,
-      dayData,
-      stream,
-    });
+    const result = await askAya({ text, region: req.user.region, dayData, stream });
 
     if (stream) {
-      // Handle streaming response
       res.setHeader("Content-Type", "text/plain");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
@@ -136,29 +233,21 @@ const ask = async (req, res) => {
       }
       res.end();
     } else {
-      // Save conversation
-      await Conversation.findOneAndUpdate(
-        { userId },
-        {
-          $push: {
-            messages: [
-              { role: "user", content: text, timestamp: new Date() },
-              {
-                role: "assistant",
-                content: result.content,
-                timestamp: new Date(),
-              },
-            ],
-          },
+      // Persist messages to the resolved conversation
+      await Conversation.findByIdAndUpdate(conversation._id, {
+        $push: {
+          messages: [
+            { role: "user", content: text, timestamp: new Date() },
+            { role: "assistant", content: result.content, timestamp: new Date() },
+          ],
         },
-        { upsert: true, new: true }
-      );
+      });
 
-      res.json({ content: result.content });
+      return res.json({ content: result.content, conversationId: conversation._id });
     }
   } catch (error) {
     console.error("Chat error:", error);
-    res.status(500).json({ error: "Failed to process chat request" });
+    return res.status(500).json({ error: "Failed to process chat request" });
   }
 };
 
@@ -209,7 +298,7 @@ const getConversationMessages = async (req, res) => {
       limit,
       chat: {
         id: conversation._id.toString(),
-        title: "Pregnancy Assistant",
+        title: conversation.title || "",
         createdAt: conversation.createdAt,
         updatedAt: conversation.updatedAt,
       },
@@ -230,4 +319,7 @@ module.exports = {
   ask,
   getConversations,
   getConversationMessages,
+  createConversation,
+  updateConversation,
+  deleteConversation,
 };

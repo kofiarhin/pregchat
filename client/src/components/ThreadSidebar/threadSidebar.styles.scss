@@ -1,0 +1,134 @@
+/* ============================================================
+   ThreadSidebar — left panel listing all conversation threads
+   ============================================================ */
+
+.threadSidebar {
+  --bg-sidebar: #0b0c10;
+  --border: rgba(255, 255, 255, 0.07);
+  --text: rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(255, 255, 255, 0.45);
+  --accent: #ff6f91;
+  --accent-soft: rgba(255, 111, 145, 0.12);
+
+  width: 260px;
+  min-width: 260px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* ---- Header ---- */
+.threadSidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0.85rem 0.65rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.threadSidebar__heading {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.threadSidebar__newBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 111, 145, 0.3);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, opacity 0.12s;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 111, 145, 0.18);
+    border-color: rgba(255, 111, 145, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+/* ---- Thread list ---- */
+.threadSidebar__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0.5rem;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+  }
+}
+
+/* ---- Empty / error states ---- */
+.threadSidebar__empty,
+.threadSidebar__error {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  padding: 1.25rem 0.5rem;
+  text-align: center;
+}
+
+.threadSidebar__empty {
+  color: var(--text-secondary);
+}
+
+.threadSidebar__error {
+  color: rgba(255, 100, 100, 0.8);
+}
+
+/* ---- Loading skeleton ---- */
+.threadSidebar__skeleton {
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.6rem;
+  margin-bottom: 0.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.threadSidebar__skeletonTitle,
+.threadSidebar__skeletonTime {
+  border-radius: 0.3rem;
+  background: rgba(255, 255, 255, 0.06);
+  animation: sidebarPulse 1.4s ease-in-out infinite;
+}
+
+.threadSidebar__skeletonTitle {
+  height: 11px;
+  width: 75%;
+}
+
+.threadSidebar__skeletonTime {
+  height: 9px;
+  width: 35%;
+  animation-delay: 0.1s;
+}
+
+@keyframes sidebarPulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.7; }
+}
