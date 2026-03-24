@@ -1,11 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./avatarDropdown.styles.module.scss";
-import { useChatMessages } from "../features/messages/hooks/useChatMessages.js";
+import { useLogoutMutation } from "../features/auth/hooks/useAuth.js";
 
-const AvatarDropdown = ({ avatar, userId }) => {
+const AvatarDropdown = ({ avatar }) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
-  const { clearMessages, isClearing } = useChatMessages();
+  const navigate = useNavigate();
+  const { mutate: logout, isPending: isLoggingOut } = useLogoutMutation({
+    onSuccess: () => navigate("/login"),
+  });
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -18,14 +22,9 @@ const AvatarDropdown = ({ avatar, userId }) => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const handleReset = async () => {
-    const confirmed = window.confirm("Clear this chat history?");
-    if (!confirmed) {
-      return;
-    }
-
-    await clearMessages(userId);
+  const handleLogout = () => {
     setOpen(false);
+    logout();
   };
 
   return (
@@ -47,11 +46,11 @@ const AvatarDropdown = ({ avatar, userId }) => {
             className={styles.dangerItem}
             type="button"
             role="menuitem"
-            onClick={handleReset}
-            disabled={isClearing}
-            title={isClearing ? "Clearing..." : "Reset Chat"}
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            title={isLoggingOut ? "Signing out..." : "Logout"}
           >
-            {isClearing ? "Clearing..." : "Reset Chat"}
+            {isLoggingOut ? "Signing out..." : "Logout"}
           </button>
         </div>
       )}
