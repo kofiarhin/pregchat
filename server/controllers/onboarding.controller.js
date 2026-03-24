@@ -66,11 +66,6 @@ const upsertMyDetails = async (req, res) => {
       { new: true, upsert: true, setDefaultsOnInsert: true }
     ).lean();
 
-    if (!req.user.onboardingCompletedAt) {
-      req.user.onboardingCompletedAt = new Date();
-      await req.user.save();
-    }
-
     return res.json(formatDetails(details));
   } catch (error) {
     return res.status(500).json({ error: "Failed to save onboarding details." });

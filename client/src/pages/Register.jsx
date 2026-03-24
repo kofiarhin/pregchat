@@ -22,9 +22,10 @@ const Register = () => {
   });
 
   const registerMutation = useRegisterMutation({
-    onSuccess: () => {
-      navigate("/onboarding", { replace: true });
-    },
+    onSuccess: ({ user }) =>
+      navigate(user?.onboardingCompletedAt ? "/dashboard" : "/onboarding", {
+        replace: true,
+      }),
   });
 
   const handleChange = (event) => {

@@ -33,7 +33,7 @@ import JournalForm from "./pages/JournalForm.jsx";
 import JournalDetail from "./pages/JournalDetail.jsx";
 import VoiceScreen from "./pages/VoiceScreen.jsx";
 
-const AppShell = ({ isAuthenticated }) => {
+const AppShell = ({ isAuthenticated, currentUser }) => {
   return (
     <Routes>
       <Route element={<PublicLayout />}>
@@ -47,7 +47,7 @@ const AppShell = ({ isAuthenticated }) => {
           element={
             <PublicOnlyRoute
               isAuthenticated={isAuthenticated}
-              redirectTo="/dashboard"
+              currentUser={currentUser}
             />
           }
         >
@@ -123,7 +123,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <AppShell isAuthenticated={isAuthenticated} />
+      <AppShell isAuthenticated={isAuthenticated} currentUser={currentUser} />
     </BrowserRouter>
   );
 };

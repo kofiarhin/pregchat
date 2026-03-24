@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCurrentUserQuery } from "../../features/auth/hooks/useAuth.js";
 import content from "../../content/appContent.json";
 import PregnancyDetailsForm from "../../components/PregnancyDetailsForm.jsx";
 import UserDetailsForm from "../../components/UserDetailsForm.jsx";
@@ -15,6 +16,7 @@ const TOTAL_STEPS = 3;
 const Onboarding = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { data: currentUser } = useCurrentUserQuery();
   const formCopy = content.forms?.pregnancyDetails ?? {};
   const steps = content.onboarding?.steps ?? {};
 
@@ -63,8 +65,14 @@ const Onboarding = () => {
   };
 
   const handleFinish = () => {
+    queryClient.invalidateQueries({ queryKey: authKeys.user() });
     navigate("/dashboard", { replace: true });
   };
+
+  // Reverse guard: completed users should not re-visit onboarding
+  if (currentUser?.onboardingCompletedAt) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
     <main className={styles.page}>

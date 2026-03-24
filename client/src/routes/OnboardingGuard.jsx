@@ -4,7 +4,7 @@ import { useCurrentUserQuery } from "../features/auth/hooks/useAuth.js";
 const OnboardingGuard = () => {
   const { data: currentUser } = useCurrentUserQuery();
 
-  if (!currentUser) return null;
+  if (!currentUser) return <div className="loading" />;
 
   if (!currentUser.onboardingCompletedAt) {
     return <Navigate to="/onboarding" replace />;
