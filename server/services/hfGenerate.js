@@ -18,7 +18,7 @@ const generateImageBuffer = async (prompt) => {
     options: { wait_for_model: true },
   });
 
-  const maxAttempts = 2;
+  const maxAttempts = 5;
   let attempt = 0;
   let lastError = null;
 
@@ -43,7 +43,9 @@ const generateImageBuffer = async (prompt) => {
       error.payload = errorPayload;
 
       if (response.status === 503 && attempt + 1 < maxAttempts) {
-        await sleep(500 * (attempt + 1));
+        const backoff = Math.min(2000 * 2 ** attempt, 30000);
+        console.log(`HF model loading (attempt ${attempt + 1}/${maxAttempts}), retrying in ${backoff}ms...`);
+        await sleep(backoff);
         attempt += 1;
         lastError = error;
         continue;
@@ -60,7 +62,8 @@ const generateImageBuffer = async (prompt) => {
       }
 
       lastError = error;
-      await sleep(500 * (attempt + 1));
+      const backoff = Math.min(2000 * 2 ** attempt, 30000);
+      await sleep(backoff);
       attempt += 1;
     }
   }

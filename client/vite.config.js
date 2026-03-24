@@ -7,7 +7,7 @@ const BACKEND_TARGET =
 
 const createProxyConfig = () => {
   // ❌ remove "/chat" — client-side route
-  const routes = ["/api", "/auth", "/updates", "/admin"];
+  const routes = ["/api", "/auth", "/updates", "/admin", "/static"];
   return routes.reduce((config, route) => {
     config[route] = {
       target: BACKEND_TARGET,

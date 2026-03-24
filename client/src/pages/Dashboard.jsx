@@ -124,7 +124,10 @@ const Dashboard = () => {
       };
     },
     enabled: hasProfile,
-    retry: 1,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(5000 * 2 ** attempt, 30000),
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60 * 24,
   });
 
   const updateMutation = useUpdatePregnancyProfileMutation({
