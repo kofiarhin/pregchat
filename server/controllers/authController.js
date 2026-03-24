@@ -79,8 +79,38 @@ const me = async (req, res) =>
     user: buildUserResponse(req.user),
   });
 
+const updateMe = async (req, res) => {
+  try {
+    const allowed = ["name", "region"];
+    const updates = {};
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) {
+        updates[key] = req.body[key];
+      }
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: "No valid fields to update" });
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json({ user: buildUserResponse(user) });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   register,
   login,
   me,
+  updateMe,
 };

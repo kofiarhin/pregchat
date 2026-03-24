@@ -116,6 +116,32 @@ export const useRegisterMutation = (options = {}) => {
   });
 };
 
+export const useUpdateUserMutation = (options = {}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updates) => {
+      const response = await http.patch("/auth/me", { json: updates });
+      const user = extractUser(response);
+      saveStoredUser(user);
+      return user;
+    },
+    onSuccess: (user) => {
+      queryClient.setQueryData(authKeys.user(), user);
+      options.onSuccess?.(user);
+    },
+    onError: (error) => {
+      store.dispatch(
+        enqueueToast({
+          message: error?.message || "Failed to update profile",
+          tone: "error",
+        })
+      );
+      options.onError?.(error);
+    },
+  });
+};
+
 export const useLogoutMutation = (options = {}) => {
   const queryClient = useQueryClient();
 
