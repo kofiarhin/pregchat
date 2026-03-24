@@ -3,12 +3,12 @@
    ============================================================ */
 
 .threadSidebar {
-  --bg-sidebar: #0b0c10;
-  --border: rgba(255, 255, 255, 0.07);
-  --text: rgba(255, 255, 255, 0.92);
-  --text-secondary: rgba(255, 255, 255, 0.45);
-  --accent: #ff6f91;
-  --accent-soft: rgba(255, 111, 145, 0.12);
+  --bg-sidebar: var(--color-surface, #111118);
+  --border: var(--color-border, rgba(255, 255, 255, 0.08));
+  --text: var(--color-text, #ededf0);
+  --text-secondary: var(--color-text-muted, #8b8b9e);
+  --accent: var(--color-accent, #a78bfa);
+  --accent-soft: var(--color-accent-soft, rgba(167, 139, 250, 0.12));
 
   width: 260px;
   min-width: 260px;
@@ -44,7 +44,7 @@
   gap: 0.3rem;
   padding: 0.35rem 0.65rem;
   border-radius: 0.5rem;
-  border: 1px solid rgba(255, 111, 145, 0.3);
+  border: 1px solid rgba(167, 139, 250, 0.3);
   background: var(--accent-soft);
   color: var(--accent);
   font-size: 0.78rem;
@@ -55,8 +55,8 @@
   white-space: nowrap;
 
   &:hover:not(:disabled) {
-    background: rgba(255, 111, 145, 0.18);
-    border-color: rgba(255, 111, 145, 0.5);
+    background: rgba(167, 139, 250, 0.18);
+    border-color: rgba(167, 139, 250, 0.5);
   }
 
   &:disabled {
@@ -97,7 +97,7 @@
 }
 
 .threadSidebar__error {
-  color: rgba(255, 100, 100, 0.8);
+  color: rgba(239, 68, 68, 0.8);
 }
 
 /* ---- Loading skeleton ---- */

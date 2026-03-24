@@ -3,10 +3,10 @@
    ============================================================ */
 
 .chatLayout {
-  --bg: #08090c;
-  --border: rgba(255, 255, 255, 0.07);
-  --accent: #ff6f91;
-  --accent-soft: rgba(255, 111, 145, 0.12);
+  --bg: var(--color-bg, #0a0a0f);
+  --border: var(--color-border, rgba(255, 255, 255, 0.08));
+  --accent: var(--color-accent, #a78bfa);
+  --accent-soft: var(--color-accent-soft, rgba(167, 139, 250, 0.12));
 
   display: flex;
   height: calc(100vh - 56px);
@@ -58,7 +58,7 @@
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
     border-bottom: 1px solid var(--border);
-    background: rgba(11, 12, 16, 0.95);
+    background: var(--color-surface, #111118);
     flex-shrink: 0;
     z-index: 10;
   }

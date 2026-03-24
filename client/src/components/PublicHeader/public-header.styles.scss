@@ -2,9 +2,9 @@
   position: sticky;
   top: 0;
   z-index: 70;
-  background: rgba(8, 13, 31, 0.76);
+  background: rgba(10, 10, 15, 0.82);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(195, 201, 230, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .public-header-inner {
@@ -16,7 +16,7 @@
 
 .public-brand {
   text-decoration: none;
-  color: #f4f1ff;
+  color: #ededf0;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
@@ -28,8 +28,8 @@
   width: 0.7rem;
   height: 0.7rem;
   border-radius: 999px;
-  background: radial-gradient(circle at 25% 25%, #f8d7b3 0%, #c89df3 70%);
-  box-shadow: 0 0 14px rgba(219, 177, 255, 0.7);
+  background: radial-gradient(circle at 25% 25%, #c4b5fd 0%, #a78bfa 70%);
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.5);
 }
 
 .public-nav {
@@ -40,7 +40,7 @@
 
 .public-nav-link {
   text-decoration: none;
-  color: #d5d9ef;
+  color: #8b8b9e;
   font-size: 0.9rem;
   padding: 0.45rem 0.86rem;
   border-radius: 999px;
@@ -49,43 +49,43 @@
 }
 
 .public-nav-link:hover {
-  background: rgba(220, 226, 250, 0.08);
-  color: #f4f5ff;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ededf0;
 }
 
 .public-nav-link.active {
-  border-color: rgba(208, 183, 237, 0.36);
-  background: rgba(198, 168, 234, 0.15);
-  color: #fff;
+  border-color: rgba(167, 139, 250, 0.3);
+  background: rgba(167, 139, 250, 0.1);
+  color: #ededf0;
 }
 
 .public-nav-subtle {
-  color: #bcc2dd;
+  color: #8b8b9e;
 }
 
 .public-nav-cta {
-  border: 1px solid rgba(255, 208, 158, 0.46);
-  background: linear-gradient(140deg, #d5b3fb 0%, #f2c792 100%);
-  color: #201833;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  background: #a78bfa;
+  color: #0a0a0f;
   font-weight: 600;
 }
 
 .public-nav-cta:hover {
-  background: linear-gradient(140deg, #e0c4ff 0%, #f6d4aa 100%);
-  color: #1f1732;
+  background: #c4b5fd;
+  color: #0a0a0f;
 }
 
 .public-nav-cta.active {
-  border-color: rgba(255, 214, 169, 0.8);
+  border-color: rgba(167, 139, 250, 0.8);
 }
 
 .public-menu-btn {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  border: 1px solid rgba(201, 207, 233, 0.23);
-  background: rgba(197, 204, 230, 0.07);
-  color: #f2f4ff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ededf0;
   display: grid;
   place-items: center;
 }
@@ -93,7 +93,7 @@
 .public-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(3, 7, 18, 0.55);
+  background: rgba(0, 0, 0, 0.55);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
@@ -111,8 +111,8 @@
   width: min(310px, 88vw);
   height: 100vh;
   padding: 1.8rem 1.1rem;
-  background: #0f1733;
-  border-left: 1px solid rgba(200, 205, 231, 0.16);
+  background: #111118;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
   transform: translateX(100%);
   transition: transform 0.25s ease;
   z-index: 80;
@@ -123,7 +123,7 @@
 }
 
 .public-mobile-title {
-  color: #d4d9ef;
+  color: #8b8b9e;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.13em;
@@ -133,11 +133,11 @@
 .public-mobile-link {
   display: block;
   text-decoration: none;
-  color: #e1e4f5;
+  color: #ededf0;
   border-radius: 11px;
   padding: 0.72rem 0.84rem;
-  border: 1px solid rgba(200, 206, 233, 0.15);
-  background: rgba(198, 204, 231, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .public-mobile-link + .public-mobile-link {
@@ -145,12 +145,12 @@
 }
 
 .public-mobile-link.active {
-  border-color: rgba(210, 181, 243, 0.45);
-  background: rgba(201, 174, 233, 0.15);
+  border-color: rgba(167, 139, 250, 0.35);
+  background: rgba(167, 139, 250, 0.1);
 }
 
 .public-mobile-cta {
-  border-color: rgba(255, 210, 163, 0.52);
+  border-color: rgba(167, 139, 250, 0.4);
 }
 
 @media (min-width: 900px) {

@@ -3,13 +3,13 @@
    ============================================================ */
 
 .threadItem {
-  --accent: #ff6f91;
-  --accent-soft: rgba(255, 111, 145, 0.12);
-  --border: rgba(255, 255, 255, 0.07);
-  --text: rgba(255, 255, 255, 0.92);
-  --text-secondary: rgba(255, 255, 255, 0.5);
+  --accent: var(--color-accent, #a78bfa);
+  --accent-soft: var(--color-accent-soft, rgba(167, 139, 250, 0.12));
+  --border: var(--color-border, rgba(255, 255, 255, 0.08));
+  --text: var(--color-text, #ededf0);
+  --text-secondary: var(--color-text-muted, #8b8b9e);
   --surface-hover: rgba(255, 255, 255, 0.05);
-  --surface-active: rgba(255, 111, 145, 0.08);
+  --surface-active: rgba(167, 139, 250, 0.08);
 
   position: relative;
   display: flex;
@@ -32,7 +32,7 @@
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 2px rgba(255, 111, 145, 0.4);
+    box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.4);
   }
 
   &--active {
@@ -102,8 +102,8 @@
   }
 
   &--danger:hover {
-    background: rgba(255, 80, 80, 0.15);
-    color: #ff6060;
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
   }
 }
 
@@ -111,7 +111,7 @@
 .threadItem__renameInput {
   flex: 1;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 111, 145, 0.35);
+  border: 1px solid rgba(167, 139, 250, 0.35);
   border-radius: 0.4rem;
   padding: 0.3rem 0.5rem;
   color: var(--text);
@@ -121,7 +121,7 @@
   width: 100%;
 
   &:focus {
-    border-color: rgba(255, 111, 145, 0.6);
+    border-color: rgba(167, 139, 250, 0.6);
   }
 }
 
@@ -153,12 +153,12 @@
 }
 
 .threadItem__confirmBtn {
-  border-color: rgba(255, 80, 80, 0.4);
-  background: rgba(255, 80, 80, 0.1);
-  color: #ff7070;
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
 
   &:hover {
-    background: rgba(255, 80, 80, 0.2);
+    background: rgba(239, 68, 68, 0.2);
   }
 }
 

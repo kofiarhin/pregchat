@@ -4,12 +4,12 @@
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  background: radial-gradient(circle at top, #181818 0%, #090909 55%, #020202 100%);
+  background: radial-gradient(circle at top, #111118 0%, #0a0a0f 55%, #050508 100%);
 }
 
 .card {
   width: min(420px, 100%);
-  background: rgba(16, 16, 24, 0.9);
+  background: rgba(17, 17, 24, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1.25rem;
   padding: 2.5rem 2rem;
@@ -24,12 +24,12 @@
 .title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #f5f7ff;
+  color: #ededf0;
   margin-bottom: 0.5rem;
 }
 
 .subtitle {
-  color: #a0a5b4;
+  color: #8b8b9e;
   font-size: 0.95rem;
 }
 
@@ -46,28 +46,28 @@
 .label {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #d0d3dc;
+  color: #8b8b9e;
 }
 
 .input {
   width: 100%;
   padding: 0.75rem;
   border-radius: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(12, 12, 18, 0.85);
-  color: #f7f7fa;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 10, 15, 0.85);
+  color: #ededf0;
 }
 
 .input:focus-visible {
-  outline: 2px solid rgba(255, 111, 145, 0.75);
+  outline: 2px solid rgba(167, 139, 250, 0.75);
   outline-offset: 2px;
 }
 
 .error {
   padding: 0.75rem;
   border-radius: 0.75rem;
-  background: rgba(235, 87, 87, 0.1);
-  border: 1px solid rgba(235, 87, 87, 0.35);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   color: #ffd6d6;
   font-size: 0.85rem;
 }
@@ -79,8 +79,8 @@
   border: none;
   font-weight: 600;
   cursor: pointer;
-  background: linear-gradient(135deg, #ff6f91, #ff9671);
-  color: #101015;
+  background: #a78bfa;
+  color: #0a0a0f;
 }
 
 .submit:disabled {
@@ -91,12 +91,12 @@
 .cta {
   margin-top: 1.5rem;
   text-align: center;
-  color: #9aa0a6;
+  color: #8b8b9e;
   font-size: 0.9rem;
 }
 
 .link {
-  color: #4c8bf5;
+  color: #a78bfa;
   font-weight: 600;
 }
 

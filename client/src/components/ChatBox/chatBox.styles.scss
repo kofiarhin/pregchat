@@ -3,13 +3,13 @@
    ============================================================ */
 
 .chat {
-  --bg: #08090c;
-  --surface: rgba(18, 19, 26, 0.85);
-  --border: rgba(255, 255, 255, 0.07);
-  --text: rgba(255, 255, 255, 0.92);
-  --text-secondary: rgba(255, 255, 255, 0.55);
-  --accent: #ff6f91;
-  --accent-soft: rgba(255, 111, 145, 0.12);
+  --bg: var(--color-bg, #0a0a0f);
+  --surface: var(--color-surface, #111118);
+  --border: var(--color-border, rgba(255, 255, 255, 0.08));
+  --text: var(--color-text, #ededf0);
+  --text-secondary: var(--color-text-muted, #8b8b9e);
+  --accent: var(--color-accent, #a78bfa);
+  --accent-soft: var(--color-accent-soft, rgba(167, 139, 250, 0.12));
 
   min-height: 100vh;
   color: var(--text);
@@ -105,8 +105,8 @@
   transition: border-color 0.15s, background 0.15s;
 
   &:hover {
-    border-color: rgba(255, 111, 145, 0.3);
-    background: rgba(255, 111, 145, 0.06);
+    border-color: rgba(167, 139, 250, 0.3);
+    background: rgba(167, 139, 250, 0.06);
   }
 }
 
@@ -158,7 +158,7 @@
 .chat__avatar--aya {
   background: var(--accent-soft);
   color: var(--accent);
-  border: 1px solid rgba(255, 111, 145, 0.2);
+  border: 1px solid rgba(167, 139, 250, 0.2);
 }
 
 .chat__avatar--user {
@@ -182,8 +182,8 @@
 }
 
 .chat__row--user .chat__bubble {
-  background: rgba(255, 111, 145, 0.14);
-  border: 1px solid rgba(255, 111, 145, 0.2);
+  background: rgba(167, 139, 250, 0.14);
+  border: 1px solid rgba(167, 139, 250, 0.2);
   border-bottom-right-radius: 0.25rem;
 }
 
@@ -204,7 +204,7 @@
     color: var(--accent);
     text-decoration: underline;
     text-underline-offset: 2px;
-    text-decoration-color: rgba(255, 111, 145, 0.4);
+    text-decoration-color: rgba(167, 139, 250, 0.4);
   }
 
   ul,
@@ -219,7 +219,7 @@
   blockquote {
     margin: 0.6rem 0;
     padding: 0.6rem 0.85rem;
-    border-left: 3px solid rgba(255, 111, 145, 0.4);
+    border-left: 3px solid rgba(167, 139, 250, 0.4);
     background: rgba(0, 0, 0, 0.2);
     border-radius: 0 0.5rem 0.5rem 0;
     color: rgba(255, 255, 255, 0.85);
@@ -379,7 +379,7 @@
   transition: border-color 0.15s;
 
   &:focus-within {
-    border-color: rgba(255, 111, 145, 0.35);
+    border-color: rgba(167, 139, 250, 0.35);
   }
 }
 
@@ -412,7 +412,7 @@
   display: grid;
   place-items: center;
   background: var(--accent);
-  color: #fff;
+  color: #0a0a0f;
   cursor: pointer;
   transition: opacity 0.12s, transform 0.12s;
 

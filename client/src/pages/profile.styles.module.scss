@@ -4,12 +4,12 @@
   align-items: center;
   justify-content: center;
   padding: 2.5rem 1.5rem;
-  background: radial-gradient(circle at top, rgba(20, 20, 30, 0.85), #060608);
+  background: radial-gradient(circle at top, rgba(17, 17, 24, 0.85), #0a0a0f);
 }
 
 .card {
   width: min(480px, 100%);
-  background: rgba(16, 16, 24, 0.9);
+  background: rgba(17, 17, 24, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1.25rem;
   padding: 2.25rem;
@@ -27,15 +27,15 @@
 .title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #f5f7ff;
+  color: #ededf0;
 }
 
 .subtitle {
-  color: #9aa0a6;
+  color: #8b8b9e;
 }
 
 .muted {
-  color: #9aa0a6;
+  color: #8b8b9e;
   text-align: center;
 }
 
@@ -50,14 +50,14 @@
 }
 
 .list dt {
-  color: #9aa0a6;
+  color: #8b8b9e;
   font-size: 0.9rem;
 }
 
 .list dd {
   margin: 0;
   font-size: 1.05rem;
-  color: #f7f7fa;
+  color: #ededf0;
 }
 
 .form {
@@ -71,22 +71,22 @@
 }
 
 .label {
-  color: #9aa0a6;
+  color: #8b8b9e;
   font-size: 0.9rem;
 }
 
 .input {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0.5rem;
   padding: 0.65rem 0.75rem;
   font-size: 1rem;
-  color: #f7f7fa;
+  color: #ededf0;
   outline: none;
   transition: border-color 0.2s;
 
   &:focus {
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(167, 139, 250, 0.5);
   }
 
   &:disabled {
@@ -98,7 +98,7 @@
 select.input {
   appearance: none;
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239aa0a6' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238b8b9e' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   padding-right: 2rem;
@@ -120,7 +120,7 @@ select.input {
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;
-  background: #f5f7ff;
+  background: #a78bfa;
   color: #0a0a0f;
 
   &:hover {
@@ -136,18 +136,18 @@ select.input {
 .cancelBtn {
   flex: 1;
   padding: 0.7rem 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0.5rem;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;
   background: transparent;
-  color: #9aa0a6;
+  color: #8b8b9e;
 
   &:hover {
     opacity: 0.9;
-    border-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.15);
   }
 
   &:disabled {

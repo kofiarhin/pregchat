@@ -1,7 +1,7 @@
 .footer {
   margin-top: auto;
-  border-top: 1px solid rgba(193, 199, 225, 0.14);
-  background: #0a1024;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0a0a0f;
 }
 
 .footer-content {
@@ -13,14 +13,14 @@
 
 .footer-brand {
   font-size: 1.08rem;
-  color: #f6f4ff;
+  color: #ededf0;
   font-weight: 700;
 }
 
 .footer-text {
   margin-top: 0.55rem;
   max-width: 34ch;
-  color: #b8bed9;
+  color: #8b8b9e;
   font-size: 0.88rem;
 }
 
@@ -31,7 +31,7 @@
 }
 
 .footer-link-group p {
-  color: #d8dcf2;
+  color: #ededf0;
   margin-bottom: 0.45rem;
   font-size: 0.82rem;
   text-transform: uppercase;
@@ -41,7 +41,7 @@
 .footer-link-group a {
   display: block;
   text-decoration: none;
-  color: #c6cce6;
+  color: #8b8b9e;
   font-size: 0.87rem;
 }
 
@@ -50,11 +50,11 @@
 }
 
 .footer-link-group a:hover {
-  color: #f0f2ff;
+  color: #ededf0;
 }
 
 .app-footer {
-  background: #05070f;
+  background: #08080d;
 }
 
 @media (min-width: 900px) {
