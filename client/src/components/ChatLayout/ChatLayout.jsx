@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu, FiX, FiPlus, FiMessageSquare } from "react-icons/fi";
 import ChatSessionProvider, { useChatSession } from "../../features/chats/context/ChatSessionContext";
 import { useChatsQuery } from "../../features/chats/hooks/useChatsQuery";
+import { useCreateChatMutation } from "../../features/chats/hooks/useCreateChatMutation";
 import { chatsKeys } from "../../features/chats/queryKeys";
 import {
   loadActiveThreadId,
@@ -71,6 +72,19 @@ const ChatLayoutContent = ({ dayData }) => {
     [context, userId]
   );
 
+  // Listen for external "switch-thread" events (e.g. from AvatarDropdown "New Chat")
+  useEffect(() => {
+    const handler = (e) => {
+      const id = e.detail?.id;
+      if (id) {
+        setActiveThread(id);
+        queryClient.invalidateQueries({ queryKey: chatsKeys.list() });
+      }
+    };
+    window.addEventListener("pregchat:switch-thread", handler);
+    return () => window.removeEventListener("pregchat:switch-thread", handler);
+  }, [setActiveThread, queryClient]);
+
   // Called when ThreadSidebar's "New Chat" creates a thread via useCreateChatMutation.
   // The mutation already updates the chats cache, so no invalidation needed here.
   const handleNewThreadFromSidebar = useCallback(
@@ -99,6 +113,17 @@ const ChatLayoutContent = ({ dayData }) => {
     [setActiveThread]
   );
 
+  // Mobile "New Chat" via toolbar
+  const { mutate: createChat, isPending: isCreatingMobile } = useCreateChatMutation({
+    onSuccess: (chat) => {
+      if (chat?.id) {
+        setActiveThread(chat.id);
+      }
+    },
+  });
+
+  const handleMobileNewChat = () => createChat({});
+
   return (
     <div className={`chatLayout${sidebarOpen ? " chatLayout--sidebarOpen" : ""}`}>
       {/* Mobile overlay */}
@@ -110,16 +135,29 @@ const ChatLayoutContent = ({ dayData }) => {
         />
       )}
 
-      {/* Mobile toggle button */}
-      <button
-        type="button"
-        className="chatLayout__menuBtn"
-        onClick={() => setSidebarOpen((v) => !v)}
-        aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-        aria-expanded={sidebarOpen}
-      >
-        {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
-      </button>
+      {/* Mobile toolbar — visible only on small screens */}
+      <div className="chatLayout__mobileBar">
+        <button
+          type="button"
+          className="chatLayout__mobileBtn"
+          onClick={handleMobileNewChat}
+          disabled={isCreatingMobile}
+          aria-label="New chat"
+        >
+          <FiPlus size={16} />
+          <span>New Chat</span>
+        </button>
+        <button
+          type="button"
+          className="chatLayout__mobileBtn"
+          onClick={() => setSidebarOpen((v) => !v)}
+          aria-label="Chat history"
+          aria-expanded={sidebarOpen}
+        >
+          <FiMessageSquare size={16} />
+          <span>History</span>
+        </button>
+      </div>
 
       <div className="chatLayout__sidebar">
         <ThreadSidebar

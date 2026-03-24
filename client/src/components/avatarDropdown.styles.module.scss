@@ -32,6 +32,28 @@
   z-index: 50;
 }
 
+.menuItem {
+  background: transparent;
+  border: 1px solid #1f2937;
+  color: #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.menuItem:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.menuItem:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .dangerItem {
   background: transparent;
   border: 1px solid #7f1d1d;
@@ -39,10 +61,17 @@
   border-radius: 8px;
   padding: 10px 12px;
   font-weight: 600;
+  font-family: inherit;
+  font-size: inherit;
   cursor: pointer;
   text-align: left;
 }
 
-.dangerItem:hover {
+.dangerItem:hover:not(:disabled) {
   background: rgba(127, 29, 29, 0.13);
+}
+
+.dangerItem:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

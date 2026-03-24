@@ -5,9 +5,11 @@
 .chatLayout {
   --bg: #08090c;
   --border: rgba(255, 255, 255, 0.07);
+  --accent: #ff6f91;
+  --accent-soft: rgba(255, 111, 145, 0.12);
 
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 56px);
   overflow: hidden;
   background: var(--bg);
   position: relative;
@@ -28,28 +30,9 @@
   overflow: hidden;
 }
 
-/* ---- Mobile menu toggle button ---- */
-.chatLayout__menuBtn {
+/* ---- Mobile toolbar (New Chat + History) ---- */
+.chatLayout__mobileBar {
   display: none;
-  position: fixed;
-  top: 0.75rem;
-  left: 0.75rem;
-  z-index: 110;
-  width: 36px;
-  height: 36px;
-  border-radius: 0.6rem;
-  border: 1px solid var(--border);
-  background: rgba(18, 19, 26, 0.9);
-  color: rgba(255, 255, 255, 0.75);
-  cursor: pointer;
-  place-items: center;
-  backdrop-filter: blur(8px);
-  transition: background 0.12s, color 0.12s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.95);
-  }
 }
 
 /* ---- Mobile overlay ---- */
@@ -65,8 +48,46 @@
 /* ── Responsive ─────────────────────────────────────────────── */
 
 @media (max-width: 767px) {
-  .chatLayout__menuBtn {
-    display: grid;
+  .chatLayout {
+    flex-direction: column;
+  }
+
+  .chatLayout__mobileBar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(11, 12, 16, 0.95);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .chatLayout__mobileBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.82rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
   }
 
   .chatLayout__sidebar {
@@ -88,9 +109,10 @@
       display: block;
     }
   }
+}
 
-  .chatLayout__panel {
-    // Slight top padding to clear the menu button on mobile
-    padding-top: 3rem;
+@media (min-width: 1024px) {
+  .chatLayout {
+    height: calc(100vh - 64px);
   }
 }
