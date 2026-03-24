@@ -1,20 +1,34 @@
 import React, { useMemo, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { useCurrentUserQuery } from "../../features/auth/hooks/useAuth.js";
+import { useAppSelector } from "../../store/store.js";
+import { selectAuthToken } from "../../store/ui/uiSlice.js";
 import "./public-header.styles.scss";
 
-const publicNavLinks = [
+const guestLinks = [
   { id: "home", label: "Home", path: "/" },
   { id: "about", label: "About", path: "/about" },
   { id: "login", label: "Login", path: "/login", subtle: true },
   { id: "register", label: "Get Started", path: "/register", cta: true },
 ];
 
+const authedLinks = [
+  { id: "home", label: "Home", path: "/" },
+  { id: "dashboard", label: "Dashboard", path: "/dashboard" },
+  { id: "chat", label: "Chat", path: "/chat" },
+  { id: "about", label: "About", path: "/about" },
+];
+
 const PublicHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const token = useAppSelector(selectAuthToken);
+  const { data: user } = useCurrentUserQuery();
+  const isLoggedIn = Boolean(token && user);
 
-  const mobileLinks = useMemo(() => publicNavLinks, []);
+  const navLinks = isLoggedIn ? authedLinks : guestLinks;
+  const mobileLinks = useMemo(() => navLinks, [isLoggedIn]);
 
   const closeMenu = () => setIsMenuOpen(false);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
@@ -32,7 +46,7 @@ const PublicHeader = () => {
         </Link>
 
         <nav className="public-nav" aria-label="Public">
-          {publicNavLinks.map((link) => (
+          {navLinks.map((link) => (
             <NavLink
               key={link.id}
               to={link.path}
