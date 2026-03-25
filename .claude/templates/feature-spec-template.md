@@ -1,50 +1,76 @@
-/spec Admin Access Control Refactor
+description: Audit the repo and generate an implementation-ready feature spec saved to \_plan
+argument-hint: [feature request]
 
-Audit the current codebase and write an implementation-ready spec for fixing admin-only access.
+---
 
-Problem:
-The app does not appear to have a clearly structured admin-only account/access system. I want a clean setup where only true admin users can access the admin dashboard and admin-only APIs.
+You are creating an implementation-ready feature spec for this project.
 
-Requirements for the spec:
+Use the project's existing instructions, conventions, and engineering guidelines already established in the current context. Do not restate them unless directly relevant to the feature.
 
-- inspect the real repo first
-- use the existing `/spec` command rules and `.claude/templates/feature-spec-template.md`
-- do not generate implementation code
-- save the spec into `_plan/`
+Your job is to take the user's request and turn it into a concrete, repo-specific, build-ready spec.
 
-What the spec should cover:
+## Core behavior
 
-- current admin/auth structure in the repo
-- whether admin is based on `isAdmin`, `role`, or both
-- whether backend admin enforcement is reliable
-- whether frontend admin protection is centralized or scattered
-- whether sidebar/nav visibility logic matches backend authorization
-- any endpoints that are currently open but should probably be authenticated-only or admin-only
+1. Inspect the real repository first before writing the spec.
+2. Base the output on what actually exists in the repo.
+3. Do not invent files, routes, models, middleware, patterns, or architecture that are not present.
+4. If the repo uses mixed patterns, call that out clearly.
+5. Prefer concrete repo findings over generic recommendations.
+6. Do not generate implementation code.
+7. Save the final spec as a new markdown file inside `_plan/`.
+8. Use a kebab-case filename based on the feature name or best summary of the request.
+9. Use `.claude/templates/feature-spec-template.md` as the output structure.
 
-Desired end state:
+## What the user may provide
 
-- one clear source of truth for admin identity
-- only authenticated admins can access the admin dashboard
-- only authenticated admins can access admin APIs
-- frontend route protection should be centralized instead of handled inside pages
-- backend authorization should be the real enforcement layer
-- admin visibility in the UI should follow the same rule as backend authorization
-- auth and authorization should be clearly separated
-- the structure should be maintainable for future admin pages and routes
+The user may provide:
 
-In the spec, be concrete and repo-specific.
-Do not invent files or patterns that do not exist.
-If the repo has mixed patterns, call that out clearly.
-In File Impact, separate:
+- a feature name
+- a rough idea
+- a bug or product problem
+- a desired end state
+- an audit/refactor request
+- a UI, backend, auth, admin, API, database, or integration request
+
+If the request is vague or incomplete, do not block progress. Infer the most reasonable scope, clearly label assumptions, and continue.
+
+## Repo audit expectations
+
+When relevant, inspect and document:
+
+- current auth structure
+- current admin structure
+- whether admin identity is based on `isAdmin`, `role`, permissions, or mixed patterns
+- whether backend authorization is reliable
+- whether frontend route protection is centralized or scattered
+- whether nav/sidebar visibility matches backend authorization
+- whether any endpoints appear under-protected
+- whether auth and authorization are cleanly separated
+- risks around current user/data shape
+- migration concerns if patterns are mixed
+
+## File Impact rules
+
+In the spec, the File Impact section must be split into:
 
 - Files Confirmed To Exist
 - Files To Create
 - Files To Update
 
-Also include:
+Only place a file under “Files Confirmed To Exist” if it was actually confirmed in the repo.
 
-- risks around existing users/data shape
-- risks around mixed `isAdmin` and `role`
-- token vs DB-backed authorization concerns
-- test requirements for admin and non-admin flows
-- migration notes if the repo currently mixes admin patterns
+## Output requirements
+
+The spec must be:
+
+- repo-specific
+- implementation-ready
+- concrete
+- testable
+- scoped
+- readable
+- useful without generating code
+
+Use the structure from `.claude/templates/feature-spec-template.md`.
+
+Now inspect the repo, generate the spec, and save it into `_plan/`.

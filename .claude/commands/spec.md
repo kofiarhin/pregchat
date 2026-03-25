@@ -1,94 +1,133 @@
----
-description: Generate an implementation-ready feature spec and save it to _plan
+description: Generate an implementation-ready feature spec and save it to \_plan
 argument-hint: [feature request]
+
 ---
 
 You are creating an implementation-ready feature spec for this project.
+
+Use the project's existing instructions, conventions, and engineering guidelines already established in the current context. Do not restate them unless they are directly relevant to the feature.
+
+Your job is to take the user's request and turn it into a clear, practical, build-ready spec that is immediately useful for implementation.
 
 The user may provide:
 
 - a feature name
 - a rough idea
 - a sentence describing the desired outcome
-- a problem they want solved
+- a bug or product problem
 - a workflow they want supported
+- a refactor target
+- a UI, backend, auth, admin, API, database, or integration request
 
-Your job is to:
+If the request is vague, incomplete, or mixed, do not block progress. Infer the most reasonable scope, clearly label assumptions, and continue.
 
-1. understand the request
-2. derive a clean feature name if needed
-3. review project context
-4. use `.claude/templates/feature-spec-template.md` as the required output structure
-5. generate the feature spec
-6. save it to `_plan/<kebab-case-feature-name>.md`
+## Instructions
 
-## Read first
+1. Interpret the request as a real product or engineering task.
+2. Produce a spec that is implementation-ready, practical, and clearly scoped.
+3. Optimize for execution, not theory.
+4. Include enough detail that coding can begin without rethinking the requirement from scratch.
+5. Keep wording crisp, concrete, and low-noise.
+6. Prefer plain English over jargon.
+7. Include both product behavior and technical implications when useful.
+8. If the request touches auth, roles, permissions, routing, data flow, APIs, UI states, or persistence, explicitly cover them.
+9. If the request implies validation, loading, empty, error, unauthorized, forbidden, duplicate-action, or failure states, include them.
+10. Separate required behavior from assumptions.
+11. Avoid inventing unnecessary complexity.
+12. Save the spec as a new markdown file inside `_plan/`.
+13. Use a kebab-case filename based on the feature name or best summary of the request.
 
-Before writing, review:
+## Output format
 
-- `pregchat-spec.md`
-- `AGENTS.md`
-- `CLAUDE.md`
-- `.claude/templates/feature-spec-template.md`
-- relevant files in `client/` and `server/`
+Write the spec in markdown using exactly this structure:
 
-If the repo differs from the master spec, prefer the real repo structure.
+# [Feature Title]
 
-## Naming rules
+## Summary
 
-Choose a feature name that:
+A short paragraph explaining what is being built or changed and why.
 
-- reflects the main user-facing capability
-- is concise
-- is implementation-friendly
-- is usually 2 to 5 words
+## Goal
 
-If the user input is already a clean feature name, use it.
-If not, infer a strong feature name from the intended outcome.
+What success looks like.
 
-Convert the final feature name to kebab-case and save to:
+## Non-Goals
 
+What is explicitly out of scope for this task.
+
+## Problem
+
+What problem this feature solves.
+
+## Users / Actors
+
+Who interacts with this feature.
+
+## Core Requirements
+
+A numbered list of the required behaviors.
+
+## User Flows
+
+Step-by-step flows for the main scenarios.
+
+## Functional Details
+
+Concrete behavior grouped by area as needed, such as:
+
+- UI / pages / components
+- routing / navigation
+- authentication / authorization
+- backend behavior
+- API endpoints
+- validation
+- database changes
+- notifications
+- analytics
+- integrations
+
+Only include sections that are relevant to the request.
+
+## States and Edge Cases
+
+List important states, edge cases, and failure conditions.
+
+## Technical Notes
+
+Important implementation guidance, dependencies, constraints, and architecture notes relevant to this feature.
+
+## Acceptance Criteria
+
+Use a checklist with concrete, testable outcomes.
+
+## Open Questions
+
+List only true unknowns that still need confirmation.
+If there are none, say:
+
+- None at this stage.
+
+## Assumptions
+
+List any assumptions made due to missing detail.
+If there are none, say:
+
+- None.
+
+## File Naming
+
+Use this pattern for the saved spec file:
 `_plan/<feature-name>.md`
 
-If `_plan/` does not exist, create it.
+## Quality Bar
 
-If a matching feature file already exists and the request clearly refers to the same feature, update it.
-Otherwise, create a more specific filename.
+The spec must be:
 
-## Generation rules
+- specific
+- implementation-ready
+- testable
+- scoped
+- readable
+- reusable across projects
 
-- Follow `.claude/templates/feature-spec-template.md`
-- Fill every section with concrete implementation details
-- Match the current repo architecture
-- Prefer decisions over vague options
-- Keep it practical and build-ready
-- Follow the actual folder structure, styling system, data-fetching patterns, and feature organization already established in the repository
-- Only fall back to general defaults when the repo does not already establish a pattern
-- Respect the conventions documented in `CLAUDE.md`
-- In `File Impact`, always separate:
-  - `Files Confirmed To Exist`
-  - `Files To Create`
-  - `Files To Update`
-
-## Accuracy rules
-
-- Do not invent existing files, hooks, routes, models, components, services, utilities, fallback logic, patterns, or stylesheets
-- Only reference an existing file, hook, route, model, component, service, or pattern if it was explicitly found during repo review
-- If something was not explicitly found, describe the requirement generically or place it under `Files To Create`
-- Never place an unverified file under `Files Confirmed To Exist` or `Files To Update`
-- Match the repo's real structure exactly
-- Do not imply an existing feature pattern, query key shape, storage pattern, or architecture convention unless it was explicitly found in the repo
-- Do not create new folder conventions unless the plan explicitly requires them or the repo already uses them
-- Follow the styling system explicitly confirmed in the repo
-- If the repo uses SCSS, do not propose Tailwind
-- If the repo uses Tailwind, do not propose SCSS
-- If the styling system is not explicitly confirmed, describe styling generically instead of inventing a new styling setup
-
-## Final response after saving
-
-Return:
-
-- Feature Name
-- Saved Path
-- Short Summary
-- Immediate Next Build Step
+Now generate the spec based on the user's request and save it to `_plan/`.
