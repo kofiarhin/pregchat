@@ -1,166 +1,50 @@
-# Feature Name
+/spec Admin Access Control Refactor
 
-## Summary
+Audit the current codebase and write an implementation-ready spec for fixing admin-only access.
 
-[One short paragraph describing what the feature does, who it helps, and why it matters now.]
+Problem:
+The app does not appear to have a clearly structured admin-only account/access system. I want a clean setup where only true admin users can access the admin dashboard and admin-only APIs.
 
-## Goal
+Requirements for the spec:
 
-- [Primary outcome this feature should achieve]
+- inspect the real repo first
+- use the existing `/spec` command rules and `.claude/templates/feature-spec-template.md`
+- do not generate implementation code
+- save the spec into `_plan/`
 
-## Problem Statement
+What the spec should cover:
 
-- [What user or business problem this solves]
-- [Why the current experience is not enough]
-- [What breaks, slows users down, or creates friction today]
+- current admin/auth structure in the repo
+- whether admin is based on `isAdmin`, `role`, or both
+- whether backend admin enforcement is reliable
+- whether frontend admin protection is centralized or scattered
+- whether sidebar/nav visibility logic matches backend authorization
+- any endpoints that are currently open but should probably be authenticated-only or admin-only
 
-## User Stories
+Desired end state:
 
-- As a [user type], I want to [action], so that [outcome].
-- As a [user type], I want to [action], so that [outcome].
+- one clear source of truth for admin identity
+- only authenticated admins can access the admin dashboard
+- only authenticated admins can access admin APIs
+- frontend route protection should be centralized instead of handled inside pages
+- backend authorization should be the real enforcement layer
+- admin visibility in the UI should follow the same rule as backend authorization
+- auth and authorization should be clearly separated
+- the structure should be maintainable for future admin pages and routes
 
-## Scope
+In the spec, be concrete and repo-specific.
+Do not invent files or patterns that do not exist.
+If the repo has mixed patterns, call that out clearly.
+In File Impact, separate:
 
-### In Scope
+- Files Confirmed To Exist
+- Files To Create
+- Files To Update
 
-- [Included behavior]
-- [Included flow]
-- [Included constraints]
+Also include:
 
-### Out of Scope
-
-- [Explicitly excluded item]
-- [Future enhancement not part of this feature]
-
-## UX/UI Requirements
-
-- [Page, component, or flow impacted]
-- [Expected interaction behavior]
-- [Loading, empty, success, and error states]
-- [Responsive requirements]
-- [Accessibility requirements]
-
-## Frontend Requirements
-
-- [Pages to create/update]
-- [Components to create/update]
-- [Local state changes]
-- [Redux impact, if any]
-- [TanStack Query / hooks / services usage]
-- [Routing changes]
-
-## Backend Requirements
-
-- [Controllers to create/update]
-- [Routes to create/update]
-- [Business logic needed]
-- [Middleware / auth / permission impact]
-- [Background jobs or integrations if needed]
-
-## Data Model Changes
-
-- [Model/schema affected]
-- [New fields]
-- [Updated fields]
-- [Indexes/constraints]
-- [Migration or seed impact]
-
-## API Changes
-
-### New Endpoints
-
-- `METHOD /api/...`
-  - Purpose:
-  - Auth:
-  - Request:
-  - Response:
-  - Error cases:
-
-### Updated Endpoints
-
-- `METHOD /api/...`
-  - Change:
-  - Impact:
-  - Error cases:
-
-## Validation Rules
-
-- [Input validation]
-- [Boundary rules]
-- [Authorization checks]
-- [Data integrity rules]
-- [Frontend validation requirements]
-- [Backend validation requirements]
-
-## Edge Cases
-
-- [Edge case]
-- [Failure case]
-- [Empty state]
-- [Stale/deleted resource case]
-- [Concurrency/race-condition concern if relevant]
-
-## Security / Authorization
-
-- [Who can access this feature]
-- [Ownership/role checks]
-- [Sensitive data considerations]
-- [Abuse/rate-limit considerations if relevant]
-
-## Testing Requirements
-
-### Frontend
-
-- [Component behavior test]
-- [Form validation test]
-- [Loading/empty/error state test]
-- [User interaction flow test]
-
-### Backend
-
-- [Route/controller test]
-- [Validation test]
-- [Auth/permission test]
-- [Failure-path test]
-- [Edge case test]
-
-## File Impact
-
-### Files Confirmed To Exist
-
-- [Only list files confirmed from the repo]
-
-### Files To Create
-
-- `client/src/...`
-- `server/...`
-
-### Files To Update
-
-- [Only existing files confirmed in the repo]
-
-## Step-by-Step Implementation Plan
-
-1. [Step 1]
-2. [Step 2]
-3. [Step 3]
-4. [Step 4]
-
-## Acceptance Criteria
-
-- [Clear success condition]
-- [Clear success condition]
-- [Clear success condition]
-
-## Risks / Unknowns
-
-- [Open technical concern]
-- [Dependency or uncertainty]
-
-## Notes
-
-- [Any implementation notes, assumptions, or follow-up considerations]
-
-##
-
-When repository conventions conflict with generic coding preferences, follow the repository conventions for this project.
+- risks around existing users/data shape
+- risks around mixed `isAdmin` and `role`
+- token vs DB-backed authorization concerns
+- test requirements for admin and non-admin flows
+- migration notes if the repo currently mixes admin patterns

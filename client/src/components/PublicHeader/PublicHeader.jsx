@@ -13,10 +13,16 @@ const guestLinks = [
   { id: "register", label: "Get Started", path: "/register", cta: true },
 ];
 
-const authedLinks = [
+const userLinks = [
   { id: "home", label: "Home", path: "/" },
   { id: "dashboard", label: "Dashboard", path: "/dashboard" },
   { id: "chat", label: "Chat", path: "/chat" },
+  { id: "about", label: "About", path: "/about" },
+];
+
+const adminLinks = [
+  { id: "home", label: "Home", path: "/" },
+  { id: "admin", label: "Admin Dashboard", path: "/admin" },
   { id: "about", label: "About", path: "/about" },
 ];
 
@@ -27,7 +33,9 @@ const PublicHeader = () => {
   const { data: user } = useCurrentUserQuery();
   const isLoggedIn = Boolean(token && user);
 
-  const navLinks = isLoggedIn ? authedLinks : guestLinks;
+  const navLinks = isLoggedIn
+    ? (user?.isAdmin === true ? adminLinks : userLinks)
+    : guestLinks;
   const mobileLinks = useMemo(() => navLinks, [isLoggedIn]);
 
   const closeMenu = () => setIsMenuOpen(false);

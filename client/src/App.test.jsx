@@ -39,14 +39,26 @@ vi.mock("./features/auth/hooks/useAuth.js", () => ({
     isError: false,
     error: null,
   }),
-  useLogoutMutation: () => ({
-    mutate: logoutMutate,
+  useLogoutMutation: (options) => ({
+    mutate: () => {
+      logoutMutate();
+      options?.onSuccess?.();
+    },
     isPending: false,
   }),
 }));
 
 vi.mock("./features/pregnancy/hooks/usePregnancy.js", () => ({
   useTodayPregnancyQuery: () => ({ data: null, isLoading: false, error: null }),
+  usePregnancyProfileQuery: () => ({ data: null, isLoading: false, error: null }),
+  usePregnancyDayQuery: () => ({ data: null, isLoading: false, error: null }),
+  useUpdatePregnancyProfileMutation: () => ({ mutate: vi.fn(), isPending: false }),
+  useResetPregnancyProfileMutation: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
+vi.mock("./context/CartContext.jsx", () => ({
+  useCart: () => ({ cartItems: [], cartCount: 0, addToCart: vi.fn(), removeFromCart: vi.fn(), clearCart: vi.fn() }),
+  CartProvider: ({ children }) => children,
 }));
 
 const createTestStore = (uiState) =>
@@ -195,7 +207,6 @@ describe("PublicOnlyRoute redirect for authenticated users", () => {
     renderApp("/login", { auth: { token: "fake-token", promptLogin: false } });
 
     // PublicOnlyRoute should redirect to /onboarding because no onboardingCompletedAt
-    // Onboarding page renders — check for an onboarding heading or the step indicator
     // (The exact text depends on appContent.json; just verify login page is NOT shown)
     expect(
       screen.queryByRole("heading", { name: /welcome back/i })
@@ -216,5 +227,98 @@ describe("PublicOnlyRoute redirect for authenticated users", () => {
     expect(
       screen.queryByRole("button", { name: /register/i })
     ).not.toBeInTheDocument();
+  });
+
+  it("redirects authenticated admin to /admin when visiting /login", () => {
+    mockCurrentUser = {
+      _id: "admin1",
+      name: "Admin",
+      isAdmin: true,
+      onboardingCompletedAt: null,
+    };
+
+    renderApp("/login", { auth: { token: "fake-token", promptLogin: false } });
+
+    // PublicOnlyRoute should redirect admin to /admin, not /onboarding or /dashboard
+    // Login page should NOT be shown
+    expect(
+      screen.queryByRole("heading", { name: /welcome back/i })
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("Admin portal isolation", () => {
+  const adminUser = {
+    _id: "admin1",
+    name: "Admin User",
+    isAdmin: true,
+    onboardingCompletedAt: null,
+  };
+
+  const authedState = { auth: { token: "fake-token", promptLogin: false } };
+
+  it("admin accessing /admin sees admin dashboard content", () => {
+    mockCurrentUser = adminUser;
+    renderApp("/admin", authedState);
+
+    // AdminLayout renders with "PregChat" brand and "Admin" accent
+    expect(screen.getByText("PregChat")).toBeInTheDocument();
+    expect(screen.getByText("Admin")).toBeInTheDocument();
+  });
+
+  it("admin accessing /dashboard is redirected away from user portal", () => {
+    mockCurrentUser = adminUser;
+    renderApp("/dashboard", authedState);
+
+    // UserOnlyRoute should redirect admin to /admin
+    // The user dashboard should NOT render
+    // Instead admin layout should be shown
+    expect(screen.getByText("PregChat")).toBeInTheDocument();
+    expect(screen.getByText("Admin")).toBeInTheDocument();
+  });
+
+  it("admin accessing /chat is redirected away from user portal", () => {
+    mockCurrentUser = adminUser;
+    renderApp("/chat", authedState);
+
+    // UserOnlyRoute should redirect admin to /admin
+    expect(screen.getByText("PregChat")).toBeInTheDocument();
+    expect(screen.getByText("Admin")).toBeInTheDocument();
+  });
+
+  it("non-admin accessing /admin is redirected to /dashboard", () => {
+    mockCurrentUser = {
+      _id: "1",
+      name: "Regular User",
+      isAdmin: false,
+      onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
+    };
+    renderApp("/admin", authedState);
+
+    // AdminRoute should redirect non-admin to /dashboard
+    // Admin layout brand should NOT be shown
+    expect(screen.queryByText("Admin")).not.toBeInTheDocument();
+  });
+
+  it("catch-all redirects admin to /admin", () => {
+    mockCurrentUser = adminUser;
+    renderApp("/nonexistent-route", authedState);
+
+    // Catch-all should redirect admin to /admin
+    expect(screen.getByText("PregChat")).toBeInTheDocument();
+    expect(screen.getByText("Admin")).toBeInTheDocument();
+  });
+
+  it("catch-all redirects non-admin to /dashboard", () => {
+    mockCurrentUser = {
+      _id: "1",
+      name: "Regular User",
+      isAdmin: false,
+      onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
+    };
+    renderApp("/nonexistent-route", authedState);
+
+    // Catch-all should redirect user to /dashboard
+    expect(screen.queryByText("Admin")).not.toBeInTheDocument();
   });
 });

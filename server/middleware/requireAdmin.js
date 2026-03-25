@@ -3,9 +3,7 @@ module.exports = (req, res, next) => {
     return res.status(403).json({ message: "Admin only" });
   }
 
-  const isAdmin = req.user.isAdmin === true || req.user.role === "admin";
-
-  if (!isAdmin) {
+  if (req.user.isAdmin !== true) {
     return res.status(403).json({ message: "Admin only" });
   }
 

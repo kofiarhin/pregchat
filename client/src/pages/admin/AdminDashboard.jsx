@@ -1,8 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import content from "../../content/appContent.json";
 import styles from "./adminDashboard.module.scss";
-import { useCurrentUserQuery } from "../../features/auth/hooks/useAuth.js";
 import { useAdminUsersQuery } from "../../features/admin/hooks/useAdminUsersQuery.js";
 import { useAdminOrdersQuery } from "../../features/admin/hooks/useAdminOrdersQuery.js";
 import { useUpdateOrderStatusMutation } from "../../features/admin/hooks/useUpdateOrderStatusMutation.js";
@@ -48,12 +46,6 @@ const formatCurrency = (value) => {
 
 const AdminDashboard = () => {
   const adminContent = content.admin;
-  const { data: currentUser, isLoading: userLoading } = useCurrentUserQuery();
-  const isAdmin = useMemo(
-    () => currentUser?.isAdmin === true || currentUser?.role === "admin",
-    [currentUser]
-  );
-
   const [activeTab, setActiveTab] = useState("users");
   const userTabId = "admin-tab-users";
   const orderTabId = "admin-tab-orders";
@@ -87,13 +79,11 @@ const AdminDashboard = () => {
   }, [userLimit]);
 
   const usersQuery = useAdminUsersQuery(
-    { q: userSearch, page: userPage, limit: userLimit },
-    { enabled: isAdmin }
+    { q: userSearch, page: userPage, limit: userLimit }
   );
 
   const ordersQuery = useAdminOrdersQuery(
-    { status: orderStatus === "all" ? "" : orderStatus, page: orderPage, limit: orderLimit },
-    { enabled: isAdmin }
+    { status: orderStatus === "all" ? "" : orderStatus, page: orderPage, limit: orderLimit }
   );
 
   useEffect(() => {
@@ -124,19 +114,6 @@ const AdminDashboard = () => {
       }));
     },
   });
-
-  if (userLoading) {
-    return (
-      <div className={styles.loadingState} aria-busy="true">
-        <span className={styles.spinner} aria-hidden="true" />
-        <p>{adminContent.users.loading}</p>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return <Navigate to="/dashboard" replace />;
-  }
 
   const { users, orders, tabs, pagination, title, subtitle, disclaimer } = adminContent;
   const statusLabels = orders.statusLabels || {};

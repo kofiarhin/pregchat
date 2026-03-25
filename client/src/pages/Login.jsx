@@ -11,10 +11,15 @@ const Login = () => {
   });
 
   const loginMutation = useLoginMutation({
-    onSuccess: ({ user }) =>
-      navigate(user?.onboardingCompletedAt ? "/dashboard" : "/onboarding", {
-        replace: true,
-      }),
+    onSuccess: ({ user }) => {
+      if (user?.isAdmin === true) {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate(user?.onboardingCompletedAt ? "/dashboard" : "/onboarding", {
+          replace: true,
+        });
+      }
+    },
   });
 
   const handleChange = (event) => {

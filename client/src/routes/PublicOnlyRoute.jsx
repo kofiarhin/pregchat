@@ -8,6 +8,9 @@ const PublicOnlyRoute = ({ isAuthenticated, currentUser }) => {
   }
 
   if (isAuthenticated) {
+    if (currentUser?.isAdmin === true) {
+      return <Navigate to="/admin" replace />;
+    }
     const dest = currentUser?.onboardingCompletedAt ? "/dashboard" : "/onboarding";
     return <Navigate to={dest} replace />;
   }
